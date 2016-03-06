@@ -4,11 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Paper_Portal.Helpers;
 using Paper_Portal.Models;
 using Paper_Portal.Services;
 
@@ -56,7 +58,7 @@ namespace Paper_Portal
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public async void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, RoleManager<IdentityRole> roleManager)
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -98,6 +100,8 @@ namespace Paper_Portal
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            await RoleHelper.EnsureRolesCreated(roleManager);
         }
 
         // Entry point for the application.
