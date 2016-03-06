@@ -9,6 +9,7 @@ using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Rendering;
 using Microsoft.Data.Entity;
 using Microsoft.Extensions.Logging;
+using Paper_Portal.Helpers;
 using Paper_Portal.Models;
 using Paper_Portal.Services;
 using Paper_Portal.ViewModels.Account;
@@ -108,6 +109,8 @@ namespace Paper_Portal.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    //TODO: Add roles
+                    await _userManager.AddToRoleAsync(user, RoleHelper.Admin);
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                     // Send an email with this link
                     //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
