@@ -1,17 +1,27 @@
+using System.IO;
 using System.Linq;
+using Microsoft.AspNet.Authorization;
+using Microsoft.AspNet.FileProviders;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Rendering;
 using Microsoft.Data.Entity;
+using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Net.Http.Headers;
+using Paper_Portal.Helpers;
 using Paper_Portal.Models;
+using Paper_Portal.ViewModels.Papers;
 
 namespace Portal.Controllers
 {
+    [Authorize]
     public class PapersController : Controller
     {
         private ApplicationDbContext _context;
+        private IApplicationEnvironment _hostingEnvironment;
 
-        public PapersController(ApplicationDbContext context)
+        public PapersController(IApplicationEnvironment hostingEnvironment, ApplicationDbContext context)
         {
+            _hostingEnvironment = hostingEnvironment;
             _context = context;    
         }
 
@@ -42,25 +52,38 @@ namespace Portal.Controllers
         // GET: Papers/Create
         public IActionResult Create()
         {
-            ViewData["DownloaderId"] = new SelectList(_context.Users, "Id", "Downloader");
-            ViewData["UploaderId"] = new SelectList(_context.Users, "Id", "Uploader");
-            return View();
+            //ViewData["DownloaderId"] = new SelectList(_context.Users, "Id", "Downloader");
+            //ViewData["UploaderId"] = new SelectList(_context.Users, "Id", "Uploader");
+            return View(new CreateViewModel());
         }
 
         // POST: Papers/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Paper paper)
+        public string Create(CreateViewModel model)
         {
-            if (ModelState.IsValid)
+            var fileName = ContentDispositionHeaderValue.Parse(model.File.ContentDisposition).FileName.Trim('"');
+            var filePath = _hostingEnvironment.ApplicationBasePath + "\\Temp\\" + fileName;
+            var output = _hostingEnvironment.ApplicationBasePath + "\\Uploads\\" + fileName;
+            
+            bool isValid = PDF.validate(model.File);
+            if (!isValid)
             {
-                _context.Paper.Add(paper);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
+                ModelState.AddModelError("File", "File is not valid");
             }
-            ViewData["DownloaderId"] = new SelectList(_context.Users, "Id", "Downloader", paper.DownloaderId);
-            ViewData["UploaderId"] = new SelectList(_context.Users, "Id", "Uploader", paper.UploaderId);
-            return View(paper);
+            PDF.AddQRCode("testing", model.File.OpenReadStream(), output);
+
+            return output;
+            //Paper paper = new Paper();
+            //if (ModelState.IsValid)
+            //{
+            //    _context.Paper.Add(paper);
+            //    _context.SaveChanges();
+            //    return RedirectToAction("Index");
+            //}
+            //ViewData["DownloaderId"] = new SelectList(_context.Users, "Id", "Downloader", paper.DownloaderId);
+            //ViewData["UploaderId"] = new SelectList(_context.Users, "Id", "Uploader", paper.UploaderId);
+            //return View(paper);
         }
 
         // GET: Papers/Edit/5
