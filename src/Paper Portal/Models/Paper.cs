@@ -12,6 +12,7 @@ namespace Paper_Portal.Models
         public int Copies { get; set; }
         public DateTime Due { get; set; }
         public string EncKey { get; set; }
+        public string FilePath { get; set; }
 
         public string UploaderId { get; set; }
         public ApplicationUser Uploader { get; set; }
