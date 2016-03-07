@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
 using Microsoft.Data.Entity.Metadata;
+using Paper_Portal.Models;
 
 namespace Paper_Portal.Models
 {
@@ -29,5 +30,6 @@ namespace Paper_Portal.Models
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+        public DbSet<Paper> Paper { get; set; }
     }
 }
