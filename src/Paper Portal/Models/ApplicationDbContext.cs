@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.Data.Entity;
+using Microsoft.Data.Entity.Metadata;
 
 namespace Paper_Portal.Models
 {
@@ -15,6 +16,18 @@ namespace Paper_Portal.Models
             // Customize the ASP.NET Identity model and override the defaults if needed.
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
+            builder.Entity<Paper>()
+                .HasOne(p => p.Uploader)
+                .WithMany(u => u.Papers)
+                .HasForeignKey(p => p.UploaderId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Paper>()
+                .HasOne(p => p.Downloader)
+                .WithMany(u => u.Papers)
+                .HasForeignKey(p => p.DownloaderId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
