@@ -25,8 +25,7 @@ namespace Paper_Portal.Migrations
                     Due = table.Column<DateTime>(nullable: false),
                     EncKey = table.Column<string>(nullable: true),
                     Title = table.Column<string>(nullable: true),
-                    UploaderId = table.Column<string>(nullable: false),
-                    UploaderId1 = table.Column<string>(nullable: true)
+                    UploaderId = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -38,11 +37,11 @@ namespace Paper_Portal.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Paper_ApplicationUser_UploaderId1",
-                        column: x => x.UploaderId1,
+                        name: "FK_Paper_ApplicationUser_UploaderId",
+                        column: x => x.UploaderId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
             migrationBuilder.AlterColumn<string>(
                 name: "UserId",

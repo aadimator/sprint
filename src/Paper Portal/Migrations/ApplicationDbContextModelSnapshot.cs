@@ -164,8 +164,6 @@ namespace Paper_Portal.Migrations
                     b.Property<string>("UploaderId")
                         .IsRequired();
 
-                    b.Property<string>("UploaderId1");
-
                     b.HasKey("PaperId");
                 });
 
@@ -209,7 +207,7 @@ namespace Paper_Portal.Migrations
 
                     b.HasOne("Paper_Portal.Models.ApplicationUser")
                         .WithMany()
-                        .HasForeignKey("UploaderId1");
+                        .HasForeignKey("UploaderId");
                 });
         }
     }
