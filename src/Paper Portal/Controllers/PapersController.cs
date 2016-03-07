@@ -60,20 +60,22 @@ namespace Portal.Controllers
         // POST: Papers/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public string Create(CreateViewModel model)
+        public IActionResult Create(CreateViewModel model)
         {
+            string outputPath = _hostingEnvironment.ApplicationBasePath + "\\Uploads";
             var fileName = ContentDispositionHeaderValue.Parse(model.File.ContentDisposition).FileName.Trim('"');
-            var filePath = _hostingEnvironment.ApplicationBasePath + "\\Temp\\" + fileName;
-            var output = _hostingEnvironment.ApplicationBasePath + "\\Uploads\\" + fileName;
+            string fullPath = outputPath + "\\" + fileName;
+            
             
             bool isValid = PDF.validate(model.File);
             if (!isValid)
             {
                 ModelState.AddModelError("File", "File is not valid");
             }
-            PDF.AddQRCode("testing", model.File.OpenReadStream(), output);
 
-            return output;
+            PDF.AddQRCode(User.Identity.Name , model.File.OpenReadStream(), fullPath);
+
+            return View();
             //Paper paper = new Paper();
             //if (ModelState.IsValid)
             //{
