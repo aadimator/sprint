@@ -19,8 +19,8 @@ namespace Paper_Portal.Models
             builder.Entity<Paper>()
                 .HasOne(p => p.Uploader)
                 .WithMany(u => u.Papers)
-                .HasForeignKey(p => p.UploaderId)
-                .IsRequired()
+                //.HasForeignKey(p => p.UploaderId)
+                .IsRequired(true)
                 .OnDelete(DeleteBehavior.Restrict);
             builder.Entity<Paper>()
                 .HasOne(p => p.Downloader)

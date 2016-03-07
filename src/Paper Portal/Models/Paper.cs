@@ -18,6 +18,5 @@ namespace Paper_Portal.Models
 
         public string DownloaderId { get; set; }
         public ApplicationUser Downloader { get; set; }
-
     }
 }
