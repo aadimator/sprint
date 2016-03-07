@@ -8,7 +8,7 @@ using Paper_Portal.Models;
 namespace Paper_Portal.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20160307025950_InitialPaper")]
+    [Migration("20160307040501_InitialPaper")]
     partial class InitialPaper
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -160,12 +160,12 @@ namespace Paper_Portal.Migrations
 
                     b.Property<string>("EncKey");
 
+                    b.Property<string>("FilePath");
+
                     b.Property<string>("Title");
 
                     b.Property<string>("UploaderId")
                         .IsRequired();
-
-                    b.Property<string>("UploaderId1");
 
                     b.HasKey("PaperId");
                 });
@@ -210,7 +210,7 @@ namespace Paper_Portal.Migrations
 
                     b.HasOne("Paper_Portal.Models.ApplicationUser")
                         .WithMany()
-                        .HasForeignKey("UploaderId1");
+                        .HasForeignKey("UploaderId");
                 });
         }
     }
