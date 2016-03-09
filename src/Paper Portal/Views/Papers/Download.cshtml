@@ -1,13 +1,25 @@
 @model Paper_Portal.Models.Paper
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Download";
 }
 
-<h2>Delete</h2>
+<h2>Download</h2>
 
-<h3>Are you sure you want to delete this?</h3>
+@{
+
+    if (ViewBag.Verified == "False")
+    {
+        <h3>Verfication Unsuccessful!</h3>
+        <h4>File Can't be downloaded.</h4>
+        <h5>It has been tampered with.</h5>
+
+        <a asp-action="Index">Back to List</a>
+    }
+    else
+    {
 <div>
+    <h3>Verfication Successful!</h3>
     <h4>Paper</h4>
     <hr />
     <dl class="dl-horizontal">
@@ -24,24 +36,6 @@
             @Html.DisplayFor(model => model.Due)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.EncKey)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.EncKey)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.FileName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.FileName)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Hash)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Hash)
-        </dd>
-        <dt>
             @Html.DisplayNameFor(model => model.Instructor)
         </dt>
         <dd>
@@ -49,10 +43,12 @@
         </dd>
     </dl>
     
-    <form asp-action="Delete">
+    <form asp-action="Download">
         <div class="form-actions no-color">
-            <input type="submit" value="Delete" class="btn btn-default" /> |
+            <input type="submit" value="Download" class="btn btn-default" /> |
             <a asp-action="Index">Back to List</a>
         </div>
     </form>
 </div>
+        }
+    }

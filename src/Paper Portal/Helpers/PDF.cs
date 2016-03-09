@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Text;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using Microsoft.AspNet.Http;
@@ -7,12 +8,60 @@ namespace Paper_Portal.Helpers
 {
     class PDF
     {
-        public static bool validate(IFormFile file)
+        public string Error { get; set; }
+        public string EncKey { get; set; }
+        public string Hash { get; set; }
+
+        public bool upload(IFormFile InputFile, string FilePath)
+        {
+            if (! validate(InputFile))
+            {
+                Error = "File couldn't be Validated!";
+                return false;
+            }
+            if (! encrypt(InputFile.OpenReadStream(), FilePath))
+            {
+                Error = "File couldn't be Encrypted!";
+                return false;
+            }
+            return true;
+        }
+
+        public Stream download(string filePath, string encKey)
+        {
+            
+            return decrypt(filePath, encKey); ;
+        }
+
+        public bool Verify (string originalHash, string filePath)
+        {
+            var encrypt = new Encrypt();
+            string fileHash = encrypt.ComputeHash(filePath);
+            return encrypt.VerifyHash(originalHash, fileHash);
+        }
+
+        private bool validate(IFormFile file)
         {
             return true;
         }
 
-        public static void AddQRCode(string msg, Stream input, string output)
+        private bool encrypt (Stream input, string output)
+        {
+            Encrypt encrypt = new Encrypt();
+            encrypt.EncryptFile(input, output);
+            EncKey = encrypt.Password;
+            Hash = encrypt.ComputeHash(output);
+            return true;
+        }
+        
+        private Stream decrypt (string input, string encKey)
+        {
+            var encrypt = new Encrypt();
+            encrypt.Password = encKey;
+            return encrypt.DecryptFile(input, encKey);
+        }
+
+        private void AddQRCode(string msg, Stream input, string output)
         {
             const int MARGIN = 5;
 

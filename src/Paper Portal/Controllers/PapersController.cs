@@ -1,34 +1,35 @@
-using System.IO;
 using System.Linq;
-using Microsoft.AspNet.Authorization;
-using Microsoft.AspNet.FileProviders;
+using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Rendering;
 using Microsoft.Data.Entity;
 using Microsoft.Extensions.PlatformAbstractions;
-using Microsoft.Net.Http.Headers;
+using Microsoft.AspNet.Identity;
+using System.Security.Claims;
 using Paper_Portal.Helpers;
 using Paper_Portal.Models;
 using Paper_Portal.ViewModels.Papers;
+using Microsoft.Net.Http.Headers;
 
 namespace Portal.Controllers
 {
-    [Authorize]
     public class PapersController : Controller
     {
         private ApplicationDbContext _context;
-        private IApplicationEnvironment _hostingEnvironment;
+        private IApplicationEnvironment _appEnvironment;
 
-        public PapersController(IApplicationEnvironment hostingEnvironment, ApplicationDbContext context)
+        public string UploadPath { get { return _appEnvironment.ApplicationBasePath + "\\Uploads\\"; } }
+
+        public PapersController(ApplicationDbContext context, IApplicationEnvironment environment)
         {
-            _hostingEnvironment = hostingEnvironment;
+            _appEnvironment = environment;
             _context = context;    
         }
 
         // GET: Papers
         public IActionResult Index()
         {
-            var applicationDbContext = _context.Paper.Include(p => p.Downloader).Include(p => p.Uploader);
+            var applicationDbContext = _context.Paper.Include(p => p.Uploader);
             return View(applicationDbContext.ToList());
         }
 
@@ -52,8 +53,6 @@ namespace Portal.Controllers
         // GET: Papers/Create
         public IActionResult Create()
         {
-            //ViewData["DownloaderId"] = new SelectList(_context.Users, "Id", "Downloader");
-            //ViewData["UploaderId"] = new SelectList(_context.Users, "Id", "Uploader");
             return View(new CreateViewModel());
         }
 
@@ -62,30 +61,27 @@ namespace Portal.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(CreateViewModel model)
         {
-            string outputPath = _hostingEnvironment.ApplicationBasePath + "\\Uploads";
-            var fileName = ContentDispositionHeaderValue.Parse(model.File.ContentDisposition).FileName.Trim('"');
-            string fullPath = outputPath + "\\" + fileName;
-            
-            
-            bool isValid = PDF.validate(model.File);
-            if (!isValid)
+            string filePath = UploadPath + model.FileName;
+            var pdf = new PDF();
+            pdf.upload(model.File, filePath);
+
+            Paper paper = new Paper();
+            paper.Copies = model.Copies;
+            paper.Due = model.Due;
+            paper.Instructor = model.Instructor;
+            paper.FileName = model.FileName;
+            paper.EncKey = pdf.EncKey;
+            paper.Hash = pdf.Hash;
+            paper.UploaderId = User.GetUserId();
+
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError("File", "File is not valid");
+                _context.Paper.Add(paper);
+                _context.SaveChanges();
+                return RedirectToAction("Index");
             }
-
-            PDF.AddQRCode(User.Identity.Name , model.File.OpenReadStream(), fullPath);
-
-            return View();
-            //Paper paper = new Paper();
-            //if (ModelState.IsValid)
-            //{
-            //    _context.Paper.Add(paper);
-            //    _context.SaveChanges();
-            //    return RedirectToAction("Index");
-            //}
-            //ViewData["DownloaderId"] = new SelectList(_context.Users, "Id", "Downloader", paper.DownloaderId);
-            //ViewData["UploaderId"] = new SelectList(_context.Users, "Id", "Uploader", paper.UploaderId);
-            //return View(paper);
+            ViewData["UploaderId"] = new SelectList(_context.Users, "Id", "Uploader", paper.UploaderId);
+            return View(paper);
         }
 
         // GET: Papers/Edit/5
@@ -101,7 +97,6 @@ namespace Portal.Controllers
             {
                 return HttpNotFound();
             }
-            ViewData["DownloaderId"] = new SelectList(_context.Users, "Id", "Downloader", paper.DownloaderId);
             ViewData["UploaderId"] = new SelectList(_context.Users, "Id", "Uploader", paper.UploaderId);
             return View(paper);
         }
@@ -117,7 +112,6 @@ namespace Portal.Controllers
                 _context.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewData["DownloaderId"] = new SelectList(_context.Users, "Id", "Downloader", paper.DownloaderId);
             ViewData["UploaderId"] = new SelectList(_context.Users, "Id", "Uploader", paper.UploaderId);
             return View(paper);
         }
@@ -149,6 +143,59 @@ namespace Portal.Controllers
             _context.Paper.Remove(paper);
             _context.SaveChanges();
             return RedirectToAction("Index");
+        }
+
+        // GET: Papers/Download/5
+        [ActionName("Download")]
+        public IActionResult Download(int? id)
+        {
+            if (id == null)
+            {
+                return HttpNotFound();
+            }
+
+            Paper paper = _context.Paper.Single(m => m.PaperId == id);
+            if (paper == null)
+            {
+                return HttpNotFound();
+            }
+
+            var filePath = UploadPath + paper.FileName;
+
+            var pdf = new PDF();
+            bool verified = pdf.Verify(paper.Hash, filePath);
+
+            if (! verified)
+            {
+                ViewBag.Verified = "False";
+            }
+            return View(paper);
+        }
+
+        // POST: Papers/Download/5
+        [HttpPost, ActionName("Download")]
+        [ValidateAntiForgeryToken]
+        public IActionResult DownloadConfirmed(int id)
+        {
+            Paper paper = _context.Paper.Single(m => m.PaperId == id);
+
+            var filePath = UploadPath + paper.FileName;
+
+            var pdf = new PDF();
+
+            var stream = pdf.download(filePath, paper.EncKey);
+
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                // for example foo.bak
+                FileName = paper.FileName + ".pdf",
+
+                // always prompt the user for downloading, set to true if you want 
+                // the browser to try to show the file inline
+                Inline = false,
+            };
+            Response.Headers.Add("Content-Disposition", cd.ToString());
+            return File(stream, "application/pdf");
         }
     }
 }

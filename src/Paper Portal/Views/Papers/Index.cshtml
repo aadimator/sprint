@@ -18,13 +18,10 @@
             @Html.DisplayNameFor(model => model.Due)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.EncKey)
+            @Html.DisplayNameFor(model => model.FileName)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.FilePath)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Title)
+            @Html.DisplayNameFor(model => model.Instructor)
         </th>
         <th></th>
     </tr>
@@ -38,16 +35,14 @@
             @Html.DisplayFor(modelItem => item.Due)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.EncKey)
+            @Html.DisplayFor(modelItem => item.FileName)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.FilePath)
+            @Html.DisplayFor(modelItem => item.Instructor)
         </td>
         <td>
-            @Html.DisplayFor(modelItem => item.Title)
-        </td>
-        <td>
-            <a asp-action="Edit" asp-route-id="@item.PaperId">Edit</a> |
+            @*<a asp-action="Edit" asp-route-id="@item.PaperId">Edit</a> |*@
+            <a asp-action="Download" asp-route-id="@item.PaperId">Download</a> |
             <a asp-action="Details" asp-route-id="@item.PaperId">Details</a> |
             <a asp-action="Delete" asp-route-id="@item.PaperId">Delete</a>
         </td>

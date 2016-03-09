@@ -10,8 +10,9 @@ namespace Paper_Portal.ViewModels.Papers
     public class CreateViewModel
     {
         [Required]
-        [StringLength(50, ErrorMessage = "Title cannot be longer than 50 characters.")]
-        public string Title { get; set; }
+        [Display(Name = "File Name")]
+        [StringLength(50, ErrorMessage = "File Name cannot be longer than 50 characters.")]
+        public string FileName { get; set; }
 
         [Display(Name = "No. of Copies")]
         [Range(0, 500)]
@@ -21,6 +22,8 @@ namespace Paper_Portal.ViewModels.Papers
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode =true)]
         public DateTime Due { get; set; }
+
+        public string Instructor { get; set; }
 
         public IFormFile File { get; set; }
 
