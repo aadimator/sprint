@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
@@ -14,12 +15,12 @@ namespace Paper_Portal.Helpers
 
         public bool upload(IFormFile InputFile, string FilePath)
         {
-            if (! validate(InputFile))
+            if (!validate(InputFile))
             {
                 Error = "File couldn't be Validated!";
                 return false;
             }
-            if (! encrypt(InputFile.OpenReadStream(), FilePath))
+            if (!encrypt(InputFile.OpenReadStream(), FilePath))
             {
                 Error = "File couldn't be Encrypted!";
                 return false;
@@ -27,13 +28,19 @@ namespace Paper_Portal.Helpers
             return true;
         }
 
-        public Stream download(string filePath, string encKey)
+        public byte[] download(string filePath, string DownloaderID, string encKey = "")
         {
-            
-            return decrypt(filePath, encKey); ;
+            EncKey = encKey;
+            var decryptedStream = decrypt(filePath, EncKey);
+            // Add QrCode and TimeStamp
+            var fileContents = AddInfo(DownloaderID, decryptedStream);
+
+            return fileContents;
+
+            //return decryptedStream;
         }
 
-        public bool Verify (string originalHash, string filePath)
+        public bool Verify(string originalHash, string filePath)
         {
             var encrypt = new Encrypt();
             string fileHash = encrypt.ComputeHash(filePath);
@@ -45,7 +52,7 @@ namespace Paper_Portal.Helpers
             return true;
         }
 
-        private bool encrypt (Stream input, string output)
+        private bool encrypt(Stream input, string output)
         {
             Encrypt encrypt = new Encrypt();
             encrypt.EncryptFile(input, output);
@@ -53,42 +60,62 @@ namespace Paper_Portal.Helpers
             Hash = encrypt.ComputeHash(output);
             return true;
         }
-        
-        private Stream decrypt (string input, string encKey)
+
+        private MemoryStream decrypt(string input, string encKey = "")
         {
             var encrypt = new Encrypt();
             encrypt.Password = encKey;
-            return encrypt.DecryptFile(input, encKey);
+            return encrypt.DecryptFile(input);
         }
 
-        private void AddQRCode(string msg, Stream input, string output)
+        private byte[] AddInfo(string msg, Stream input)
         {
-            const int MARGIN = 5;
-
-            //using (Stream inputPdfStream = new FileStream(input, FileMode.Open, FileAccess.Read, FileShare.Read))
-            using (Stream outputPdfStream = new FileStream(output, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (MemoryStream ms = new MemoryStream())
             {
-                PdfReader reader = new PdfReader(input);
-                PdfStamper stamper = new PdfStamper(reader, outputPdfStream);
-
-                BarcodeQRCode qrcode = new BarcodeQRCode(msg, 1, 1, null);
-                Image image = qrcode.GetImage();
-
-                stamper.SetEncryption(true, "12345", "asdf", 0);
-
-                for (int i = 1; i <= reader.NumberOfPages; i++)
+                using (PdfReader reader = new PdfReader(input))
+                using (PdfStamper stamper = new PdfStamper(reader, ms))
                 {
-                    Rectangle pageSize = reader.GetPageSize(i);
-                    float x = 0 + MARGIN;
-                    float y = pageSize.Height - (image.Height + MARGIN);
-                    PdfContentByte pdfContentByte = stamper.GetOverContent(i);
-    
-                    image.SetAbsolutePosition(x, y);
-                    pdfContentByte.AddImage(image);
+                    int Margin = 5;
+                    for (int i = 1; i <= reader.NumberOfPages; i++)
+                    {
+                        Rectangle pageSize = reader.GetPageSize(i);
+                        float x = pageSize.Width - Margin;
+                        float y = 0 + Margin;
+                        PdfContentByte ContentByte = stamper.GetOverContent(i);
+
+                        AddQRCode(msg, ContentByte, x, y);
+                        AddTimeStamp(ContentByte, x, y);
+                    }
                 }
                 
-                stamper.Close();
+                return ms.ToArray();
             }
+
+        }
+        private void AddQRCode(string msg, PdfContentByte ContentByte, float x, float y, int Margin = 10)
+        {
+            BarcodeQRCode qrcode = new BarcodeQRCode(msg, 1, 1, null);
+            Image image = qrcode.GetImage();
+            x = x - (image.Width + Margin);
+            y = y + Margin;
+            image.SetAbsolutePosition(x, y);
+            ContentByte.AddImage(image);
+        }
+        private void AddTimeStamp(PdfContentByte ContentByte, float x, float y, int Margin = 5)
+        {
+            var timeStamp = DateTime.Now.ToString();
+
+            // select the font properties
+            BaseFont bf = BaseFont.CreateFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+            ContentByte.SetColorFill(BaseColor.DARK_GRAY);
+            ContentByte.SetFontAndSize(bf, 6);
+
+            x = x - Margin;
+            y = y + Margin;
+            ContentByte.BeginText();
+            ContentByte.ShowTextAligned(PdfContentByte.ALIGN_RIGHT, timeStamp, x, y, 0);
+            ContentByte.EndText();
         }
     }
+
 }

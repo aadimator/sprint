@@ -10,9 +10,12 @@ using Paper_Portal.Helpers;
 using Paper_Portal.Models;
 using Paper_Portal.ViewModels.Papers;
 using Microsoft.Net.Http.Headers;
+using Microsoft.AspNet.Authorization;
+using System.IO;
 
 namespace Portal.Controllers
 {
+    [Authorize]
     public class PapersController : Controller
     {
         private ApplicationDbContext _context;
@@ -23,13 +26,13 @@ namespace Portal.Controllers
         public PapersController(ApplicationDbContext context, IApplicationEnvironment environment)
         {
             _appEnvironment = environment;
-            _context = context;    
+            _context = context;
         }
 
         // GET: Papers
         public IActionResult Index()
         {
-            var applicationDbContext = _context.Paper.Include(p => p.Uploader);
+            var applicationDbContext = _context.Paper.Include(p => p.Uploader).OrderBy(p => p.Due);
             return View(applicationDbContext.ToList());
         }
 
@@ -165,7 +168,7 @@ namespace Portal.Controllers
             var pdf = new PDF();
             bool verified = pdf.Verify(paper.Hash, filePath);
 
-            if (! verified)
+            if (!verified)
             {
                 ViewBag.Verified = "False";
             }
@@ -183,19 +186,19 @@ namespace Portal.Controllers
 
             var pdf = new PDF();
 
-            var stream = pdf.download(filePath, paper.EncKey);
+            var fileContents = pdf.download(filePath, User.GetUserId(), paper.EncKey);
 
             var cd = new System.Net.Mime.ContentDisposition
             {
-                // for example foo.bak
                 FileName = paper.FileName + ".pdf",
 
                 // always prompt the user for downloading, set to true if you want 
                 // the browser to try to show the file inline
                 Inline = false,
             };
+
             Response.Headers.Add("Content-Disposition", cd.ToString());
-            return File(stream, "application/pdf");
+            return File(fileContents, "application/pdf");
         }
     }
 }
