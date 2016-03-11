@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Rendering;
 using Microsoft.Data.Entity;
@@ -24,19 +26,22 @@ namespace Paper_Portal.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
+        private readonly ApplicationDbContext _context;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
             ISmsSender smsSender,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _smsSender = smsSender;
             _logger = loggerFactory.CreateLogger<AccountController>();
+            _context = context;
         }
 
         //
@@ -93,7 +98,16 @@ namespace Paper_Portal.Controllers
         [AllowAnonymous]
         public IActionResult Register()
         {
-            return View();
+            var roles = _context.Roles.OrderBy(r => r.Name).ToList()
+                .Select(s => new
+                {
+                    Text = s.Name.ToUpper(),
+                    Value = s.Name
+                });
+
+            //ViewBag.Roles = new SelectList(roles, "Text", "Value" , roles.First());
+            var list = new SelectList(roles, "Text", "Value"); 
+            return View(new RegisterViewModel(list));
         }
 
         //
@@ -105,7 +119,8 @@ namespace Paper_Portal.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.Name, Email = model.Email };
+                
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

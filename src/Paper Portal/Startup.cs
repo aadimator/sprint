@@ -47,6 +47,7 @@ namespace Paper_Portal
                     options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"]));
 
             services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddRoleManager<ApplicationRoleManager>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 

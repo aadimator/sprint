@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Mvc.Rendering;
 
 namespace Paper_Portal.ViewModels.Account
 {
@@ -14,6 +15,11 @@ namespace Paper_Portal.ViewModels.Account
         public string Email { get; set; }
 
         [Required]
+        [StringLength(75, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 5)]
+        [Display(Name = "Name")]
+        public string Name { get; set; }
+
+        [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
@@ -23,5 +29,15 @@ namespace Paper_Portal.ViewModels.Account
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        [Required]
+        public string Role { get; set; }
+
+        public SelectList Roles { get; private set; }
+
+        public RegisterViewModel(SelectList list)
+        {
+            Roles = list;
+        }
     }
 }

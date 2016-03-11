@@ -181,11 +181,9 @@ namespace Portal.Controllers
         public IActionResult DownloadConfirmed(int id)
         {
             Paper paper = _context.Paper.Single(m => m.PaperId == id);
-
             var filePath = UploadPath + paper.FileName;
 
             var pdf = new PDF();
-
             var fileContents = pdf.download(filePath, User.GetUserId(), paper.EncKey);
 
             var cd = new System.Net.Mime.ContentDisposition
