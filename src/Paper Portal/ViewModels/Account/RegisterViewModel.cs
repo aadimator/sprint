@@ -32,12 +32,5 @@ namespace Paper_Portal.ViewModels.Account
 
         [Required]
         public string Role { get; set; }
-
-        public SelectList Roles { get; private set; }
-
-        public RegisterViewModel(SelectList list)
-        {
-            Roles = list;
-        }
     }
 }

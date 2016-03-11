@@ -98,16 +98,18 @@ namespace Paper_Portal.Controllers
         [AllowAnonymous]
         public IActionResult Register()
         {
-            var roles = _context.Roles.OrderBy(r => r.Name).ToList()
+            var ti = new CultureInfo("en-US", true).TextInfo; // to convert the lowercase string to Title Case
+            // select all roles except the Admin
+            var roles = _context.Roles.Where(r => r.Name != RoleHelper.Admin).ToList()
                 .Select(s => new
                 {
-                    Text = s.Name.ToUpper(),
+                    Text = ti.ToTitleCase(s.Name),
                     Value = s.Name
                 });
 
-            //ViewBag.Roles = new SelectList(roles, "Text", "Value" , roles.First());
-            var list = new SelectList(roles, "Text", "Value"); 
-            return View(new RegisterViewModel(list));
+            ViewBag.Roles = new SelectList(roles, "Value", "Text", roles.First());
+            
+            return View();
         }
 
         //
@@ -125,7 +127,7 @@ namespace Paper_Portal.Controllers
                 if (result.Succeeded)
                 {
                     //TODO: Add roles
-                    await _userManager.AddToRoleAsync(user, RoleHelper.Admin);
+                    await _userManager.AddToRoleAsync(user, model.Role);
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                     // Send an email with this link
                     //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
