@@ -23,6 +23,9 @@ namespace Paper_Portal.Models
                 //.HasForeignKey(p => p.UploaderId)
                 .IsRequired(true)
                 .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<Paper>()
+                .Property(p => p.Downloads)
+                .HasDefaultValue(0);
         }
         public DbSet<Paper> Paper { get; set; }
     }

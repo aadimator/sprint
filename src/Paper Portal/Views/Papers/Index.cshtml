@@ -1,14 +1,17 @@
 @model IEnumerable<Paper_Portal.Models.Paper>
 @using Paper_Portal.Helpers
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Papers";
 }
 
-<h2>Index</h2>
+<h2>Papers</h2>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+@if (User.IsInRole(RoleHelper.Teacher))
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
 
 <table class="table">
     <tr>
@@ -19,7 +22,7 @@
             @Html.DisplayNameFor(model => model.Due)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.FileName)
+            @Html.DisplayNameFor(model => model.Title)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.Instructor)
@@ -37,7 +40,7 @@
                 @Html.DisplayFor(modelItem => item.Due)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.FileName)
+                @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Instructor)

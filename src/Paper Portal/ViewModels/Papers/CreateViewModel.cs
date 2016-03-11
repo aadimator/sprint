@@ -10,9 +10,8 @@ namespace Paper_Portal.ViewModels.Papers
     public class CreateViewModel
     {
         [Required]
-        [Display(Name = "File Name")]
         [StringLength(50, ErrorMessage = "File Name cannot be longer than 50 characters.")]
-        public string FileName { get; set; }
+        public string Title { get; set; }
 
         [Display(Name = "No. of Copies")]
         [Range(0, 500)]

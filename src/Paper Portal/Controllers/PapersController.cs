@@ -13,6 +13,7 @@ using Microsoft.Net.Http.Headers;
 using Microsoft.AspNet.Authorization;
 using System.IO;
 using System.Collections.Generic;
+using System;
 
 namespace Portal.Controllers
 {
@@ -37,11 +38,18 @@ namespace Portal.Controllers
             if (User.IsInRole(RoleHelper.Teacher))
             {
                 string UserId = User.GetUserId();
-                Papers = _context.Paper.Where(p => p.Uploader.UserName == UserId).OrderBy(p => p.Due).ToList();
+                Papers = _context.Paper
+                    .Where(p => p.Uploader.Id == UserId)
+                    .OrderBy(p => p.Due )
+                    .ThenBy(p => p.Downloads)
+                    .ToList();
             }
             else
             {
-                Papers = _context.Paper.OrderBy(p => p.Due).ToList();
+                Papers = _context.Paper
+                    .OrderBy(p => p.Due)
+                    .ThenBy(p => p.Downloads)
+                    .ToList();
             }
 
             return View(Papers);
@@ -65,6 +73,7 @@ namespace Portal.Controllers
         }
 
         // GET: Papers/Create
+        [Authorize(Roles = RoleHelper.Teacher)]
         public IActionResult Create()
         {
             return View(new CreateViewModel());
@@ -73,9 +82,11 @@ namespace Portal.Controllers
         // POST: Papers/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleHelper.Teacher)]
         public IActionResult Create(CreateViewModel model)
         {
-            string filePath = UploadPath + model.FileName;
+            string fileName = DateTime.UtcNow.ToFileTimeUtc() + "-" + model.Title.Replace(" ", String.Empty); 
+            string filePath = UploadPath + fileName;
             var pdf = new PDF();
             pdf.upload(model.File, filePath);
 
@@ -83,7 +94,9 @@ namespace Portal.Controllers
             paper.Copies = model.Copies;
             paper.Due = model.Due;
             paper.Instructor = model.Instructor;
-            paper.FileName = model.FileName;
+            paper.Title = model.Title;
+
+            paper.FileName = fileName;
             paper.EncKey = pdf.EncKey;
             paper.Hash = pdf.Hash;
             paper.UploaderId = User.GetUserId();
@@ -94,11 +107,11 @@ namespace Portal.Controllers
                 _context.SaveChanges();
                 return RedirectToAction("Index");
             }
-            ViewData["UploaderId"] = new SelectList(_context.Users, "Id", "Uploader", paper.UploaderId);
             return View(paper);
         }
 
         // GET: Papers/Edit/5
+        [Authorize(Roles = RoleHelper.Teacher)]
         public IActionResult Edit(int? id)
         {
             if (id == null)
@@ -111,18 +124,24 @@ namespace Portal.Controllers
             {
                 return HttpNotFound();
             }
-            ViewData["UploaderId"] = new SelectList(_context.Users, "Id", "Uploader", paper.UploaderId);
             return View(paper);
         }
 
         // POST: Papers/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleHelper.Teacher)]
         public IActionResult Edit(Paper paper)
         {
+            Paper original = _context.Paper.Single(m => m.PaperId == paper.PaperId);
+            original.Copies = paper.Copies;
+            original.Due = paper.Due;
+            original.Instructor = paper.Instructor;
+            original.Title = paper.Title;
+
             if (ModelState.IsValid)
             {
-                _context.Update(paper);
+                _context.Update(original);
                 _context.SaveChanges();
                 return RedirectToAction("Index");
             }
@@ -132,6 +151,7 @@ namespace Portal.Controllers
 
         // GET: Papers/Delete/5
         [ActionName("Delete")]
+        [Authorize(Roles = RoleHelper.Teacher)]
         public IActionResult Delete(int? id)
         {
             if (id == null)
@@ -151,6 +171,7 @@ namespace Portal.Controllers
         // POST: Papers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleHelper.Teacher)]
         public IActionResult DeleteConfirmed(int id)
         {
             Paper paper = _context.Paper.Single(m => m.PaperId == id);
@@ -161,6 +182,7 @@ namespace Portal.Controllers
 
         // GET: Papers/Download/5
         [ActionName("Download")]
+        [Authorize(Roles = RoleHelper.Printer)]
         public IActionResult Download(int? id)
         {
             if (id == null)
@@ -189,17 +211,23 @@ namespace Portal.Controllers
         // POST: Papers/Download/5
         [HttpPost, ActionName("Download")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleHelper.Printer)]
         public IActionResult DownloadConfirmed(int id)
         {
             Paper paper = _context.Paper.Single(m => m.PaperId == id);
+            paper.Downloads = paper.Downloads + 1;
+            
             var filePath = UploadPath + paper.FileName;
 
             var pdf = new PDF();
-            var fileContents = pdf.download(filePath, User.GetUserId(), paper.EncKey);
+            var fileContents = pdf.download(filePath, User.GetUserId(), paper.Downloads, paper.EncKey);
+
+            _context.Update(paper);
+            _context.SaveChanges();
 
             var cd = new System.Net.Mime.ContentDisposition
             {
-                FileName = paper.FileName + ".pdf",
+                FileName = paper.Title + ".pdf",
 
                 // always prompt the user for downloading, set to true if you want 
                 // the browser to try to show the file inline
