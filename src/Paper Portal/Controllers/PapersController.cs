@@ -12,6 +12,7 @@ using Paper_Portal.ViewModels.Papers;
 using Microsoft.Net.Http.Headers;
 using Microsoft.AspNet.Authorization;
 using System.IO;
+using System.Collections.Generic;
 
 namespace Portal.Controllers
 {
@@ -32,8 +33,18 @@ namespace Portal.Controllers
         // GET: Papers
         public IActionResult Index()
         {
-            var applicationDbContext = _context.Paper.Include(p => p.Uploader).OrderBy(p => p.Due);
-            return View(applicationDbContext.ToList());
+            List<Paper> Papers = null;
+            if (User.IsInRole(RoleHelper.Teacher))
+            {
+                string UserId = User.GetUserId();
+                Papers = _context.Paper.Where(p => p.Uploader.UserName == UserId).OrderBy(p => p.Due).ToList();
+            }
+            else
+            {
+                Papers = _context.Paper.OrderBy(p => p.Due).ToList();
+            }
+
+            return View(Papers);
         }
 
         // GET: Papers/Details/5

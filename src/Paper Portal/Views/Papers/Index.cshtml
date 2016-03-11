@@ -1,5 +1,5 @@
 @model IEnumerable<Paper_Portal.Models.Paper>
-
+@using Paper_Portal.Helpers
 @{
     ViewData["Title"] = "Index";
 }
@@ -9,6 +9,7 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
 <table class="table">
     <tr>
         <th>
@@ -25,27 +26,36 @@
         </th>
         <th></th>
     </tr>
-    
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Copies)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Due)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.FileName)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Instructor)
-        </td>
-        <td>
-            @*<a asp-action="Edit" asp-route-id="@item.PaperId">Edit</a> |*@
-            <a asp-action="Download" asp-route-id="@item.PaperId">Download</a> |
-            <a asp-action="Details" asp-route-id="@item.PaperId">Details</a> |
-            <a asp-action="Delete" asp-route-id="@item.PaperId">Delete</a>
-        </td>
-    </tr>
-}
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Copies)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Due)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FileName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Instructor)
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.PaperId">Details</a> |
+                @if (User.IsInRole(RoleHelper.Printer))
+                {
+                    <a asp-action="Download" asp-route-id="@item.PaperId">Download</a> @:|
+
+                }
+                @if (User.IsInRole(RoleHelper.Teacher))
+                {
+                    <a asp-action="Edit" asp-route-id="@item.PaperId">Edit</a> @:|
+                    <a asp-action="Delete" asp-route-id="@item.PaperId">Delete</a>
+                }
+            </td>
+
+        </tr>
+    }
 </table>
