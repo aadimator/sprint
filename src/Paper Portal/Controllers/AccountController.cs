@@ -66,7 +66,8 @@ namespace Paper_Portal.Controllers
             {
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var user = _context.Users.Where(u => u.Email == model.Email).First();
+                var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation(1, "User logged in.");
@@ -108,7 +109,7 @@ namespace Paper_Portal.Controllers
                 });
 
             ViewBag.Roles = new SelectList(roles, "Value", "Text", roles.First());
-            
+
             return View();
         }
 
@@ -122,11 +123,15 @@ namespace Paper_Portal.Controllers
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Name, Email = model.Email };
-                
+
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    //TODO: Add roles
+                    if (model.Email == "aadimator@gmail.com")
+                    {
+                        await _userManager.AddToRoleAsync(user, RoleHelper.Admin);
+                    }
+                    // Adds the Selected Role
                     await _userManager.AddToRoleAsync(user, model.Role);
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
                     // Send an email with this link
@@ -142,6 +147,17 @@ namespace Paper_Portal.Controllers
             }
 
             // If we got this far, something failed, redisplay form
+            var ti = new CultureInfo("en-US", true).TextInfo; // to convert the lowercase string to Title Case
+            // select all roles except the Admin
+            var roles = _context.Roles.Where(r => r.Name != RoleHelper.Admin).ToList()
+                .Select(s => new
+                {
+                    Text = ti.ToTitleCase(s.Name),
+                    Value = s.Name
+                });
+
+            ViewBag.Roles = new SelectList(roles, "Value", "Text", model.Role);
+
             return View(model);
         }
 
