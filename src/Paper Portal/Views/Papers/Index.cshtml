@@ -16,6 +16,9 @@
 <table class="table">
     <tr>
         <th>
+            @Html.DisplayNameFor(model => model.Downloads)
+        </th>
+        <th>
             @Html.DisplayNameFor(model => model.Copies)
         </th>
         <th>
@@ -33,6 +36,9 @@
     @foreach (var item in Model)
     {
         <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Downloads)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Copies)
             </td>

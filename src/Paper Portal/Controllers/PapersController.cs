@@ -40,15 +40,15 @@ namespace Portal.Controllers
                 string UserId = User.GetUserId();
                 Papers = _context.Paper
                     .Where(p => p.Uploader.Id == UserId)
-                    .OrderBy(p => p.Due )
-                    .ThenBy(p => p.Downloads)
+                    .OrderBy(p => p.Downloads )
+                    .ThenBy(p => p.Due)
                     .ToList();
             }
             else
             {
                 Papers = _context.Paper
-                    .OrderBy(p => p.Due)
-                    .ThenBy(p => p.Downloads)
+                    .OrderBy(p => p.Downloads)
+                    .ThenBy(p => p.Due)
                     .ToList();
             }
 
@@ -76,6 +76,7 @@ namespace Portal.Controllers
         [Authorize(Roles = RoleHelper.Teacher)]
         public IActionResult Create()
         {
+            string Instructor = User.GetUserName();
             return View(new CreateViewModel());
         }
 
@@ -107,7 +108,7 @@ namespace Portal.Controllers
                 _context.SaveChanges();
                 return RedirectToAction("Index");
             }
-            return View(paper);
+            return View(model);
         }
 
         // GET: Papers/Edit/5
