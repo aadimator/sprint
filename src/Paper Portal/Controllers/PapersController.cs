@@ -23,6 +23,7 @@ namespace Portal.Controllers
         private ApplicationDbContext _context;
         private IApplicationEnvironment _appEnvironment;
 
+        // Place to store the Uploaded Encrypted Files
         public string UploadPath { get { return _appEnvironment.ApplicationBasePath + "\\Uploads\\"; } }
 
         public PapersController(ApplicationDbContext context, IApplicationEnvironment environment)
@@ -34,7 +35,9 @@ namespace Portal.Controllers
         // GET: Papers
         public IActionResult Index()
         {
+            // List of Papers according to the user
             List<Paper> Papers = null;
+            // If user is a Teacher, only show the PDF that he uploaded
             if (User.IsInRole(RoleHelper.Teacher))
             {
                 string UserId = User.GetUserId();
@@ -44,6 +47,7 @@ namespace Portal.Controllers
                     .ThenBy(p => p.Due)
                     .ToList();
             }
+            // otherwise (admin, printer), show all the PDFs
             else
             {
                 Papers = _context.Paper
@@ -76,7 +80,6 @@ namespace Portal.Controllers
         [Authorize(Roles = RoleHelper.Teacher)]
         public IActionResult Create()
         {
-            string Instructor = User.GetUserName();
             return View(new CreateViewModel());
         }
 
@@ -86,11 +89,14 @@ namespace Portal.Controllers
         [Authorize(Roles = RoleHelper.Teacher)]
         public IActionResult Create(CreateViewModel model)
         {
+            // create a unique fileName using TimeStamp, Remove the whitespace from the Title
             string fileName = DateTime.UtcNow.ToFileTimeUtc() + "-" + model.Title.Replace(" ", String.Empty); 
-            string filePath = UploadPath + fileName;
-            var pdf = new PDF();
-            pdf.upload(model.File, filePath);
 
+            string filePath = UploadPath + fileName;
+
+            var pdf = new PDF();
+            bool uploaded = pdf.upload(model.File, filePath);
+            
             Paper paper = new Paper();
             paper.Copies = model.Copies;
             paper.Due = model.Due;
