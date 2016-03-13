@@ -93,27 +93,32 @@ namespace Portal.Controllers
             string fileName = DateTime.UtcNow.ToFileTimeUtc() + "-" + model.Title.Replace(" ", String.Empty); 
 
             string filePath = UploadPath + fileName;
-
+            
             var pdf = new PDF();
             bool uploaded = pdf.upload(model.File, filePath);
-            
-            Paper paper = new Paper();
-            paper.Copies = model.Copies;
-            paper.Due = model.Due;
-            paper.Instructor = model.Instructor;
-            paper.Title = model.Title;
 
-            paper.FileName = fileName;
-            paper.EncKey = pdf.EncKey;
-            paper.Hash = pdf.Hash;
-            paper.UploaderId = User.GetUserId();
-
-            if (ModelState.IsValid)
+            if (uploaded && ModelState.IsValid)
             {
+                Paper paper = new Paper();
+
+                paper.Copies = model.Copies;
+                paper.Due = model.Due;
+                paper.Instructor = model.Instructor;
+                paper.Title = model.Title;
+
+                paper.FileName = fileName;
+                paper.EncKey = pdf.EncKey;
+                paper.Hash = pdf.Hash;
+                paper.UploaderId = User.GetUserId();
+
                 _context.Paper.Add(paper);
                 _context.SaveChanges();
                 return RedirectToAction("Index");
+
             }
+
+            // if there was some error, store it and return the user to the Upload form
+            ModelState.AddModelError("file", pdf.Error);
             return View(model);
         }
 
@@ -140,18 +145,22 @@ namespace Portal.Controllers
         [Authorize(Roles = RoleHelper.Teacher)]
         public IActionResult Edit(Paper paper)
         {
+            // Retrieve the original paper from DB for modification
             Paper original = _context.Paper.Single(m => m.PaperId == paper.PaperId);
+            // modify the values recieved from the form
             original.Copies = paper.Copies;
             original.Due = paper.Due;
             original.Instructor = paper.Instructor;
             original.Title = paper.Title;
 
+            // save changes to the DB
             if (ModelState.IsValid)
             {
                 _context.Update(original);
                 _context.SaveChanges();
                 return RedirectToAction("Index");
             }
+
             ViewData["UploaderId"] = new SelectList(_context.Users, "Id", "Uploader", paper.UploaderId);
             return View(paper);
         }
