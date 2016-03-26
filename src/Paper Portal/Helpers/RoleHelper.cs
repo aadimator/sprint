@@ -11,6 +11,8 @@ namespace Paper_Portal.Helpers
         public const string Teacher = "teacher";
         public const string Printer = "printer";
 
+        public static readonly string[] Admins = { "aadimator@gmail.com" };
+
         private static async Task EnsureRoleCreated(RoleManager<IdentityRole> roleManager, string roleName)
         {
             if (!await roleManager.RoleExistsAsync(roleName))

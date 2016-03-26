@@ -127,7 +127,8 @@ namespace Paper_Portal.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    if (model.Email == "aadimator@gmail.com")
+                    // TODO: Find a suitable Implementation
+                    if (RoleHelper.Admins.Contains<string>(model.Email))
                     {
                         await _userManager.AddToRoleAsync(user, RoleHelper.Admin);
                     }
