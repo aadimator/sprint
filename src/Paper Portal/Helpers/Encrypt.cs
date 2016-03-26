@@ -98,8 +98,6 @@ namespace Paper_Portal.Helpers
         {
             Password = GenerateToken(30);
 
-            System.Console.WriteLine(Password);
-            System.Console.WriteLine();
             byte[] passwordBytes = Encoding.UTF8.GetBytes(Password);
 
             // Hash the password with SHA256

@@ -15,31 +15,33 @@ namespace Paper_Portal.Helpers
 
         public bool upload(IFormFile InputFile, string FilePath)
         {
+            // Validate if the file is in correct format
             if (!validate(InputFile))
             {
                 Error = "File couldn't be Validated!";
                 return false;
             }
+            // Check if the file is encrypted or not
             if (!encrypt(InputFile.OpenReadStream(), FilePath))
             {
                 Error = "File couldn't be Encrypted!";
                 return false;
             }
-            return true;
+
+            return true; // everything went great
         }
 
         public byte[] download(string filePath, string DownloaderID, int downloads, string encKey = "")
         {
-            EncKey = encKey;
+            EncKey = (encKey != "") ? encKey : null;
             var decryptedStream = decrypt(filePath, EncKey);
+
             // Add QrCode and TimeStamp
             var fileContents = AddInfo(DownloaderID, downloads, decryptedStream);
-
             return fileContents;
-
-            //return decryptedStream;
         }
 
+        // Compute the Hash of the file and then compare it with the original one
         public bool Verify(string originalHash, string filePath)
         {
             var encrypt = new Encrypt();
@@ -49,6 +51,7 @@ namespace Paper_Portal.Helpers
 
         private bool validate(IFormFile file)
         {
+            // TODO: Add functionality like format conversion (docx -> pdf) etc
             return true;
         }
 
@@ -99,7 +102,6 @@ namespace Paper_Portal.Helpers
                 
                 return ms.ToArray();
             }
-
         }
         private void AddQRCode(PdfContentByte ContentByte, string msg, float x, float y, int Margin = 5)
         {
