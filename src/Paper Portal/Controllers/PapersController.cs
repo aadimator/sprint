@@ -1,17 +1,12 @@
 using System.Linq;
-using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Rendering;
-using Microsoft.Data.Entity;
 using Microsoft.Extensions.PlatformAbstractions;
-using Microsoft.AspNet.Identity;
 using System.Security.Claims;
 using Paper_Portal.Helpers;
 using Paper_Portal.Models;
 using Paper_Portal.ViewModels.Papers;
-using Microsoft.Net.Http.Headers;
 using Microsoft.AspNet.Authorization;
-using System.IO;
 using System.Collections.Generic;
 using System;
 
