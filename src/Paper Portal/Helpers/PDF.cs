@@ -114,7 +114,7 @@ namespace Paper_Portal.Helpers
         }
         private void AddTimeStamp(PdfContentByte ContentByte, float x, float y, int Margin = 5)
         {
-            var timeStamp = DateTime.Now.ToString();
+            var timeStamp = DateTime.Now.ToFileTimeUtc().ToString();
 
             AddText(ContentByte, timeStamp, x, y, Margin);
         }
