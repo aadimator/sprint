@@ -12,6 +12,7 @@ using System;
 
 namespace Portal.Controllers
 {
+    [RequireHttps]
     [Authorize]
     public class PapersController : Controller
     {

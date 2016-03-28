@@ -18,6 +18,7 @@ using Paper_Portal.ViewModels.Account;
 
 namespace Paper_Portal.Controllers
 {
+    [RequireHttps]
     [Authorize]
     public class AccountController : Controller
     {

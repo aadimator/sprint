@@ -6,6 +6,7 @@ using Microsoft.AspNet.Mvc;
 
 namespace Paper_Portal.Controllers
 {
+    [RequireHttps]
     public class HomeController : Controller
     {
         public IActionResult Index()

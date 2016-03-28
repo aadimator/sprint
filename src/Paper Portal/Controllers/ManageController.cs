@@ -13,6 +13,7 @@ using Paper_Portal.ViewModels.Manage;
 
 namespace Paper_Portal.Controllers
 {
+    [RequireHttps]
     [Authorize]
     public class ManageController : Controller
     {
