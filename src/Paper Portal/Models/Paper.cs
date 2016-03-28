@@ -15,7 +15,13 @@ namespace Paper_Portal.Models
         public string EncKey { get; set; }
         public string Hash { get; set; }
         public string Instructor { get; set; }
-        public int Downloads { get; set; }
+        public int DownloadsNum { get; set; }
+        public bool Complete { get; set; }
+        public string Comment { get; set; }
+        public string Report { get; set; }
+
+        [DataType(DataType.Date)]
+        public DateTime Created { get; set; }
 
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
@@ -23,5 +29,7 @@ namespace Paper_Portal.Models
 
         public string UploaderId { get; set; }
         public ApplicationUser Uploader { get; set; }
+
+        public ICollection<Downloads> Downloader { get; set; }
     }
 }

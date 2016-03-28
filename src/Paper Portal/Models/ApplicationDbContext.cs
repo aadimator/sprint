@@ -17,16 +17,30 @@ namespace Paper_Portal.Models
             // Customize the ASP.NET Identity model and override the defaults if needed.
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
+            builder.Entity<ApplicationUser>()
+                 .HasOne(u => u.Department) 
+                 .WithMany(d => d.Users)
+                 .HasForeignKey(u => u.DepartmentId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<Paper>()
                 .HasOne(p => p.Uploader)
-                .WithMany(u => u.Papers)
-                //.HasForeignKey(p => p.UploaderId)
+                .WithMany(u => u.Uploads)
                 .IsRequired(true)
                 .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<Paper>()
-                .Property(p => p.Downloads)
+                .Property(p => p.DownloadsNum)
                 .HasDefaultValue(0);
+
+            builder.Entity<Downloads>()
+                .HasOne(d => d.Paper)
+                .WithMany(p => p.Downloader);
+            builder.Entity<Downloads>()
+                .HasOne(d => d.User)
+                .WithMany(u => u.Downloads);
         }
+
         public DbSet<Paper> Paper { get; set; }
     }
 }

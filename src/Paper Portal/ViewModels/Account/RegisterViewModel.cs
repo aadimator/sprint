@@ -16,7 +16,7 @@ namespace Paper_Portal.ViewModels.Account
 
         [Required]
         [StringLength(75, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 5)]
-        [Display(Name = "Name")]
+        [Display(Name = "User Name")]
         public string Name { get; set; }
 
         [Required]

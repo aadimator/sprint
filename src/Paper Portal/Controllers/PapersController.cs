@@ -38,15 +38,16 @@ namespace Portal.Controllers
                 string UserId = User.GetUserId();
                 Papers = _context.Paper
                     .Where(p => p.Uploader.Id == UserId)
-                    .OrderBy(p => p.Downloads )
+                    .OrderBy(p => p.DownloadsNum)
                     .ThenBy(p => p.Due)
                     .ToList();
+                //Papers = _context.Users.Where(p => p.Id == UserId).First().Papers.ToList();
             }
             // otherwise (admin, printer), show all the PDFs
             else
             {
                 Papers = _context.Paper
-                    .OrderBy(p => p.Downloads)
+                    .OrderBy(p => p.DownloadsNum)
                     .ThenBy(p => p.Due)
                     .ToList();
             }
@@ -226,12 +227,12 @@ namespace Portal.Controllers
         public IActionResult DownloadConfirmed(int id)
         {
             Paper paper = _context.Paper.Single(m => m.PaperId == id);
-            paper.Downloads = paper.Downloads + 1;
+            paper.DownloadsNum = paper.DownloadsNum + 1;
             
             var filePath = UploadPath + paper.FileName;
 
             var pdf = new PDF();
-            var fileContents = pdf.download(filePath, User.GetUserId(), paper.Downloads, paper.EncKey);
+            var fileContents = pdf.download(filePath, User.GetUserId(), paper.DownloadsNum, paper.EncKey);
 
             _context.Update(paper);
             _context.SaveChanges();
