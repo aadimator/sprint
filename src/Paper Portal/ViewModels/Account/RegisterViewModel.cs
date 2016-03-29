@@ -32,5 +32,8 @@ namespace Paper_Portal.ViewModels.Account
 
         [Required]
         public string Role { get; set; }
+
+        [Display(Name = "Department")]
+        public int DepartmentId { get; set; }
     }
 }

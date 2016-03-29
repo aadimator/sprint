@@ -42,5 +42,6 @@ namespace Paper_Portal.Models
         }
 
         public DbSet<Paper> Paper { get; set; }
+        public DbSet<Department> Department { get; set; }
     }
 }

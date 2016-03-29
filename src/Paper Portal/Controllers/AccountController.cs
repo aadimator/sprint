@@ -109,8 +109,17 @@ namespace Paper_Portal.Controllers
                     Value = s.Name
                 });
 
-            ViewBag.Roles = new SelectList(roles, "Value", "Text", roles.First());
+            var departments = _context.Department
+                .Select(s => new
+                {
+                    Text = s.Name,
+                    Value = s.DepartmentId
+                })
+                .ToList();
 
+            ViewBag.Roles = new SelectList(roles, "Value", "Text", roles.First());
+            // TODO: Modify for the Printer
+            ViewBag.Departments = new SelectList(departments, "Value", "Text");
             return View();
         }
 
@@ -157,8 +166,17 @@ namespace Paper_Portal.Controllers
                     Text = ti.ToTitleCase(s.Name),
                     Value = s.Name
                 });
+            var departments = _context.Department
+               .Select(s => new
+               {
+                   Text = s.Name,
+                   Value = s.DepartmentId
+               })
+               .ToList();
 
-            ViewBag.Roles = new SelectList(roles, "Value", "Text", model.Role);
+            ViewBag.Roles = new SelectList(roles, "Value", "Text", roles.First());
+            // TODO: Modify for the Printer
+            ViewBag.Departments = new SelectList(departments, "Value", "Text");
 
             return View(model);
         }
