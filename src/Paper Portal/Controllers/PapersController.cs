@@ -102,11 +102,16 @@ namespace Portal.Controllers
                 paper.Due = model.Due;
                 paper.Instructor = model.Instructor;
                 paper.Title = model.Title;
+                paper.Comment = model.Comment;
 
                 paper.FileName = fileName;
                 paper.EncKey = pdf.EncKey;
                 paper.Hash = pdf.Hash;
+
+
                 paper.UploaderId = User.GetUserId();
+                paper.Uploader = _context.Users.Where(u => u.Id == paper.UploaderId).First();
+                
 
                 _context.Paper.Add(paper);
                 _context.SaveChanges();

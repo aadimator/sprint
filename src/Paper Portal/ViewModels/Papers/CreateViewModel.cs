@@ -26,6 +26,8 @@ namespace Paper_Portal.ViewModels.Papers
 
         public IFormFile File { get; set; }
 
+        public string Comment { get; set; }
+
         public CreateViewModel()
         {
             Copies = 2;
