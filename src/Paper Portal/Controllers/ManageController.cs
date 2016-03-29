@@ -22,19 +22,22 @@ namespace Paper_Portal.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
+        private ApplicationDbContext _context;
 
         public ManageController(
         UserManager<ApplicationUser> userManager,
         SignInManager<ApplicationUser> signInManager,
         IEmailSender emailSender,
         ISmsSender smsSender,
-        ILoggerFactory loggerFactory)
+        ILoggerFactory loggerFactory,
+        ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _smsSender = smsSender;
             _logger = loggerFactory.CreateLogger<ManageController>();
+            _context = context;
         }
 
         //
@@ -89,6 +92,54 @@ namespace Paper_Portal.Controllers
             return RedirectToAction(nameof(Index), new { Message = ManageMessageId.Error });
         }
 
+        // GET: Manage/Verfiy
+        public IActionResult VerifyUsers()
+        {
+            List<VerifyUsersViewModel> Users = new List<VerifyUsersViewModel>();
+
+            var Data = _userManager.Users
+                .Where(p => p.Verified == false)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.FullName,
+                    p.Email,
+                    Department = p.Department.Name,
+                    p.EmailConfirmed
+                })
+                .ToList();
+
+            foreach (var user in Data)
+            {
+                Users.Add(new VerifyUsersViewModel(user.Id, user.FullName, user.Email, user.Department, user.EmailConfirmed));
+            }
+            return View(Users);
+        }
+
+        // TODO: Implement it later
+        public IActionResult Verify(List<VerifyUsersViewModel> Users)
+        {
+            foreach (var user in Users)
+            {
+                if (user.Selected == true)
+                {
+                    var temp = _context.Users.Where(u => u.Id == user.Id).First();
+                    temp.Verified = true;
+                    _context.Update(temp);
+                }
+            }
+            _context.SaveChanges();
+            return RedirectToAction(nameof(VerifyUsers));
+        }
+
+        public IActionResult VerifyUser(string id)
+        {
+            var temp = _context.Users.Where(u => u.Id == id).First();
+            temp.Verified = true;
+            _context.Update(temp);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(VerifyUsers));
+        }
 
         #region Helpers
 

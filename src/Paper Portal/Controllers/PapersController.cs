@@ -9,6 +9,8 @@ using Paper_Portal.ViewModels.Papers;
 using Microsoft.AspNet.Authorization;
 using System.Collections.Generic;
 using System;
+using System.Threading.Tasks;
+using Microsoft.AspNet.Identity;
 
 namespace Portal.Controllers
 {
@@ -29,8 +31,14 @@ namespace Portal.Controllers
         }
 
         // GET: Papers
-        public IActionResult Index()
+        public IActionResult Index(ManageMessageId? message = null)
         {
+            ViewData["StatusMessage"] =
+                message == ManageMessageId.FileUploadSuccess ? "Your File has been uploaded."
+                : message == ManageMessageId.NotVerfied ? "Your Account has not yet been verified by the Admin"
+                : message == ManageMessageId.Error ? "An error has occurred."
+                : "";
+
             // List of Papers according to the user
             List<Paper> Papers = null;
             // If user is a Teacher, only show the PDF that he uploaded
@@ -77,6 +85,11 @@ namespace Portal.Controllers
         [Authorize(Roles = RoleHelper.Teacher)]
         public IActionResult Create()
         {
+            var user = _context.Users.Where(u => u.Id == User.GetUserId()).First();
+            if (!user.Verified)
+            {
+                return RedirectToAction(nameof(Index), new { Message = ManageMessageId.NotVerfied });
+            }
             return View(new CreateViewModel());
         }
 
@@ -100,6 +113,7 @@ namespace Portal.Controllers
 
                 paper.Copies = model.Copies;
                 paper.Due = model.Due;
+                paper.Created = DateTime.Now;
                 paper.Instructor = model.Instructor;
                 paper.Title = model.Title;
                 paper.Comment = model.Comment;
@@ -115,7 +129,7 @@ namespace Portal.Controllers
 
                 _context.Paper.Add(paper);
                 _context.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", new { Message = ManageMessageId.FileUploadSuccess });
 
             }
 
@@ -255,5 +269,24 @@ namespace Portal.Controllers
             Response.Headers.Add("Content-Disposition", cd.ToString());
             return File(fileContents, "application/pdf");
         }
+
+        #region Helpers
+
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+        }
+
+        public enum ManageMessageId
+        {
+            FileUploadSuccess,
+            NotVerfied,
+            Error
+        }
+
+        #endregion
     }
 }

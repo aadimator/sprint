@@ -1,0 +1,57 @@
+@model IEnumerable<Paper_Portal.ViewModels.Manage.VerifyUsersViewModel>
+
+@{
+    ViewData["Title"] = "Verify Users";
+}
+
+<h2>Verfiy Users</h2>
+
+<form asp-controller="Manage" asp-action="Verify" method="post" class="form-horizontal" role="form">
+    <p>
+        <button type="submit">Verify</button>
+    </p>
+    <table class="table">
+        <tr>
+            <th>
+                @Html.Raw("Verify")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Department)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EmailConfirmed)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <input type="checkbox" name="@item.Selected" value="@item" />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Department)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EmailConfirmed)
+                </td>
+                <td>
+                    <a asp-action="VerifyUser" asp-route-id="@item.Id">Verify</a>
+                </td>
+            </tr>
+        }
+    </table>
+</form>
