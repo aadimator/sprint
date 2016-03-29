@@ -16,7 +16,7 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.DownloadsNum)
+            @Html.Raw("Downloaded")
         </th>
         <th>
             @Html.DisplayNameFor(model => model.Copies)
@@ -37,7 +37,12 @@
     {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.DownloadsNum)
+                @if (item.DownloadsNum >= 1)
+                {
+                    @Html.Raw("&#10004;")
+                } else {
+                    @Html.Raw("&#10008;")
+                }
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Copies)

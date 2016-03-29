@@ -15,10 +15,12 @@ namespace Paper_Portal.Models
         public string EncKey { get; set; }
         public string Hash { get; set; }
         public string Instructor { get; set; }
-        public int DownloadsNum { get; set; }
         public bool Complete { get; set; }
         public string Comment { get; set; }
         public string Report { get; set; }
+
+        [Display(Name ="No. of Downloads")]
+        public int DownloadsNum { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime Created { get; set; }
