@@ -152,8 +152,7 @@ namespace Paper_Portal.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    // TODO: Find a suitable Implementation
-                    if (RoleHelper.Admins.Contains<string>(model.Email))
+                    if (_context.Admin.Where(a => a.Email == model.Email).Count() == 1)
                     {
                         await _userManager.AddToRoleAsync(user, RoleHelper.Admin);
                     }
@@ -167,6 +166,12 @@ namespace Paper_Portal.Controllers
                         "Please confirm your account by clicking this link: <a href=\"" + callbackUrl + "\">link</a>");
                     //await _signInManager.SignInAsync(user, isPersistent: false);
                     _logger.LogInformation(3, "User created a new account with password.");
+
+                    // Add user to the Department
+                    department.Users.Add(user);
+                    _context.Update(department);
+                    _context.SaveChanges();
+
                     return RedirectToAction(nameof(HomeController.Index), "Home");
                 }
                 AddErrors(result);

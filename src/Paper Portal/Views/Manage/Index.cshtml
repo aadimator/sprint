@@ -12,15 +12,31 @@
     <dl class="dl-horizontal">
         <dt>Password:</dt>
         <dd>
-            @if (Model.HasPassword)
-            {
-                <text>[&nbsp;&nbsp;<a asp-controller="Manage" asp-action="ChangePassword">Change</a>&nbsp;&nbsp;]</text>
-            }
-            else
-            {
-                <text>[&nbsp;&nbsp;<a asp-controller="Manage" asp-action="SetPassword">Create</a>&nbsp;&nbsp;]</text>
-            }
+            <text>[&nbsp;&nbsp;<a asp-controller="Manage" asp-action="ChangePassword">Change</a>&nbsp;&nbsp;]</text>
         </dd>
-        
+        <dt>
+            @Html.DisplayNameFor(model => model.UserName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.UserName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.FullName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FullName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Department)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Department.Name)
+        </dd>
     </dl>
 </div>

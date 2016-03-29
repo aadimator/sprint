@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
+using Microsoft.Data.Entity;
 
 namespace Portal.Controllers
 {
@@ -46,8 +47,10 @@ namespace Portal.Controllers
             {
                 string UserId = User.GetUserId();
                 Papers = _context.Paper
+                    .Include(p => p.Uploader)
+                    .Include(p => p.Uploader.Department)
                     .Where(p => p.Uploader.Id == UserId)
-                    .OrderBy(p => p.DownloadsNum)
+                    .OrderBy(p => p.Created)
                     .ThenBy(p => p.Due)
                     .ToList();
                 //Papers = _context.Users.Where(p => p.Id == UserId).First().Papers.ToList();
@@ -55,8 +58,10 @@ namespace Portal.Controllers
             // otherwise (admin, printer), show all the PDFs
             else
             {
-                Papers = _context.Paper
-                    .OrderBy(p => p.DownloadsNum)
+                Papers = _context.Paper.
+                    Include(p => p.Uploader)
+                    .Include(p => p.Uploader.Department)
+                    .OrderBy(p => p.Created)
                     .ThenBy(p => p.Due)
                     .ToList();
             }

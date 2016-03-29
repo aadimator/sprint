@@ -23,13 +23,13 @@
             @Html.DisplayNameFor(model => model.Copies)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Due)
-        </th>
-        <th>
             @Html.DisplayNameFor(model => model.Title)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.Instructor)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Uploader.Department.Name)
         </th>
         <th></th>
     </tr>
@@ -49,13 +49,13 @@
                 @Html.DisplayFor(modelItem => item.Copies)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Due)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Instructor)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Uploader.Department.Name)
             </td>
             <td>
                 <a asp-action="Details" asp-route-id="@item.PaperId">Details</a> |

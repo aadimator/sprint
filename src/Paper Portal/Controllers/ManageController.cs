@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Paper_Portal.Models;
 using Paper_Portal.Services;
 using Paper_Portal.ViewModels.Manage;
+using Microsoft.Data.Entity;
 
 namespace Paper_Portal.Controllers
 {
@@ -50,10 +51,18 @@ namespace Paper_Portal.Controllers
                 : message == ManageMessageId.Error ? "An error has occurred."
                 : "";
 
-            var user = await GetCurrentUserAsync();
+            var user = _context.Users
+                .Include(u => u.Department)
+                .Where(u => u.Id == User.GetUserId())
+                .First();
+
+            var dep = user.Department.Name;
             var model = new IndexViewModel
             {
-                HasPassword = await _userManager.HasPasswordAsync(user),
+                Department = user.Department.Name,
+                Email = user.Email,
+                FullName = user.FullName,
+                UserName = user.UserName,
             };
             return View(model);
         }
@@ -134,7 +143,10 @@ namespace Paper_Portal.Controllers
 
         public IActionResult VerifyUser(string id)
         {
-            var temp = _context.Users.Where(u => u.Id == id).First();
+            var temp = _context.Users
+                //.Include(u => u.Department)
+                .Where(u => u.Id == id)
+                .First();
             temp.Verified = true;
             _context.Update(temp);
             _context.SaveChanges();
