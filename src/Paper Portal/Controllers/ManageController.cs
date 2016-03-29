@@ -11,6 +11,7 @@ using Paper_Portal.Models;
 using Paper_Portal.Services;
 using Paper_Portal.ViewModels.Manage;
 using Microsoft.Data.Entity;
+using Paper_Portal.Helpers;
 
 namespace Paper_Portal.Controllers
 {
@@ -126,25 +127,21 @@ namespace Paper_Portal.Controllers
         }
 
         // TODO: Implement it later
-        public IActionResult Verify(List<VerifyUsersViewModel> Users)
+        [Authorize (Roles = RoleHelper.Admin)]
+        public IActionResult Verify(string[] selected)
         {
-            foreach (var user in Users)
+            foreach (var userId in selected)
             {
-                if (user.Selected == true)
-                {
-                    var temp = _context.Users.Where(u => u.Id == user.Id).First();
-                    temp.Verified = true;
-                    _context.Update(temp);
-                }
+                VerifyUser(userId);
             }
             _context.SaveChanges();
             return RedirectToAction(nameof(VerifyUsers));
         }
 
+        [Authorize(Roles = RoleHelper.Admin)]
         public IActionResult VerifyUser(string id)
         {
             var temp = _context.Users
-                //.Include(u => u.Department)
                 .Where(u => u.Id == id)
                 .First();
             temp.Verified = true;

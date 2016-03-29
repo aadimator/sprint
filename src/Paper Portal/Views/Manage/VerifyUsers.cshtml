@@ -7,9 +7,12 @@
 <h2>Verfiy Users</h2>
 
 <form asp-controller="Manage" asp-action="Verify" method="post" class="form-horizontal" role="form">
-    <p>
-        <button type="submit">Verify</button>
-    </p>
+    <div class="form-group">
+
+        <input type="checkbox" class="checkbox-inline" id="toggleAll" /><span class="text-info"> Check All </span>
+
+        <button class="btn btn-default pull-right" type="submit">Verify</button>
+    </div>
     <table class="table">
         <tr>
             <th>
@@ -34,7 +37,7 @@
         {
             <tr>
                 <td>
-                    <input type="checkbox" name="@item.Selected" value="@item" />
+                    <input type="checkbox" name="selected" value="@item.Id" />
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Email)
@@ -55,3 +58,31 @@
         }
     </table>
 </form>
+
+@section Scripts {
+    <script>
+        function toggleChecked(status) {
+            $(".table input[name=selected]").each(function () {
+                // Set the checked status of each to match the
+                // checked status of the check all checkbox:
+                $(this).prop("checked", status);
+            });
+        }
+
+        $(document).ready(function () {
+
+            // Grab a reference to the check all box:
+            var checkAllBox = $("#toggleAll");
+
+            //Set the default value of the global checkbox to true:
+            checkAllBox.prop('checked', false);
+
+            // Attach the call to toggleChecked to the
+            // click event of the global checkbox:
+            checkAllBox.click(function () {
+                var status = checkAllBox.prop('checked');
+                toggleChecked(status);
+            });
+        });
+    </script>
+}
