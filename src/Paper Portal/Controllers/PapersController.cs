@@ -139,7 +139,7 @@ namespace Portal.Controllers
             }
 
             // if there was some error, store it and return the user to the Upload form
-            ModelState.AddModelError("file", pdf.Error);
+            ModelState.AddModelError("File", pdf.Error);
             return View(model);
         }
 
@@ -201,7 +201,7 @@ namespace Portal.Controllers
             {
                 return HttpNotFound();
             }
-
+            // TODO: Remove the Details
             return View(paper);
         }
 

@@ -18,7 +18,7 @@ namespace Paper_Portal.Helpers
             // Validate if the file is in correct format
             if (!validate(InputFile))
             {
-                Error = "File couldn't be Validated!";
+                Error = "Only PDF files are supported as of now !";
                 return false;
             }
             // Check if the file is encrypted or not
@@ -52,7 +52,10 @@ namespace Paper_Portal.Helpers
         private bool validate(IFormFile file)
         {
             // TODO: Add functionality like format conversion (docx -> pdf) etc
-            return true;
+            if (file.ContentType.Equals("application/pdf"))
+                return true;
+
+            return false;
         }
 
         private bool encrypt(Stream input, string output)
