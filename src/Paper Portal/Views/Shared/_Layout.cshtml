@@ -1,29 +1,30 @@
 ﻿<!doctype html>
+<!--
+  Material Design Lite
+  Copyright 2015 Google Inc. All rights reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      https://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License
+-->
 
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="A secure Paper Printing Portal">
+    <meta name="description" content="Introducing Lollipop, a sweet new take on Android.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
     <title>@ViewData["Title"] - Sprint</title>
 
-    <!-- Add to homescreen for Chrome on Android -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <link rel="icon" sizes="192x192" href="images/android-desktop.png">
-
-    <!-- Add to homescreen for Safari on iOS -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="Material Design Lite">
-    <link rel="apple-touch-icon-precomposed" href="images/ios-desktop.png">
-
-    <!-- Tile icon for Win8 (144x144 + tile color) -->
-    <meta name="msapplication-TileImage" content="images/touch/ms-touch-icon-144x144-precomposed.png">
-    <meta name="msapplication-TileColor" content="#3372DF">
-
-    <link rel="shortcut icon" href="images/favicon.png">
-
+    <!-- Page styles -->
     <environment names="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
@@ -41,7 +42,6 @@
         <link rel="stylesheet" href="~/css/material.min.css" asp-append-version="true" />
         <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
     </environment>
-    
     <style>
         #view-source {
             position: fixed;
@@ -55,67 +55,252 @@
     </style>
 </head>
 <body>
-    <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
-        <header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+
+        <div class="android-header mdl-layout__header mdl-layout__header--waterfall">
             <div class="mdl-layout__header-row">
-                <span class="mdl-layout-title">@ViewData["Title"]</span>
-                <div class="mdl-layout-spacer"></div>
-                <div class="mdl-textfield mdl-js-textfield mdl-textfield--expandable">
-                    <label class="mdl-button mdl-js-button mdl-button--icon" for="search">
-                        <i class="material-icons">search</i>
-                    </label>
-                    <div class="mdl-textfield__expandable-holder">
-                        <input class="mdl-textfield__input" type="text" id="search">
-                        <label class="mdl-textfield__label" for="search">Enter your query...</label>
-                    </div>
+                <span class="android-title mdl-layout-title">
+                    <img class="android-logo-image" src="~/images/logo.png">
+                </span>
+                <!-- Add spacer, to align navigation to the right in desktop -->
+                <div class="android-header-spacer mdl-layout-spacer"></div>
+                @*<div class="android-search-box mdl-textfield mdl-js-textfield mdl-textfield--expandable mdl-textfield--floating-label mdl-textfield--align-right mdl-textfield--full-width">
+                        <label class="mdl-button mdl-js-button mdl-button--icon" for="search-field">
+                            <i class="material-icons">search</i>
+                        </label>
+                        <div class="mdl-textfield__expandable-holder">
+                            <input class="mdl-textfield__input" type="text" id="search-field">
+                        </div>
+                    </div>*@
+                <!-- Navigation -->
+                <div class="android-navigation-container">
+                    <nav class="android-navigation mdl-navigation">
+                        <a class="mdl-navigation__link mdl-typography--text-uppercase" href="">Phones</a>
+                        <a class="mdl-navigation__link mdl-typography--text-uppercase" href="">Tablets</a>
+                        <a class="mdl-navigation__link mdl-typography--text-uppercase" href="">Wear</a>
+                        <a class="mdl-navigation__link mdl-typography--text-uppercase" href="">TV</a>
+                        <a class="mdl-navigation__link mdl-typography--text-uppercase" href="">Auto</a>
+                        <a class="mdl-navigation__link mdl-typography--text-uppercase" href="">One</a>
+                        <a class="mdl-navigation__link mdl-typography--text-uppercase" href="">Play</a>
+                        @Html.Partial("_LoginPartial")
+                    </nav>
                 </div>
-                <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon" id="hdrbtn">
+                <span class="android-mobile-title mdl-layout-title">
+                    <img class="android-logo-image" src="images/android-logo.png">
+                </span>
+                <button class="android-more-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" id="more-button">
                     <i class="material-icons">more_vert</i>
                 </button>
-                <ul class="mdl-menu mdl-js-menu mdl-js-ripple-effect mdl-menu--bottom-right" for="hdrbtn">
-                    <li class="mdl-menu__item">About</li>
-                    <li class="mdl-menu__item">Contact</li>
-                    <li class="mdl-menu__item">Legal information</li>
+                <ul class="mdl-menu mdl-js-menu mdl-menu--bottom-right mdl-js-ripple-effect" for="more-button">
+                    <li class="mdl-menu__item">5.0 Lollipop</li>
+                    <li class="mdl-menu__item">4.4 KitKat</li>
+                    <li disabled class="mdl-menu__item">4.3 Jelly Bean</li>
+                    <li class="mdl-menu__item">Android History</li>
                 </ul>
             </div>
-        </header>
-        <div class="demo-drawer mdl-layout__drawer mdl-color--blue-grey-900 mdl-color-text--blue-grey-50">
-            <header class="demo-drawer-header">
-                @*<img src="images/user.jpg" class="demo-avatar">*@
-                <h1 class="brand-logo"><a class="">Sprint</a></h1>
-                <div class="demo-avatar-dropdown">
-                    <span>hello@example.com</span>
-                    <div class="mdl-layout-spacer"></div>
-                    <button id="accbtn" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--icon">
-                        <i class="material-icons" role="presentation">arrow_drop_down</i>
-                        <span class="visuallyhidden">Accounts</span>
-                    </button>
-                    <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect" for="accbtn">
-                        <li class="mdl-menu__item">hello@example.com</li>
-                        <li class="mdl-menu__item">info@example.com</li>
-                        <li class="mdl-menu__item"><i class="material-icons">add</i>Add another account...</li>
-                    </ul>
-                </div>
-            </header>
-            <nav class="demo-navigation mdl-navigation mdl-color--blue-grey-800">
-                <a class="mdl-navigation__link" asp-controller="Home" asp-action="Index"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">home</i>Home</a>
-                <a class="mdl-navigation__link" asp-controller="Paper" asp-action="Index"><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">inbox</i>Papers</a>
-                <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">delete</i>Trash</a>
-                <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">report</i>Spam</a>
-                <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">forum</i>Forums</a>
-                <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">flag</i>Updates</a>
-                <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">local_offer</i>Promos</a>
-                <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">shopping_cart</i>Purchases</a>
-                <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">people</i>Social</a>
-                <div class="mdl-layout-spacer"></div>
-                <a class="mdl-navigation__link" href=""><i class="mdl-color-text--blue-grey-400 material-icons" role="presentation">help_outline</i><span class="visuallyhidden">Help</span></a>
+        </div>
+
+        <div class="android-drawer mdl-layout__drawer">
+            <span class="mdl-layout-title">
+                <img class="android-logo-image" src="images/logo-white.png">
+            </span>
+            <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="">Phones</a>
+                <a class="mdl-navigation__link" href="">Tablets</a>
+                <a class="mdl-navigation__link" href="">Wear</a>
+                <a class="mdl-navigation__link" href="">TV</a>
+                <a class="mdl-navigation__link" href="">Auto</a>
+                <a class="mdl-navigation__link" href="">One</a>
+                <a class="mdl-navigation__link" href="">Play</a>
+                <div class="android-drawer-separator"></div>
+                <span class="mdl-navigation__link" href="">Versions</span>
+                <a class="mdl-navigation__link" href="">Lollipop 5.0</a>
+                <a class="mdl-navigation__link" href="">KitKat 4.4</a>
+                <a class="mdl-navigation__link" href="">Jelly Bean 4.3</a>
+                <a class="mdl-navigation__link" href="">Android history</a>
+                <div class="android-drawer-separator"></div>
+                <span class="mdl-navigation__link" href="">Resources</span>
+                <a class="mdl-navigation__link" href="">Official blog</a>
+                <a class="mdl-navigation__link" href="">Android on Google+</a>
+                <a class="mdl-navigation__link" href="">Android on Twitter</a>
+                <div class="android-drawer-separator"></div>
+                <span class="mdl-navigation__link" href="">For developers</span>
+                <a class="mdl-navigation__link" href="">App developer resources</a>
+                <a class="mdl-navigation__link" href="">Android Open Source Project</a>
+                <a class="mdl-navigation__link" href="">Android SDK</a>
             </nav>
         </div>
-        <main class="mdl-layout__content mdl-color--grey-100">
-            <div class="mdl-grid demo-content">
-                @RenderBody()
+
+        <div class="android-content mdl-layout__content">
+            <a name="top"></a>
+            <div class="android-be-together-section mdl-typography--text-center">
+                <div class="logo-font android-slogan">be together. not the same.</div>
+                <div class="logo-font android-sub-slogan">welcome to android... be yourself. do your thing. see what's going on.</div>
+                <div class="logo-font android-create-character">
+                    <a href=""><img src="images/andy.png"> create your android character</a>
+                </div>
+
+                <a href="#screens">
+                    <button class="android-fab mdl-button mdl-button--colored mdl-js-button mdl-button--fab mdl-js-ripple-effect">
+                        <i class="material-icons">expand_more</i>
+                    </button>
+                </a>
             </div>
-        </main>
+            <div class="android-screen-section mdl-typography--text-center">
+                <a name="screens"></a>
+                <div class="mdl-typography--display-1-color-contrast">Powering screens of all sizes</div>
+                <div class="android-screens">
+                    <div class="android-wear android-screen">
+                        <a class="android-image-link" href="">
+                            <img class="android-screen-image" src="images/wear-silver-on.png">
+                            <img class="android-screen-image" src="images/wear-black-on.png">
+                        </a>
+                        <a class="android-link mdl-typography--font-regular mdl-typography--text-uppercase" href="">Android Wear</a>
+                    </div>
+                    <div class="android-phone android-screen">
+                        <a class="android-image-link" href="">
+                            <img class="android-screen-image" src="images/nexus6-on.jpg">
+                        </a>
+                        <a class="android-link mdl-typography--font-regular mdl-typography--text-uppercase" href="">Phones</a>
+                    </div>
+                    <div class="android-tablet android-screen">
+                        <a class="android-image-link" href="">
+                            <img class="android-screen-image" src="images/nexus9-on.jpg">
+                        </a>
+                        <a class="android-link mdl-typography--font-regular mdl-typography--text-uppercase" href="">Tablets</a>
+                    </div>
+                    <div class="android-tv android-screen">
+                        <a class="android-image-link" href="">
+                            <img class="android-screen-image" src="images/tv-on.jpg">
+                        </a>
+                        <a class="android-link mdl-typography--font-regular mdl-typography--text-uppercase" href="">Android TV</a>
+                    </div>
+                    <div class="android-auto android-screen">
+                        <a class="android-image-link" href="">
+                            <img class="android-screen-image" src="images/auto-on.jpg">
+                        </a>
+                        <a class="android-link mdl-typography--font-regular mdl-typography--text-uppercase mdl-typography--text-left" href="">Coming Soon: Android Auto</a>
+                    </div>
+                </div>
+            </div>
+            <div class="android-wear-section">
+                <div class="android-wear-band">
+                    <div class="android-wear-band-text">
+                        <div class="mdl-typography--display-2 mdl-typography--font-thin">The best of Google built in</div>
+                        <p class="mdl-typography--headline mdl-typography--font-thin">
+                            Android works perfectly with your favourite apps like Google Maps,
+                            Calendar and YouTube.
+                        </p>
+                        <p>
+                            <a class="mdl-typography--font-regular mdl-typography--text-uppercase android-alt-link" href="">
+                                See what's new in the Play Store&nbsp;<i class="material-icons">chevron_right</i>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="android-customized-section">
+                <div class="android-customized-section-text">
+                    <div class="mdl-typography--font-light mdl-typography--display-1-color-contrast">Customised by you, for you</div>
+                    <p class="mdl-typography--font-light">
+                        Put the stuff that you care about right on your home screen: the latest news, the weather or a stream of your recent photos.
+                        <br>
+                        <a href="" class="android-link mdl-typography--font-light">Customise your phone</a>
+                    </p>
+                </div>
+                <div class="android-customized-section-image"></div>
+            </div>
+            <div class="android-more-section">
+                <div class="android-section-title mdl-typography--display-1-color-contrast">More from Android</div>
+                <div class="android-card-container mdl-grid">
+                    <div class="mdl-cell mdl-cell--3-col mdl-cell--4-col-tablet mdl-cell--4-col-phone mdl-card mdl-shadow--3dp">
+                        <div class="mdl-card__media">
+                            <img src="images/more-from-1.png">
+                        </div>
+                        <div class="mdl-card__title">
+                            <h4 class="mdl-card__title-text">Get going on Android</h4>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <span class="mdl-typography--font-light mdl-typography--subhead">Four tips to make your switch to Android quick and easy</span>
+                        </div>
+                        <div class="mdl-card__actions">
+                            <a class="android-link mdl-button mdl-js-button mdl-typography--text-uppercase" href="">
+                                Make the switch
+                                <i class="material-icons">chevron_right</i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="mdl-cell mdl-cell--3-col mdl-cell--4-col-tablet mdl-cell--4-col-phone mdl-card mdl-shadow--3dp">
+                        <div class="mdl-card__media">
+                            <img src="images/more-from-4.png">
+                        </div>
+                        <div class="mdl-card__title">
+                            <h4 class="mdl-card__title-text">Create your own Android character</h4>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <span class="mdl-typography--font-light mdl-typography--subhead">Turn the little green Android mascot into you, your friends, anyone!</span>
+                        </div>
+                        <div class="mdl-card__actions">
+                            <a class="android-link mdl-button mdl-js-button mdl-typography--text-uppercase" href="">
+                                androidify.com
+                                <i class="material-icons">chevron_right</i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="mdl-cell mdl-cell--3-col mdl-cell--4-col-tablet mdl-cell--4-col-phone mdl-card mdl-shadow--3dp">
+                        <div class="mdl-card__media">
+                            <img src="images/more-from-2.png">
+                        </div>
+                        <div class="mdl-card__title">
+                            <h4 class="mdl-card__title-text">Get a clean customisable home screen</h4>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <span class="mdl-typography--font-light mdl-typography--subhead">A clean, simple, customisable home screen that comes with the power of Google Now: Traffic alerts, weather and much more, just a swipe away.</span>
+                        </div>
+                        <div class="mdl-card__actions">
+                            <a class="android-link mdl-button mdl-js-button mdl-typography--text-uppercase" href="">
+                                Download now
+                                <i class="material-icons">chevron_right</i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="mdl-cell mdl-cell--3-col mdl-cell--4-col-tablet mdl-cell--4-col-phone mdl-card mdl-shadow--3dp">
+                        <div class="mdl-card__media">
+                            <img src="images/more-from-3.png">
+                        </div>
+                        <div class="mdl-card__title">
+                            <h4 class="mdl-card__title-text">Millions to choose from</h4>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <span class="mdl-typography--font-light mdl-typography--subhead">Hail a taxi, find a recipe, run through a temple – Google Play has all the apps and games that let you make your Android device uniquely yours.</span>
+                        </div>
+                        <div class="mdl-card__actions">
+                            <a class="android-link mdl-button mdl-js-button mdl-typography--text-uppercase" href="">
+                                Find apps
+                                <i class="material-icons">chevron_right</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @RenderBody()
+            <footer class="android-footer mdl-mini-footer">
+                <div class="mdl-mini-footer--right-section">
+                    <a class="mdl-typography--font-light" href="#top">
+                        Back to Top
+                        <i class="material-icons">expand_less</i>
+                    </a>
+                </div>
+
+                <div class="mdl-mini-footer--left-section">
+                    <p class="mdl-typography--font-light">Satellite imagery: © 2014 Astrium, DigitalGlobe</p>
+                    @*<p class="mdl-typography--font-light">Some features and devices may not be available in all areas</p>*@
+                </div>
+            </footer>
+        </div>
     </div>
     <environment names="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>
@@ -135,6 +320,7 @@
     </environment>
 
     @RenderSection("scripts", required: false)
+
 
 </body>
 </html>

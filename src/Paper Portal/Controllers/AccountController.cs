@@ -209,9 +209,7 @@ namespace Paper_Portal.Controllers
         }
 
         //
-        // POST: /Account/LogOff
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        // GET: /Account/LogOff
         public async Task<IActionResult> LogOff()
         {
             await _signInManager.SignOutAsync();
