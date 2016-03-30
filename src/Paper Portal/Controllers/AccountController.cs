@@ -145,9 +145,13 @@ namespace Paper_Portal.Controllers
                 var user = new ApplicationUser {
                     UserName = model.Name,
                     Email = model.Email,
-                    DepartmentId = model.DepartmentId,
-                    Department = department,
                 };
+
+                if (model.Role.Equals(RoleHelper.Teacher))
+                {
+                    user.DepartmentId = model.DepartmentId;
+                    user.Department = department;
+                }
 
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
@@ -168,9 +172,12 @@ namespace Paper_Portal.Controllers
                     _logger.LogInformation(3, "User created a new account with password.");
 
                     // Add user to the Department
-                    department.Users.Add(user);
-                    _context.Update(department);
-                    _context.SaveChanges();
+                    if (user.DepartmentId != null)
+                    {
+                        department.Users.Add(user);
+                        _context.Update(department);
+                        _context.SaveChanges();
+                    }
 
                     return RedirectToAction(nameof(HomeController.Index), "Home");
                 }
@@ -317,6 +324,15 @@ namespace Paper_Portal.Controllers
             }
             var result = await _userManager.ConfirmEmailAsync(user, code);
             return View(result.Succeeded ? "ConfirmEmail" : "Error");
+        }
+
+        //
+        // GET: /Account/AccessDenied
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
 
         //

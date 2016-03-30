@@ -103,30 +103,33 @@ namespace Paper_Portal.Controllers
         }
 
         // GET: Manage/Verfiy
-        public IActionResult VerifyUsers()
+        [Authorize(Roles = RoleHelper.Admin)]
+        public async Task<IActionResult> VerifyUsers()
         {
-            List<VerifyUsersViewModel> Users = new List<VerifyUsersViewModel>();
+            List<VerifyUsersViewModel> UserList = new List<VerifyUsersViewModel>();
 
             var Data = _userManager.Users
                 .Where(p => p.Verified == false)
-                .Select(p => new
-                {
-                    p.Id,
-                    p.FullName,
-                    p.Email,
-                    Department = p.Department.Name,
-                    p.EmailConfirmed
-                })
                 .ToList();
 
             foreach (var user in Data)
             {
-                Users.Add(new VerifyUsersViewModel(user.Id, user.FullName, user.Email, user.Department, user.EmailConfirmed));
+                var department = "Printer";
+                if (await _userManager.IsInRoleAsync(user, RoleHelper.Teacher))
+                {
+                    department = _context.Users.Include(u => u.Department).Where(u => u.Id == user.Id).First().Department.Name;
+                }
+                UserList.Add(new VerifyUsersViewModel(
+                    user.Id,
+                    user.FullName,
+                    user.Email,
+                    department,
+                    user.EmailConfirmed)
+                    );
             }
-            return View(Users);
+            return View(UserList);
         }
 
-        // TODO: Implement it later
         [Authorize (Roles = RoleHelper.Admin)]
         public IActionResult Verify(string[] selected)
         {

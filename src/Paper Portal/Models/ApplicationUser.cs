@@ -11,7 +11,7 @@ namespace Paper_Portal.Models
     {
         public string FullName { get; set; }
         public bool Verified { get; set; }
-        public int DepartmentId { get; set; }
+        public int? DepartmentId { get; set; }
         public Department Department { get; set; }
 
         public ICollection<Paper> Uploads { get; set; } // for teachers

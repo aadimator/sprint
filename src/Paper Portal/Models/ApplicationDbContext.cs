@@ -21,6 +21,7 @@ namespace Paper_Portal.Models
                  .HasOne(u => u.Department) 
                  .WithMany(d => d.Users)
                  .HasForeignKey(u => u.DepartmentId)
+                 .IsRequired(false)
                  .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Paper>()

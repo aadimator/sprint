@@ -61,6 +61,7 @@ namespace Portal.Controllers
                 Papers = _context.Paper.
                     Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
+                    .Where(p => p.Complete == false)
                     .OrderBy(p => p.Created)
                     .ThenBy(p => p.Due)
                     .ToList();
@@ -77,7 +78,7 @@ namespace Portal.Controllers
                 return HttpNotFound();
             }
 
-            Paper paper = _context.Paper.Single(m => m.PaperId == id);
+            Paper paper = _context.Paper.Include(p => p.Downloader).Single(m => m.PaperId == id);
             if (paper == null)
             {
                 return HttpNotFound();
@@ -227,6 +228,12 @@ namespace Portal.Controllers
                 return HttpNotFound();
             }
 
+            var user = _context.Users.Where(u => u.Id == User.GetUserId()).First();
+            if (!user.Verified)
+            {
+                return RedirectToAction(nameof(Index), new { Message = ManageMessageId.NotVerfied });
+            }
+
             Paper paper = _context.Paper.Single(m => m.PaperId == id);
             if (paper == null)
             {
@@ -251,6 +258,12 @@ namespace Portal.Controllers
         [Authorize(Roles = RoleHelper.Printer)]
         public IActionResult DownloadConfirmed(int id)
         {
+            var user = _context.Users.Where(u => u.Id == User.GetUserId()).First();
+            if (!user.Verified)
+            {
+                return RedirectToAction(nameof(Index), new { Message = ManageMessageId.NotVerfied });
+            }
+
             Paper paper = _context.Paper.Single(m => m.PaperId == id);
             paper.DownloadsNum = paper.DownloadsNum + 1;
             
@@ -273,6 +286,32 @@ namespace Portal.Controllers
 
             Response.Headers.Add("Content-Disposition", cd.ToString());
             return File(fileContents, "application/pdf");
+        }
+
+        
+
+        // GET: Papers/Done?id
+        [Authorize(Roles = RoleHelper.Printer)]
+        public IActionResult Done(int[] selected)
+        {
+            foreach (var userId in selected)
+            {
+                JobDone(userId);
+            }
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [Authorize(Roles = RoleHelper.Admin)]
+        public IActionResult JobDone(int id)
+        {
+            var temp = _context.Paper
+                .Where(p => p.PaperId == id)
+                .First();
+            temp.Complete = true;
+            _context.Update(temp);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Index));
         }
 
         #region Helpers
