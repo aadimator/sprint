@@ -138,7 +138,7 @@ namespace Paper_Portal.Controllers
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
-        {
+        { 
             if (ModelState.IsValid)
             {
                 var department = _context.Department.Where(d => d.DepartmentId == model.DepartmentId).First();

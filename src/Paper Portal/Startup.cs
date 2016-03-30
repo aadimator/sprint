@@ -61,6 +61,7 @@ namespace Paper_Portal
             // Add Identity services to the services container.
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
+                options.User.RequireUniqueEmail = true;
                 options.Password.RequireDigit = true;
                 options.Password.RequiredLength = 6;
                 options.Password.RequireLowercase = false;
