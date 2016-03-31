@@ -3,21 +3,26 @@
 
 @if (User.IsSignedIn())
 {
+    <div class="android-drawer-separator"></div>
+    <span class="mdl-navigation__link" href="">Papers</span>
     <a class="mdl-navigation__link" asp-controller="Papers" asp-action="Index">Papers</a>
     <a class="mdl-navigation__link" asp-controller="Papers" asp-action="Status">Status</a>
     @if (User.IsInRole(RoleHelper.Teacher))
     {
         <a class="mdl-navigation__link" asp-controller="Papers" asp-action="Create">Create</a>
     }
-    else if (User.IsInRole(RoleHelper.Printer))
-    {
 
-    }
+    <div class="android-drawer-separator"></div>
+    <span class="mdl-navigation__link" href="">Account</span>
+    <a class="mdl-navigation__link" asp-controller="Manage" asp-action="Index">Profile</a>
+    <a class="mdl-navigation__link" asp-controller="Manage" asp-action="Edit">Edit</a>
     if (User.IsInRole(RoleHelper.Admin))
     {
         <a class="mdl-navigation__link" asp-controller="Manage" asp-action="VerifyUsers">Verify</a>
     }
+    else if (User.IsInRole(RoleHelper.Printer))
+    {
+
+    }
+    
 }
-
-
-
