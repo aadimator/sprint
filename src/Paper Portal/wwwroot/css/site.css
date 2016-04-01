@@ -8,9 +8,12 @@
 /* Set widths on the form inputs since otherwise they're 100% wide */
 input,
 select,
+.input-group,
 textarea {
     max-width: 380px;
 }
+
+
 
 /* Carousel */
 .carousel-caption {
@@ -40,4 +43,8 @@ body {
 .form-horizontal .form-group {
     margin-right: 0px;
     margin-left: 0px;
+}
+
+.input-group {
+    width : 100%;
 }

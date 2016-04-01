@@ -15,6 +15,7 @@ namespace Paper_Portal.ViewModels.Papers
 
         [Display(Name = "No. of Copies")]
         [Range(0, 500)]
+        [Required]
         public int Copies { get; set; }
 
         [Display(Name = "Due Date")]
@@ -24,6 +25,7 @@ namespace Paper_Portal.ViewModels.Papers
 
         public string Instructor { get; set; }
 
+        [Required]
         public IFormFile File { get; set; }
 
         public string Comment { get; set; }
