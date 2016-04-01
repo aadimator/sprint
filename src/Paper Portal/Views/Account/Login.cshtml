@@ -8,38 +8,32 @@
     ViewData["Title"] = "Log in";
 }
 
-<h2 class="mdl-typography--title mdl-typography--text-center">@ViewData["Title"]</h2>
-<div class="mdl-grid">
-    <div class="mdl-layout-spacer"></div>
-    <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
-        <h4 class="mdl-typography--subhead">Use a local account to log in.</h4>
+
+<h2>@ViewData["Title"]</h2>
+<form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
+    <div class="col-md-offset-2 col-md-10">
+        <h4>Use a local account to log in.</h4>
         <hr />
         <div asp-validation-summary="ValidationSummary.All" class="text-danger"></div>
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                <input asp-for="Email" class="mdl-textfield__input" />
-                <label asp-for="Email" class="mdl-textfield__label"></label>
-                <span asp-validation-for="Email" class="mdl-textfield__error"></span>
-            </div>
-        <br>
-        <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-            <input asp-for="Password" pattern="^[0-9A-Za-z]*$" class="mdl-textfield__input" />
-            <label asp-for="Password" class="mdl-textfield__label"></label>
-            <span asp-validation-for="Password" class="mdl-textfield__error"></span>
+        <div class="form-group label-floating">
+            <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
         </div>
-        @*<div class="form-group">
-                <div class="col-md-offset-2 col-md-10">
-                    <div class="checkbox">
-                        <input asp-for="RememberMe" />
-                        <label asp-for="RememberMe"></label>
-                    </div>
+        <div class="form-group label-floating">
+            <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+                <div class="checkbox">
+                    <label asp-for="RememberMe">
+                        <input asp-for="RememberMe" /> Remember Me
+                    </label>
                 </div>
-            </div>*@
-        <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect" asp-for="RememberMe">
-            <input asp-for="RememberMe" class="mdl-checkbox__input">
-            <span class="mdl-checkbox__label">Remember Me</span>
-        </label>
-        <div class="mdl-cell">
-            <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--colored">Log in</button>
+        </div>
+        <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-raised">Log in</button>
         </div>
         <p>
             <a asp-action="Register">Register as a new user?</a>
@@ -47,10 +41,8 @@
         <p>
             <a asp-action="ForgotPassword">Forgot your password?</a>
         </p>
-    </form>
-
-    <div class="mdl-layout-spacer"></div>
-</div>
+    </div>
+</form>
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }

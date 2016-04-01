@@ -1,9 +1,4 @@
-﻿body {
-    padding-top: 50px;
-    padding-bottom: 20px;
-}
-
-/* Wrapping element */
+﻿/* Wrapping element */
 /* Set some basic padding to keep content from hitting the edges */
 .body-content {
     padding-left: 15px;
@@ -14,7 +9,7 @@
 input,
 select,
 textarea {
-    max-width: 280px;
+    max-width: 380px;
 }
 
 /* Carousel */
@@ -31,4 +26,18 @@ textarea {
     .carousel-caption {
         z-index: 10 !important;
     }
+}
+
+/*Bootstrap Material Design*/
+body {
+    background-color: white;
+}
+
+.form-horizontal .control-label {
+    text-align: left;
+}
+
+.form-horizontal .form-group {
+    margin-right: 0px;
+    margin-left: 0px;
 }
