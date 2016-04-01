@@ -1,0 +1,84 @@
+@model IEnumerable<Paper_Portal.Models.Paper>
+@using Paper_Portal.Helpers
+
+<table class="table">
+    <thead>
+        <tr>
+            @if (User.IsInRole(RoleHelper.Printer))
+            {
+                <th>
+                    @Html.Raw("Done")
+                </th>
+            }
+            <th>
+                @Html.Raw("Downloaded")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Copies)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Instructor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Uploader.Department.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+            {
+            <tr>
+                @if (User.IsInRole(RoleHelper.Printer))
+                {
+                    <td>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="selected" value="@item.PaperId" />
+                            </label>
+                        </div>
+                    </td>
+                }
+                <td>
+                    @if (item.DownloadsNum >= 1)
+                {
+                        @Html.Raw("&#10004;")
+                    }
+                    else {
+                        @Html.Raw("&#10008;")
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Copies)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Instructor)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Uploader.Department.Name)
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.PaperId">Details</a> |
+                    @if (User.IsInRole(RoleHelper.Printer))
+                {
+                        <a asp-action="Download" asp-route-id="@item.PaperId">Download</a> @:|
+                        <a asp-action="JobDone" asp-route-id="@item.PaperId">Done</a>
+
+                    }
+                    @if (User.IsInRole(RoleHelper.Teacher))
+                {
+                        <a asp-action="Edit" asp-route-id="@item.PaperId">Edit</a> @:|
+                        <a asp-action="Delete" asp-route-id="@item.PaperId">Delete</a>
+                    }
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>

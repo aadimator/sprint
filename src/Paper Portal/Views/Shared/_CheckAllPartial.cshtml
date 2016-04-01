@@ -1,0 +1,42 @@
+﻿@using System.Security.Claims
+@using Paper_Portal.Helpers;
+
+@if (User.IsInRole(RoleHelper.Printer))
+{
+    <div class="form-group">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" class="checkbox-inline" id="toggleAll" /> Check All
+            </label>
+        </div>
+        <button class="btn btn-default pull-right" type="submit">Done</button>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        function toggleChecked(status) {
+            $(".table input[name=selected]").each(function () {
+                // Set the checked status of each to match the
+                // checked status of the check all checkbox:
+                $(this).prop("checked", status);
+            });
+        }
+
+        $(document).ready(function () {
+
+            // Grab a reference to the check all box:
+            var checkAllBox = $("#toggleAll");
+
+            //Set the default value of the global checkbox to false:
+            checkAllBox.prop('checked', false);
+
+            // Attach the call to toggleChecked to the
+            // click event of the global checkbox:
+            checkAllBox.click(function () {
+                var status = checkAllBox.prop('checked');
+                toggleChecked(status);
+            });
+        });
+    </script>
+}
