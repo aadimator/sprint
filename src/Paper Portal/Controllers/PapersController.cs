@@ -332,23 +332,43 @@ namespace Portal.Controllers
             var pdf = new PDF();
             var fileContents = pdf.download(filePath, User.GetUserId(), paper.DownloadsNum, paper.EncKey);
 
-            Downloads downloads = new Downloads();
-            downloads.User = user;
-            downloads.Paper = paper;
+            var count = _context.Downloads.Where(d => d.UserId == UserId && d.PaperId == paper.PaperId).Count();
+            var downloads = new Downloads();
 
-            if (paper.Downloader == null)
+            if (count == 0)
             {
-                paper.Downloader = new List<Downloads>();
-            }
-            if (user.Downloads == null)
+                downloads.User = user;
+                downloads.Paper = paper;
+                downloads.Count = 1;
+                downloads.LastDownload = DateTime.UtcNow;
+
+                if (paper.Downloader == null)
+                {
+                    paper.Downloader = new List<Downloads>();
+                }
+                if (user.Downloads == null)
+                {
+                    user.Downloads = new List<Downloads>();
+                }
+                paper.Downloader.Add(downloads);
+                user.Downloads.Add(downloads);
+            } else
             {
-                user.Downloads = new List<Downloads>();
+                downloads = _context.Downloads.Where(d => d.UserId == UserId && d.PaperId == paper.PaperId).Single();
             }
-            paper.Downloader.Add(downloads);
-            user.Downloads.Add(downloads);
+
+            var lastTime = downloads.LastDownload;
+            var currentTime = DateTime.UtcNow;
+
+            if (lastTime.AddSeconds(5) < currentTime)
+            {
+                downloads.Count++;
+                downloads.LastDownload = currentTime;
+            }
 
             _context.Update(downloads);
             _context.Update(paper);
+            _context.Update(user);
             _context.SaveChanges();
 
             var cd = new System.Net.Mime.ContentDisposition

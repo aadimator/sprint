@@ -45,14 +45,14 @@
                 <td style="vertical-align:middle;">
                     @if (item.DownloadsNum >= 1 && User.IsInRole(RoleHelper.Teacher))
                     {
-                        var downloaders = item.Downloader.Select(d => d.User).ToList();
+                        var downloaders = item.Downloader.Select(d => new { d.User, d.Count }).ToList();
                         var id = "downloaders" + item.PaperId;
                         var btnId = "#" + id;
                         <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=@btnId>
                             Downloaders
                         </button>
 
-                        <div class="modal fade"  data-keyboard="true" id=@id tabindex="-1" role="dialog">
+                        <div class="modal fade" id=@id tabindex="-1" role="dialog">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -64,8 +64,8 @@
                                             @{
                                                 foreach (var user in downloaders)
                                                 {
-                                                    var name = (user.FullName != null) ? user.FullName : user.UserName;
-                                                    <li>@name</li>
+                                                    var name = (user.User.FullName != null) ? user.User.FullName : user.User.UserName;
+                                                    <li>@name <span class="badge">@user.Count</span></li>
 
                                                 }
                                             }

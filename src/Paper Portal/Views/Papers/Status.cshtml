@@ -29,5 +29,10 @@
         <div class="panel-body">
             @Html.Partial("_PapersList", Model.Incomplete)
         </div>
-        </div>
     </div>
+</div>
+
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ModalScriptPartial"); }
+}

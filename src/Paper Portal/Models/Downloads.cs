@@ -12,5 +12,8 @@ namespace Paper_Portal.Models
 
         public string UserId { get; set; }
         public ApplicationUser User { get; set; }
+
+        public int Count { get; set; }
+        public DateTime LastDownload { get; set; }
     }
 }
