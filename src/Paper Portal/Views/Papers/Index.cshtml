@@ -27,7 +27,28 @@
     <div class="panel-body">
         <form asp-controller="Papers" asp-action="Done" method="post" class="form-horizontal" role="form">
             @Html.Partial("_CheckAllPartial")
+            @{ 
+                ViewData["Checks"] = "true";
+                ViewData["Options"] = "true";
+            }
             @Html.Partial("_PapersList", Model)
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        var checkeventcount = 1, prevTarget;
+        $('.modal').on('show.bs.modal', function (e) {
+            if (typeof prevTarget == 'undefined' || (checkeventcount == 1 && e.target != prevTarget)) {
+                prevTarget = e.target;
+                checkeventcount++;
+                e.preventDefault();
+                $(e.target).appendTo('body').modal('show');
+            }
+            else if (e.target == prevTarget && checkeventcount == 2) {
+                checkeventcount--;
+            }
+        });
+    </script>
+}

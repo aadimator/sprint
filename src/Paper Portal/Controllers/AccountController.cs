@@ -145,6 +145,7 @@ namespace Paper_Portal.Controllers
                 var user = new ApplicationUser {
                     UserName = model.Name,
                     Email = model.Email,
+                    Downloads = new List<Downloads>(),
                 };
 
                 if (model.Role.Equals(RoleHelper.Teacher))

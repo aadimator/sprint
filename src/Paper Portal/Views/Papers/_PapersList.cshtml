@@ -1,10 +1,10 @@
 @model IEnumerable<Paper_Portal.Models.Paper>
 @using Paper_Portal.Helpers
-
+@using Microsoft.Data.Entity;
 <table class="table">
     <thead>
         <tr>
-            @if (User.IsInRole(RoleHelper.Printer))
+            @if (User.IsInRole(RoleHelper.Printer) && ViewBag.Checks == "true")
             {
                 <th>
                     @Html.Raw("Done")
@@ -32,7 +32,7 @@
         @foreach (var item in Model)
             {
             <tr>
-                @if (User.IsInRole(RoleHelper.Printer))
+                @if (User.IsInRole(RoleHelper.Printer) && ViewBag.Checks == "true")
                 {
                     <td>
                         <div class="checkbox">
@@ -42,43 +42,81 @@
                         </div>
                     </td>
                 }
-                <td>
-                    @if (item.DownloadsNum >= 1)
-                {
+                <td style="vertical-align:middle;">
+                    @if (item.DownloadsNum >= 1 && User.IsInRole(RoleHelper.Teacher))
+                    {
+                        var downloaders = item.Downloader.Select(d => d.User).ToList();
+                        var id = "downloaders" + item.PaperId;
+                        var btnId = "#" + id;
+                        <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=@btnId>
+                            Downloaders
+                        </button>
+
+                        <div class="modal fade"  data-keyboard="true" id=@id tabindex="-1" role="dialog">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title">Downloaders</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul>
+                                            @{
+                                                foreach (var user in downloaders)
+                                                {
+                                                    var name = (user.FullName != null) ? user.FullName : user.UserName;
+                                                    <li>@name</li>
+
+                                                }
+                                            }
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else if (item.DownloadsNum >= 1)
+                    {
                         @Html.Raw("&#10004;")
                     }
                     else {
                         @Html.Raw("&#10008;")
                     }
                 </td>
-                <td>
+                <td style="vertical-align:middle;">
                     @Html.DisplayFor(modelItem => item.Copies)
                 </td>
-                <td>
+                <td style="vertical-align:middle;">
                     @Html.DisplayFor(modelItem => item.Title)
                 </td>
-                <td>
+                <td style="vertical-align:middle;">
                     @Html.DisplayFor(modelItem => item.Instructor)
                 </td>
-                <td>
+                <td style="vertical-align:middle;">
                     @Html.DisplayFor(modelItem => item.Uploader.Department.Name)
                 </td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.PaperId">Details</a> |
-                    @if (User.IsInRole(RoleHelper.Printer))
-                {
-                        <a asp-action="Download" asp-route-id="@item.PaperId">Download</a> @:|
-                        <a asp-action="JobDone" asp-route-id="@item.PaperId">Done</a>
+                    <div class="btn-group-sm">
+                        <a asp-action="Details" asp-route-id="@item.PaperId" class="btn btn-info">Details</a>
+                        @if (User.IsInRole(RoleHelper.Printer) && ViewBag.Options == "true")
+                        {
+                            <a asp-action="Download" asp-route-id="@item.PaperId" class="btn btn-primary">Download</a>
+                            <a asp-action="JobDone" asp-route-id="@item.PaperId" class="btn btn-success">Done</a>
 
-                    }
-                    @if (User.IsInRole(RoleHelper.Teacher))
-                {
-                        <a asp-action="Edit" asp-route-id="@item.PaperId">Edit</a> @:|
-                        <a asp-action="Delete" asp-route-id="@item.PaperId">Delete</a>
-                    }
+
+                        }
+                        @if (User.IsInRole(RoleHelper.Teacher) && ViewBag.Options == "true")
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.PaperId" class="btn btn-primary">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@item.PaperId" class="btn btn-danger">Delete</a>
+                        }
+                    </div>
                 </td>
 
             </tr>
-        }
+                                                }
     </tbody>
 </table>

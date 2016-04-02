@@ -49,6 +49,8 @@ namespace Portal.Controllers
                 Papers = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
+                    .Include(p => p.Downloader)
+                    .ThenInclude(d => d.User)
                     .Where(p => p.Uploader.Id == UserId)
                     .OrderBy(p => p.Created)
                     .ThenBy(p => p.Due)
@@ -87,6 +89,8 @@ namespace Portal.Controllers
                 completed = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
+                    .Include(p => p.Downloader)
+                    .ThenInclude(d => d.User)
                     .Where(p => p.Uploader.Id == UserId)
                     .Where(p => p.Complete == true)
                     .ToList();
@@ -94,6 +98,8 @@ namespace Portal.Controllers
                 incomplete = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
+                    .Include(p => p.Downloader)
+                    .ThenInclude(d => d.User)
                     .Where(p => p.Uploader.Id == UserId)
                     .Where(p => p.Complete == false)
                     .ToList();
@@ -187,6 +193,7 @@ namespace Portal.Controllers
                 paper.UploaderId = User.GetUserId();
                 paper.Uploader = _context.Users.Where(u => u.Id == paper.UploaderId).First();
 
+                paper.Downloader = new List<Downloads>();
 
                 _context.Paper.Add(paper);
                 _context.SaveChanges();
@@ -301,7 +308,7 @@ namespace Portal.Controllers
             }
             return View(paper);
         }
-
+        
         // POST: Papers/Download/5
         [HttpPost, ActionName("Download")]
         [ValidateAntiForgeryToken]
@@ -309,15 +316,16 @@ namespace Portal.Controllers
         public IActionResult DownloadConfirmed(int id)
         {
             var UserId = User.GetUserId();
-            var user = _context.Users.Where(u => u.Id == UserId).First();
+            var user = _context.Users.Include(u => u.Downloads).Single(u => u.Id == UserId);
             if (!user.Verified)
             {
                 return RedirectToAction(nameof(Index), new { Message = ManageMessageId.NotVerfied });
             }
 
-            Paper paper = _context.Paper.Single(m => m.PaperId == id);
+            Paper paper = _context.Paper.Include(p => p.Downloader).Single(m => m.PaperId == id);
 
             paper.DownloadsNum = paper.DownloadsNum + 1;
+            
 
             var filePath = UploadPath + paper.FileName;
 
@@ -327,6 +335,17 @@ namespace Portal.Controllers
             Downloads downloads = new Downloads();
             downloads.User = user;
             downloads.Paper = paper;
+
+            if (paper.Downloader == null)
+            {
+                paper.Downloader = new List<Downloads>();
+            }
+            if (user.Downloads == null)
+            {
+                user.Downloads = new List<Downloads>();
+            }
+            paper.Downloader.Add(downloads);
+            user.Downloads.Add(downloads);
 
             _context.Update(downloads);
             _context.Update(paper);

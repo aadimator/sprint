@@ -48,3 +48,7 @@ body {
 .input-group {
     width : 100%;
 }
+
+.modal-backdrop {
+    z-index:50;
+}
