@@ -24,5 +24,20 @@ namespace Paper_Portal.Helpers
             "Psychology"
             };
 
+        public static async Task EnsureDepartmentsCreated(this ApplicationDbContext context)
+        {
+            // add all roles, that should be in database, here
+            foreach (var department in Departments)
+            {
+                if (context.Department.Where(d => d.Name == department).Count() == 0)
+                {
+                    context.Department.Add(new Department()
+                    {
+                        Name = department,
+                    });
+                }
+            }
+            await context.SaveChangesAsync();
+        }
     }
 }

@@ -35,15 +35,12 @@ namespace Paper_Portal.Models
                 .HasDefaultValue(0);
 
             builder.Entity<Downloads>()
-                .HasOne(d => d.Paper)
-                .WithMany(p => p.Downloader);
-            builder.Entity<Downloads>()
-                .HasOne(d => d.User)
-                .WithMany(u => u.Downloads);
+                .HasKey(x => new { x.PaperId, x.UserId });
         }
 
         public DbSet<Paper> Paper { get; set; }
         public DbSet<Department> Department { get; set; }
+        public DbSet<Downloads> Downloads { get; set; }
         public DbSet<ApplicationUser> ApplicationUser { get; set; }
         public DbSet<Admin> Admin { get; set; }
     }

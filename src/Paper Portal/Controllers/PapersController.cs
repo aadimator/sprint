@@ -49,6 +49,8 @@ namespace Portal.Controllers
                 Papers = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
+                    .Include(p => p.Downloader)
+                    .ThenInclude(d => d.User)
                     .Where(p => p.Uploader.Id == UserId)
                     .OrderBy(p => p.Created)
                     .ThenBy(p => p.Due)
@@ -58,8 +60,8 @@ namespace Portal.Controllers
             // otherwise (admin, printer), show all the PDFs
             else
             {
-                Papers = _context.Paper.
-                    Include(p => p.Uploader)
+                Papers = _context.Paper
+                    .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
                     .Where(p => p.Complete == false)
                     .OrderBy(p => p.Created)
@@ -68,6 +70,65 @@ namespace Portal.Controllers
             }
 
             return View(Papers);
+        }
+
+        // GET: Papers/Status
+        public IActionResult Status(ManageMessageId? message = null)
+        {
+            // List of Papers according to the user
+            List<Paper> completed = null;
+            List<Paper> incomplete = null;
+
+            // Get the Currently logged in User
+            string UserId = User.GetUserId();
+
+            // Only show the current teachers incomplete papers
+            if (User.IsInRole(RoleHelper.Teacher))
+            {
+                // Store all the completed Papers in the list
+                completed = _context.Paper
+                    .Include(p => p.Uploader)
+                    .Include(p => p.Uploader.Department)
+                    .Include(p => p.Downloader)
+                    .ThenInclude(d => d.User)
+                    .Where(p => p.Uploader.Id == UserId)
+                    .Where(p => p.Complete == true)
+                    .ToList();
+                // Store all the remaining papers uploaded by the teacher
+                incomplete = _context.Paper
+                    .Include(p => p.Uploader)
+                    .Include(p => p.Uploader.Department)
+                    .Include(p => p.Downloader)
+                    .ThenInclude(d => d.User)
+                    .Where(p => p.Uploader.Id == UserId)
+                    .Where(p => p.Complete == false)
+                    .ToList();
+            }
+            else // for printers, show all the incomplete jobs
+            {
+                // Store all the completed Papers by the printer in the list
+                completed = _context.Downloads
+                    .Where(d => d.User.Id == UserId)
+                    .Select(d => d.Paper)
+                    .Where(p => p.Complete == true)
+                    .Include(p => p.Uploader)
+                    .ToList();
+
+                incomplete = _context.Paper
+                    .Include(p => p.Uploader)
+                    .Include(p => p.Uploader.Department)
+                    .Where(p => p.Complete == false)
+                    .ToList();
+            }
+
+            var StatusVM = new StatusViewModel
+            {
+                Completed = completed,
+                Incomplete = incomplete,
+            };
+
+
+            return View(StatusVM);
         }
 
         // GET: Papers/Details/5
@@ -96,7 +157,12 @@ namespace Portal.Controllers
             {
                 return RedirectToAction(nameof(Index), new { Message = ManageMessageId.NotVerfied });
             }
-            return View(new CreateViewModel());
+            return View(new CreateViewModel()
+            {
+                Copies = 20,
+                Instructor = User.GetUserName(),
+                Due = DateTime.Now.AddDays(2),
+            });
         }
 
         // POST: Papers/Create
@@ -106,10 +172,10 @@ namespace Portal.Controllers
         public IActionResult Create(CreateViewModel model)
         {
             // create a unique fileName using TimeStamp, Remove the whitespace from the Title
-            string fileName = DateTime.UtcNow.ToFileTimeUtc() + "-" + model.Title.Replace(" ", String.Empty); 
+            string fileName = DateTime.UtcNow.ToFileTimeUtc() + "-" + model.Title.Replace(" ", String.Empty);
 
             string filePath = UploadPath + fileName;
-            
+
             var pdf = new PDF();
             bool uploaded = pdf.upload(model.File, filePath);
 
@@ -131,7 +197,8 @@ namespace Portal.Controllers
 
                 paper.UploaderId = User.GetUserId();
                 paper.Uploader = _context.Users.Where(u => u.Id == paper.UploaderId).First();
-                
+
+                paper.Downloader = new List<Downloads>();
 
                 _context.Paper.Add(paper);
                 _context.SaveChanges();
@@ -221,13 +288,8 @@ namespace Portal.Controllers
         // GET: Papers/Download/5
         [ActionName("Download")]
         [Authorize(Roles = RoleHelper.Printer)]
-        public IActionResult Download(int? id)
+        public IActionResult Download(int id)
         {
-            if (id == null)
-            {
-                return HttpNotFound();
-            }
-
             var user = _context.Users.Where(u => u.Id == User.GetUserId()).First();
             if (!user.Verified)
             {
@@ -251,28 +313,67 @@ namespace Portal.Controllers
             }
             return View(paper);
         }
-
+        
         // POST: Papers/Download/5
         [HttpPost, ActionName("Download")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         [Authorize(Roles = RoleHelper.Printer)]
         public IActionResult DownloadConfirmed(int id)
         {
-            var user = _context.Users.Where(u => u.Id == User.GetUserId()).First();
+            var UserId = User.GetUserId();
+            var user = _context.Users.Include(u => u.Downloads).Single(u => u.Id == UserId);
             if (!user.Verified)
             {
                 return RedirectToAction(nameof(Index), new { Message = ManageMessageId.NotVerfied });
             }
 
-            Paper paper = _context.Paper.Single(m => m.PaperId == id);
+            Paper paper = _context.Paper.Include(p => p.Downloader).Single(m => m.PaperId == id);
+
             paper.DownloadsNum = paper.DownloadsNum + 1;
             
+
             var filePath = UploadPath + paper.FileName;
 
             var pdf = new PDF();
             var fileContents = pdf.download(filePath, User.GetUserId(), paper.DownloadsNum, paper.EncKey);
 
+            var count = _context.Downloads.Where(d => d.UserId == UserId && d.PaperId == paper.PaperId).Count();
+            var downloads = new Downloads();
+
+            if (count == 0)
+            {
+                downloads.User = user;
+                downloads.Paper = paper;
+                downloads.Count = 1;
+                downloads.LastDownload = DateTime.UtcNow;
+
+                if (paper.Downloader == null)
+                {
+                    paper.Downloader = new List<Downloads>();
+                }
+                if (user.Downloads == null)
+                {
+                    user.Downloads = new List<Downloads>();
+                }
+                paper.Downloader.Add(downloads);
+                user.Downloads.Add(downloads);
+            } else
+            {
+                downloads = _context.Downloads.Where(d => d.UserId == UserId && d.PaperId == paper.PaperId).Single();
+            }
+
+            var lastTime = downloads.LastDownload;
+            var currentTime = DateTime.UtcNow;
+
+            if (lastTime.AddSeconds(5) < currentTime)
+            {
+                downloads.Count++;
+                downloads.LastDownload = currentTime;
+            }
+
+            _context.Update(downloads);
             _context.Update(paper);
+            _context.Update(user);
             _context.SaveChanges();
 
             var cd = new System.Net.Mime.ContentDisposition
@@ -288,7 +389,7 @@ namespace Portal.Controllers
             return File(fileContents, "application/pdf");
         }
 
-        
+
 
         // GET: Papers/Done?id
         [Authorize(Roles = RoleHelper.Printer)]
@@ -302,7 +403,8 @@ namespace Portal.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = RoleHelper.Admin)]
+
+        [Authorize(Roles = RoleHelper.Printer)]
         public IActionResult JobDone(int id)
         {
             var temp = _context.Paper

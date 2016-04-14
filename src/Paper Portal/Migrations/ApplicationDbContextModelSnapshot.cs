@@ -176,14 +176,15 @@ namespace Paper_Portal.Migrations
 
             modelBuilder.Entity("Paper_Portal.Models.Downloads", b =>
                 {
-                    b.Property<int>("DownloadsId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<int?>("PaperPaperId");
+                    b.Property<int>("PaperId");
 
                     b.Property<string>("UserId");
 
-                    b.HasKey("DownloadsId");
+                    b.Property<int>("Count");
+
+                    b.Property<DateTime>("LastDownload");
+
+                    b.HasKey("PaperId", "UserId");
                 });
 
             modelBuilder.Entity("Paper_Portal.Models.Paper", b =>
@@ -266,7 +267,7 @@ namespace Paper_Portal.Migrations
                 {
                     b.HasOne("Paper_Portal.Models.Paper")
                         .WithMany()
-                        .HasForeignKey("PaperPaperId");
+                        .HasForeignKey("PaperId");
 
                     b.HasOne("Paper_Portal.Models.ApplicationUser")
                         .WithMany()

@@ -11,7 +11,6 @@ namespace Paper_Portal.Models
         public int PaperId { get; set; }
         public string Title { get; set; }
         public string FileName { get; set; }
-        public int Copies { get; set; }
         public string EncKey { get; set; }
         public string Hash { get; set; }
         public string Instructor { get; set; }
@@ -19,12 +18,18 @@ namespace Paper_Portal.Models
         public string Comment { get; set; }
         public string Report { get; set; }
 
+        [Display(Name = "No. of Copies")]
+        [Range(0, 500)]
+        [Required]
+        public int Copies { get; set; }
+
         [Display(Name ="No. of Downloads")]
         public int DownloadsNum { get; set; }
 
         [DataType(DataType.Date)]
         public DateTime Created { get; set; }
 
+        [Display(Name = "Due Date")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime Due { get; set; }

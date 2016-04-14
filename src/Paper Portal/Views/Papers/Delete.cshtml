@@ -10,31 +10,22 @@
 <div>
     <h4>Paper</h4>
     <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Copies)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Copies)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Due)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Due)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Instructor)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Instructor)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <div class="form-actions no-color">
-            <input type="submit" value="Delete" class="btn btn-default" /> |
-            <a asp-action="Index">Back to List</a>
+    <form asp-action="Delete" class="form-horizontal">
+        <div class="col-md-offset-2 col-md-10">
+            <h4>Paper</h4>
+            <hr />
+            <div asp-validation-summary="ValidationSummary.ModelOnly" class="text-danger"></div>
+            @Html.Partial("_PaperDetail")
+            <div class="form-group">
+                <a class="btn btn-default" asp-action="Index">Back to List</a>
+                <a class="btn btn-primary" asp-action="Delete" asp-route-id="@Model.PaperId">Delete</a>
+            </div>
         </div>
     </form>
 </div>
+
+@section Scripts{
+    <script>
+            $(".input-fields").prop("disabled", true); //Disable
+    </script>
+}

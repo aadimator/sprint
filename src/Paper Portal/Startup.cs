@@ -117,6 +117,7 @@ namespace Paper_Portal
             });
 
             await RoleHelper.EnsureRolesCreated(roleManager);
+            await DepartmentHelper.EnsureDepartmentsCreated(app.ApplicationServices.GetService<ApplicationDbContext>());
         }
 
         // Entry point for the application.

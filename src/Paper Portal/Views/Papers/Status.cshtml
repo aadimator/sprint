@@ -1,0 +1,38 @@
+@model Paper_Portal.ViewModels.Papers.StatusViewModel
+@using Paper_Portal.Helpers
+@{
+    ViewData["Title"] = "Papers";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+
+<div class="panel panel-success">
+    <div class="panel-heading" data-toggle="collapse" href="#completed">
+        <h3 class="panel-title">
+            Completed
+        </h3>
+    </div>
+    <div id="completed" class="panel-collapse collapse in">
+        <div class="panel-body">
+            <p>Following Papers are completed.</p>
+            @Html.Partial("_PapersList", Model.Completed)
+        </div>
+    </div>
+</div>
+
+<div class="panel panel-primary">
+    <div class="panel-heading" data-toggle="collapse" href="#incomplete">
+        <h3 class="panel-title">Incomplete</h3>
+    </div>
+    <div id="incomplete" class="panel-collapse collapse in">
+        <div class="panel-body">
+            @Html.Partial("_PapersList", Model.Incomplete)
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ModalScriptPartial"); }
+}
