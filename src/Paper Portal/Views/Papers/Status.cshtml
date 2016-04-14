@@ -1,11 +1,18 @@
 @model Paper_Portal.ViewModels.Papers.StatusViewModel
 @using Paper_Portal.Helpers
 @{
-    ViewData["Title"] = "Papers";
+    ViewData["Title"] = "Status";
 }
 
 <h2>@ViewData["Title"]</h2>
 
+@if ((string)ViewData["StatusMessage"] != "")
+{
+    <div class="alert alert-info alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        @ViewData["StatusMessage"]
+    </div>
+}
 
 <div class="panel panel-success">
     <div class="panel-heading" data-toggle="collapse" href="#completed">

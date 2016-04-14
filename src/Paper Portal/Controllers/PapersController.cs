@@ -35,9 +35,15 @@ namespace Portal.Controllers
         public IActionResult Index(ManageMessageId? message = null)
         {
             ViewData["StatusMessage"] =
-                message == ManageMessageId.FileUploadSuccess ? "Your File has been uploaded."
+                message == ManageMessageId.FileUploadSuccess ? "Your Paper has been uploaded!"
+                : message == ManageMessageId.FileDeletionSuccess ? "Your Paper has been deleted!"
+                : message == ManageMessageId.FileDownloadSuccess ? "Your Paper has been downloded!"
+                : message == ManageMessageId.FileEditSuccess ? "Your changes has been saved successfully!"
                 : message == ManageMessageId.NotVerfied ? "Your Account has not yet been verified by the Admin"
                 : message == ManageMessageId.Error ? "An error has occurred."
+                : message == ManageMessageId.JobsDoneSuccess ? "All Downloaded Jobs are Completed Successfully!"
+                : message == ManageMessageId.JobDoneSuccess ? "Job Completed Successfully!"
+                : message == ManageMessageId.JobDoneFailure ? "Papers should be downloaded before they are marked as Done"
                 : "";
 
             // List of Papers according to the user
@@ -51,13 +57,12 @@ namespace Portal.Controllers
                     .Include(p => p.Uploader.Department)
                     .Include(p => p.Downloader)
                     .ThenInclude(d => d.User)
-                    .Where(p => p.Uploader.Id == UserId)
+                    .Where(p => p.Uploader.Id == UserId && p.Complete == false) // Job is not done
                     .OrderBy(p => p.Created)
                     .ThenBy(p => p.Due)
                     .ToList();
-                //Papers = _context.Users.Where(p => p.Id == UserId).First().Papers.ToList();
             }
-            // otherwise (admin, printer), show all the PDFs
+            // otherwise (printer), show all the PDFs
             else
             {
                 Papers = _context.Paper
@@ -75,8 +80,11 @@ namespace Portal.Controllers
         // GET: Papers/Status
         public IActionResult Status(ManageMessageId? message = null)
         {
+            ViewData["StatusMessage"] =
+                message == ManageMessageId.JobUnDoneSuccess ? "Job Done Status changed to not Done!"
+                : "";
             // List of Papers according to the user
-            List<Paper> completed = null;
+            List <Paper> completed = null;
             List<Paper> incomplete = null;
 
             // Get the Currently logged in User
@@ -247,7 +255,7 @@ namespace Portal.Controllers
             {
                 _context.Update(original);
                 _context.SaveChanges();
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", new { Message = ManageMessageId.FileEditSuccess });
             }
 
             ViewData["UploaderId"] = new SelectList(_context.Users, "Id", "Uploader", paper.UploaderId);
@@ -282,7 +290,7 @@ namespace Portal.Controllers
             Paper paper = _context.Paper.Single(m => m.PaperId == id);
             _context.Paper.Remove(paper);
             _context.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { Message = ManageMessageId.FileDeletionSuccess });
         }
 
         // GET: Papers/Download/5
@@ -391,7 +399,7 @@ namespace Portal.Controllers
 
 
 
-        // GET: Papers/Done?id
+        // POST: Papers/Done
         [Authorize(Roles = RoleHelper.Printer)]
         public IActionResult Done(int[] selected)
         {
@@ -399,21 +407,38 @@ namespace Portal.Controllers
             {
                 JobDone(userId);
             }
-            _context.SaveChanges();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { Message = ManageMessageId.JobsDoneSuccess });
         }
 
-
+        // GET: Papers/Done?id
         [Authorize(Roles = RoleHelper.Printer)]
         public IActionResult JobDone(int id)
         {
             var temp = _context.Paper
                 .Where(p => p.PaperId == id)
                 .First();
+            if (temp.DownloadsNum < 1)
+            {
+                return RedirectToAction(nameof(Index), new { Message = ManageMessageId.JobDoneFailure });
+            }
+
             temp.Complete = true;
             _context.Update(temp);
             _context.SaveChanges();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), new { Message = ManageMessageId.JobDoneSuccess });
+        }
+
+        // GET: Papers/UnDone?id
+        [Authorize(Roles = RoleHelper.Printer)]
+        public IActionResult JobUnDone(int id)
+        {
+            var temp = _context.Paper
+                .Single(p => p.PaperId == id);
+
+            temp.Complete = false;
+            _context.Update(temp);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Status), new { Message = ManageMessageId.JobUnDoneSuccess });
         }
 
         #region Helpers
@@ -429,6 +454,13 @@ namespace Portal.Controllers
         public enum ManageMessageId
         {
             FileUploadSuccess,
+            FileDeletionSuccess,
+            FileEditSuccess,
+            FileDownloadSuccess,
+            JobsDoneSuccess,
+            JobDoneSuccess,
+            JobDoneFailure,
+            JobUnDoneSuccess,
             NotVerfied,
             Error
         }
