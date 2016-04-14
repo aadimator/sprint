@@ -157,7 +157,12 @@ namespace Portal.Controllers
             {
                 return RedirectToAction(nameof(Index), new { Message = ManageMessageId.NotVerfied });
             }
-            return View(new CreateViewModel());
+            return View(new CreateViewModel()
+            {
+                Copies = 20,
+                Instructor = User.GetUserName(),
+                Due = DateTime.Now.AddDays(2),
+            });
         }
 
         // POST: Papers/Create
@@ -311,7 +316,7 @@ namespace Portal.Controllers
         
         // POST: Papers/Download/5
         [HttpPost, ActionName("Download")]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         [Authorize(Roles = RoleHelper.Printer)]
         public IActionResult DownloadConfirmed(int id)
         {

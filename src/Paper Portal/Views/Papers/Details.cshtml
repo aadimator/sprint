@@ -7,53 +7,24 @@
 
 <h2>Details</h2>
 
-<div>
-    <h4>Paper</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.DownloadsNum)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.DownloadsNum)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Copies)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Copies)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Due)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Due)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Title)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Title)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Instructor)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Instructor)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Comment)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Comment)
-        </dd>
-    </dl>
-</div>
-<p>
-    @if (User.IsInRole(RoleHelper.Teacher))
-    {
-        <a asp-action="Edit" asp-route-id="@Model.PaperId">Edit</a> @:|
-    }
-    
-    <a asp-action="Index">Back to List</a>
-</p>
+<form asp-action="Details" class="form-horizontal">
+    <div class="col-md-offset-2 col-md-10">
+        <h4>Paper</h4>
+        <hr />
+        <div asp-validation-summary="ValidationSummary.ModelOnly" class="text-danger"></div>
+        @Html.Partial("_PaperDetail")
+        <div class="form-group">
+            <a class="btn btn-default" asp-action="Index">Back to List</a>
+            @if (User.IsInRole(RoleHelper.Teacher))
+            {
+                <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.PaperId">Edit</a>
+            }
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+    <script>
+        $(".input-fields").prop("disabled", true); //Disable
+    </script>
+}
