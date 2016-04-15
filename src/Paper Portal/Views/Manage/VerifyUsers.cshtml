@@ -8,10 +8,12 @@
 
 <form asp-controller="Manage" asp-action="Verify" method="post" class="form-horizontal" role="form">
     <div class="form-group">
-
-        <input type="checkbox" class="checkbox-inline" id="toggleAll" /><span class="text-info"> Check All </span>
-
-        <button class="btn btn-default pull-right" type="submit">Verify</button>
+        <div class="checkbox checkbox-inline">
+            <label>
+                <input type="checkbox" class="checkbox-inline" id="toggleAll" /> Check All
+            </label>
+        </div>
+        <button class="btn btn-primary btn-raised pull-right" type="submit">Verify</button>
     </div>
     <table class="table">
         <tr>
@@ -36,23 +38,31 @@
         @foreach (var item in Model)
         {
             <tr>
-                <td>
-                    <input type="checkbox" name="selected" value="@item.Id" />
+                <td style="vertical-align:middle;">
+                    <div class="checkbox checkbox-inline">
+                        <label>
+                            <input type="checkbox" name="selected" value="@item.Id" />
+                        </label>
+                    </div>
                 </td>
-                <td>
+                <td style="vertical-align:middle;">
                     @Html.DisplayFor(modelItem => item.Email)
                 </td>
-                <td>
+                <td style="vertical-align:middle;">
                     @Html.DisplayFor(modelItem => item.FullName)
                 </td>
-                <td>
+                <td style="vertical-align:middle;">
                     @Html.DisplayFor(modelItem => item.Department)
                 </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.EmailConfirmed)
+                <td style="vertical-align:middle;">
+                    <div class="checkbox checkbox-inline">
+                        <label>
+                            <input asp-for="@item.EmailConfirmed" class="checkbox checkbox-inline" disabled />
+                        </label>
+                    </div>
                 </td>
-                <td>
-                    <a asp-action="VerifyUser" asp-route-id="@item.Id">Verify</a>
+                <td style="vertical-align:middle;">
+                    <a asp-action="VerifyUser" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Verify</a>
                 </td>
             </tr>
         }
@@ -60,29 +70,5 @@
 </form>
 
 @section Scripts {
-    <script>
-        function toggleChecked(status) {
-            $(".table input[name=selected]").each(function () {
-                // Set the checked status of each to match the
-                // checked status of the check all checkbox:
-                $(this).prop("checked", status);
-            });
-        }
-
-        $(document).ready(function () {
-
-            // Grab a reference to the check all box:
-            var checkAllBox = $("#toggleAll");
-
-            //Set the default value of the global checkbox to true:
-            checkAllBox.prop('checked', false);
-
-            // Attach the call to toggleChecked to the
-            // click event of the global checkbox:
-            checkAllBox.click(function () {
-                var status = checkAllBox.prop('checked');
-                toggleChecked(status);
-            });
-        });
-    </script>
+    @{ await Html.RenderPartialAsync("_CheckAllScriptPartial");}
 }

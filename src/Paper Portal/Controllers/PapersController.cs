@@ -55,10 +55,10 @@ namespace Portal.Controllers
                 Papers = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
-                    .Include(p => p.Downloader)
+                    .Include(p => p.Downloaders)
                     .ThenInclude(d => d.User)
-                    .Where(p => p.Uploader.Id == UserId && p.Complete == false) // Job is not done
-                    .OrderBy(p => p.Created)
+                    .Where(p => p.Uploader.Id == UserId && p.Done == false) // Job is not done
+                    .OrderBy(p => p.CreatedAt)
                     .ThenBy(p => p.Due)
                     .ToList();
             }
@@ -68,8 +68,8 @@ namespace Portal.Controllers
                 Papers = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
-                    .Where(p => p.Complete == false)
-                    .OrderBy(p => p.Created)
+                    .Where(p => p.Done == false)
+                    .OrderBy(p => p.CreatedAt)
                     .ThenBy(p => p.Due)
                     .ToList();
             }
@@ -97,19 +97,19 @@ namespace Portal.Controllers
                 completed = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
-                    .Include(p => p.Downloader)
+                    .Include(p => p.Downloaders)
                     .ThenInclude(d => d.User)
                     .Where(p => p.Uploader.Id == UserId)
-                    .Where(p => p.Complete == true)
+                    .Where(p => p.Done == true)
                     .ToList();
                 // Store all the remaining papers uploaded by the teacher
                 incomplete = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
-                    .Include(p => p.Downloader)
+                    .Include(p => p.Downloaders)
                     .ThenInclude(d => d.User)
                     .Where(p => p.Uploader.Id == UserId)
-                    .Where(p => p.Complete == false)
+                    .Where(p => p.Done == false)
                     .ToList();
             }
             else // for printers, show all the incomplete jobs
@@ -118,14 +118,14 @@ namespace Portal.Controllers
                 completed = _context.Downloads
                     .Where(d => d.User.Id == UserId)
                     .Select(d => d.Paper)
-                    .Where(p => p.Complete == true)
+                    .Where(p => p.Done == true)
                     .Include(p => p.Uploader)
                     .ToList();
 
                 incomplete = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
-                    .Where(p => p.Complete == false)
+                    .Where(p => p.Done == false)
                     .ToList();
             }
 
@@ -147,7 +147,7 @@ namespace Portal.Controllers
                 return HttpNotFound();
             }
 
-            Paper paper = _context.Paper.Include(p => p.Downloader).Single(m => m.PaperId == id);
+            Paper paper = _context.Paper.Include(p => p.Downloaders).Single(m => m.PaperId == id);
             if (paper == null)
             {
                 return HttpNotFound();
@@ -193,7 +193,7 @@ namespace Portal.Controllers
 
                 paper.Copies = model.Copies;
                 paper.Due = model.Due;
-                paper.Created = DateTime.Now;
+                paper.CreatedAt = DateTime.Now;
                 paper.Instructor = model.Instructor;
                 paper.Title = model.Title;
                 paper.Comment = model.Comment;
@@ -206,7 +206,7 @@ namespace Portal.Controllers
                 paper.UploaderId = User.GetUserId();
                 paper.Uploader = _context.Users.Where(u => u.Id == paper.UploaderId).First();
 
-                paper.Downloader = new List<Downloads>();
+                paper.Downloaders = new List<Downloads>();
 
                 _context.Paper.Add(paper);
                 _context.SaveChanges();
@@ -335,7 +335,7 @@ namespace Portal.Controllers
                 return RedirectToAction(nameof(Index), new { Message = ManageMessageId.NotVerfied });
             }
 
-            Paper paper = _context.Paper.Include(p => p.Downloader).Single(m => m.PaperId == id);
+            Paper paper = _context.Paper.Include(p => p.Downloaders).Single(m => m.PaperId == id);
 
             paper.DownloadsNum = paper.DownloadsNum + 1;
 
@@ -357,9 +357,9 @@ namespace Portal.Controllers
             if (Downloads.Count != 0) // the user already downloaded this paper, check if it was downloaded recently
             {
 
-                if (paper.Downloader == null)
+                if (paper.Downloaders == null)
                 {
-                    paper.Downloader = new List<Downloads>();
+                    paper.Downloaders = new List<Downloads>();
                 }
                 if (user.Downloads == null)
                 {
@@ -372,7 +372,7 @@ namespace Portal.Controllers
                 if (lastTime.AddSeconds(5) > currentTime)
                 {
                     _context.Downloads.Add(download);
-                    paper.Downloader.Add(download);
+                    paper.Downloaders.Add(download);
                     user.Downloads.Add(download);
                     _context.Update(paper);
                     _context.Update(user);
@@ -381,7 +381,7 @@ namespace Portal.Controllers
             else // not downloaded before
             {
                 _context.Downloads.Add(download);
-                paper.Downloader.Add(download);
+                paper.Downloaders.Add(download);
                 user.Downloads.Add(download);
                 _context.Update(paper);
                 _context.Update(user);
@@ -419,16 +419,28 @@ namespace Portal.Controllers
         [Authorize(Roles = RoleHelper.Printer)]
         public IActionResult JobDone(int id)
         {
-            var temp = _context.Paper
+            var paper = _context.Paper
                 .Where(p => p.PaperId == id)
                 .First();
-            if (temp.DownloadsNum < 1)
+            if (paper.DownloadsNum < 1)
             {
                 return RedirectToAction(nameof(Index), new { Message = ManageMessageId.JobDoneFailure });
             }
 
-            temp.Complete = true;
-            _context.Update(temp);
+            paper.Done = true;
+
+            var user = _context.Users.Single(u => u.Id == User.GetUserId());
+            paper.DoneById = user.Id;
+            paper.DoneBy = user;
+            
+            if (user.CompletedJobs == null)
+            {
+                user.CompletedJobs = new List<Paper>();
+            }
+            user.CompletedJobs.Add(paper);
+
+            _context.Update(paper);
+            _context.Update(user);
             _context.SaveChanges();
             return RedirectToAction(nameof(Index), new { Message = ManageMessageId.JobDoneSuccess });
         }
@@ -437,11 +449,16 @@ namespace Portal.Controllers
         [Authorize(Roles = RoleHelper.Printer)]
         public IActionResult JobUnDone(int id)
         {
-            var temp = _context.Paper
-                .Single(p => p.PaperId == id);
+            var paper = _context.Paper.Single(p => p.PaperId == id);
+            var user = _context.Users.Single(u => u.Id == User.GetUserId());
 
-            temp.Complete = false;
-            _context.Update(temp);
+            user.CompletedJobs.Remove(paper);
+            paper.Done = false;
+            paper.DoneBy = null;
+            paper.DoneById = null;
+
+            _context.Update(paper);
+            _context.Update(user);
             _context.SaveChanges();
             return RedirectToAction(nameof(Status), new { Message = ManageMessageId.JobUnDoneSuccess });
         }

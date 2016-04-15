@@ -49,7 +49,7 @@
                     @* Downloaders Model *@
                     @if (User.IsInRole(RoleHelper.Teacher) && item.DownloadsNum >= 1)
                     {
-                        var downloaders = item.Downloader.GroupBy(d => d.User)
+                        var downloaders = item.Downloaders.GroupBy(d => d.User)
                             .Select(g => new { g.Key, Count = g.Count() })
                             .ToDictionary(p => p.Key, p => p.Count);
                         var id = "downloaders" + item.PaperId;
@@ -114,9 +114,9 @@
 
                         @if (User.IsInRole(RoleHelper.Printer))
                         {
-                            if (item.Complete == true)
+                            if (item.Done == true)
                             {
-                                <a asp-action="JobUnDone" asp-route-id="@item.PaperId" class="btn btn-danger">Undone</a>
+                                <a asp-action="JobUnDone" asp-route-id="@item.PaperId" class="btn btn-danger">Undo Done</a>
                             }
                             if (ViewBag.Options == "true")
                             {

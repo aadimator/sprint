@@ -77,6 +77,11 @@ namespace Paper_Portal.Controllers
                         return View(model);
                     }
                 }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    return View(model);
+                }
                 var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
@@ -138,11 +143,12 @@ namespace Paper_Portal.Controllers
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
-        { 
+        {
             if (ModelState.IsValid)
             {
                 var department = _context.Department.Where(d => d.DepartmentId == model.DepartmentId).First();
-                var user = new ApplicationUser {
+                var user = new ApplicationUser
+                {
                     UserName = model.Name,
                     Email = model.Email,
                     Downloads = new List<Downloads>(),

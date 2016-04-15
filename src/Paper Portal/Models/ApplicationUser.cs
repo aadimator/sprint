@@ -16,6 +16,7 @@ namespace Paper_Portal.Models
 
         public ICollection<Paper> Uploads { get; set; } // for teachers
         public ICollection<Downloads> Downloads { get; set; } // for printers
+        public ICollection<Paper> CompletedJobs { get; set; } // All the completed jobs by the Priner
     }
 
     public class Admin

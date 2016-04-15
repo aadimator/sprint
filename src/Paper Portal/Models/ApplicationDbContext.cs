@@ -31,12 +31,19 @@ namespace Paper_Portal.Models
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Paper>()
+                .HasOne(p => p.DoneBy)
+                .WithMany(u => u.CompletedJobs)
+                .IsRequired(false)
+                .HasForeignKey(p => p.DoneById)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Paper>()
                 .Property(p => p.DownloadsNum)
                 .HasDefaultValue(0);
 
             builder.Entity<Downloads>()
                 .HasOne(d => d.Paper)
-                .WithMany(p => p.Downloader)
+                .WithMany(p => p.Downloaders)
                 .HasForeignKey(d => d.PaperId);
 
             builder.Entity<Downloads>()

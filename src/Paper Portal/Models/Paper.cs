@@ -14,7 +14,7 @@ namespace Paper_Portal.Models
         public string EncKey { get; set; }
         public string Hash { get; set; }
         public string Instructor { get; set; }
-        public bool Complete { get; set; }
+        public bool Done { get; set; }
         public string Comment { get; set; }
         public string Report { get; set; }
 
@@ -27,7 +27,7 @@ namespace Paper_Portal.Models
         public int DownloadsNum { get; set; }
 
         [DataType(DataType.Date)]
-        public DateTime Created { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         [Display(Name = "Due Date")]
         [DataType(DataType.Date)]
@@ -37,6 +37,10 @@ namespace Paper_Portal.Models
         public string UploaderId { get; set; }
         public ApplicationUser Uploader { get; set; }
 
-        public ICollection<Downloads> Downloader { get; set; }
+        // The User who completed the job 
+        public string DoneById { get; set; }
+        public ApplicationUser DoneBy { get; set; }
+
+        public ICollection<Downloads> Downloaders { get; set; }
     }
 }
