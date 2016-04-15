@@ -1,6 +1,7 @@
 @model Paper_Portal.Models.Paper
 
-    <input type="hidden" asp-for="PaperId" />
+<input type="hidden" asp-for="PaperId" />
+<div class="col-md-6">
     <div class="form-group label-floating">
         <label asp-for="Title" class="control-label"></label>
         <input asp-for="Title" class="form-control input-fields" />
@@ -16,6 +17,8 @@
         <input asp-for="Due" class="form-control input-fields" />
         <span asp-validation-for="Due" class="text-danger" />
     </div>
+</div>
+<div class="col-md-6">
     <div class="form-group label-floating">
         <label asp-for="Instructor" class="control-label"></label>
         <input asp-for="Instructor" class="form-control input-fields" />
@@ -24,3 +27,4 @@
         <label asp-for="Comment" class="control-label"></label>
         <textarea asp-for="Comment" class="form-control input-fields"></textarea>
     </div>
+</div>

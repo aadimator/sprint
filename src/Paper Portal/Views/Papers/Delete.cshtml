@@ -6,26 +6,22 @@
 
 <h2>Delete</h2>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Paper</h4>
-    <hr />
+@*<h3>Are you sure you want to delete this?</h3>*@
+<div class="well col-md-11 col-md-offset-1">
     <form asp-action="Delete" class="form-horizontal">
-        <div class="col-md-offset-2 col-md-10">
-            <h4>Paper</h4>
-            <hr />
-            <div asp-validation-summary="ValidationSummary.ModelOnly" class="text-danger"></div>
-            @Html.Partial("_PaperDetail")
-            <div class="form-group">
-                <a class="btn btn-default" asp-action="Index">Back to List</a>
-                <a class="btn btn-primary" asp-action="Delete" asp-route-id="@Model.PaperId">Delete</a>
-            </div>
+        <h4>Paper</h4>
+        <hr />
+        <div asp-validation-summary="ValidationSummary.ModelOnly" class="text-danger"></div>
+        @Html.Partial("_PaperDetail")
+        <div class="form-group col-md-6">
+            <a class="btn btn-default" asp-action="Index">Back to List</a>
+            <a class="btn btn-primary" asp-action="Delete" asp-route-id="@Model.PaperId">Delete</a>
         </div>
     </form>
 </div>
 
 @section Scripts{
     <script>
-            $(".input-fields").prop("disabled", true); //Disable
+        $(".input-fields").prop("disabled", true); //Disable
     </script>
 }

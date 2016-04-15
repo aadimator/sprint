@@ -19,8 +19,8 @@
     else
     {
         <h3>Verfication Successful!</h3>
-        <form asp-action="Download" class="form-horizontal">
-            <div class="col-md-offset-2 col-md-10">
+        <div class="center-block well">
+            <form asp-action="Download" class="form-horizontal">
                 <h4>Paper</h4>
                 <hr />
                 <div asp-validation-summary="ValidationSummary.ModelOnly" class="text-danger"></div>
@@ -29,8 +29,8 @@
                     <a class="btn btn-default" asp-action="Index">Back to List</a>
                     <input type="submit" class="btn btn-primary" value="Download" />
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     }
 
     @section Scripts{
