@@ -112,15 +112,22 @@ namespace Portal.Controllers
                     .Where(p => p.Done == false)
                     .ToList();
             }
-            else // for printers, show all the incomplete jobs
+            else // for printers
             {
                 // Store all the completed Papers by the printer in the list
-                completed = _context.Downloads
-                    .Where(d => d.User.Id == UserId)
-                    .Select(d => d.Paper)
-                    .Where(p => p.Done == true)
-                    .Include(p => p.Uploader)
-                    .ToList();
+                var temp = _context.Users
+                    .Where(u => u.Id == User.GetUserId())
+                    .Include(u => u.CompletedJobs)
+                    .Single()
+                    .CompletedJobs;
+
+                completed = temp != null ? temp.ToList() : new List<Paper>();
+                //completed = _context.Downloads
+                //    .Where(d => d.User.Id == UserId)
+                //    .Select(d => d.Paper)
+                //    .Where(p => p.Done == true)
+                //    .Include(p => p.Uploader)
+                //    .ToList();
 
                 incomplete = _context.Paper
                     .Include(p => p.Uploader)
@@ -369,7 +376,7 @@ namespace Portal.Controllers
                 var lastTime = Downloads.Last().DownloadedAt;
                 var currentTime = DateTime.UtcNow;
 
-                if (lastTime.AddSeconds(5) > currentTime)
+                if (currentTime > lastTime.AddSeconds(5))
                 {
                     _context.Downloads.Add(download);
                     paper.Downloaders.Add(download);
@@ -429,7 +436,7 @@ namespace Portal.Controllers
 
             paper.Done = true;
 
-            var user = _context.Users.Single(u => u.Id == User.GetUserId());
+            var user = _context.Users.Include(u => u.CompletedJobs).Single(u => u.Id == User.GetUserId());
             paper.DoneById = user.Id;
             paper.DoneBy = user;
             
