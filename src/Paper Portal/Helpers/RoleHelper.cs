@@ -7,9 +7,9 @@ namespace Paper_Portal.Helpers
     public static class RoleHelper
     {
 
-        public const string Admin = "admin";
-        public const string Teacher = "teacher";
-        public const string Printer = "printer";
+        public const string Admin = "Admin";
+        public const string Teacher = "Faculty Memeber";
+        public const string Printer = "Printer";
 
         private static async Task EnsureRoleCreated(RoleManager<IdentityRole> roleManager, string roleName)
         {
