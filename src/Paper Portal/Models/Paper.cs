@@ -15,6 +15,7 @@ namespace Paper_Portal.Models
         public string Hash { get; set; }
         public string Instructor { get; set; }
         public bool Done { get; set; }
+        public bool Delete { get; set; }
         public string Comment { get; set; }
         public string Report { get; set; }
 
