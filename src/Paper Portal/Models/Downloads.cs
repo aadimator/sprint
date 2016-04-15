@@ -7,13 +7,14 @@ namespace Paper_Portal.Models
 {
     public class Downloads
     {
+        public int DownloadsId { get; set; }
+
         public int PaperId { get; set; }
         public Paper Paper { get; set; }
 
         public string UserId { get; set; }
         public ApplicationUser User { get; set; }
 
-        public int Count { get; set; }
-        public DateTime LastDownload { get; set; }
+        public DateTime DownloadedAt { get; set; }
     }
 }

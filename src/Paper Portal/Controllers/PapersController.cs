@@ -84,7 +84,7 @@ namespace Portal.Controllers
                 message == ManageMessageId.JobUnDoneSuccess ? "Job Done Status changed to not Done!"
                 : "";
             // List of Papers according to the user
-            List <Paper> completed = null;
+            List<Paper> completed = null;
             List<Paper> incomplete = null;
 
             // Get the Currently logged in User
@@ -321,7 +321,7 @@ namespace Portal.Controllers
             }
             return View(paper);
         }
-        
+
         // POST: Papers/Download/5
         [HttpPost, ActionName("Download")]
         //[ValidateAntiForgeryToken]
@@ -338,22 +338,24 @@ namespace Portal.Controllers
             Paper paper = _context.Paper.Include(p => p.Downloader).Single(m => m.PaperId == id);
 
             paper.DownloadsNum = paper.DownloadsNum + 1;
-            
+
 
             var filePath = UploadPath + paper.FileName;
 
             var pdf = new PDF();
             var fileContents = pdf.download(filePath, User.GetUserId(), paper.DownloadsNum, paper.EncKey);
 
-            var count = _context.Downloads.Where(d => d.UserId == UserId && d.PaperId == paper.PaperId).Count();
-            var downloads = new Downloads();
+            var Downloads = _context.Downloads.Where(d => d.UserId == UserId && d.PaperId == paper.PaperId).OrderBy(d => d.DownloadedAt).ToList();
 
-            if (count == 0)
+            var download = new Downloads();
+
+            download.User = user;
+            download.Paper = paper;
+            download.DownloadedAt = DateTime.UtcNow;
+
+            // Want this because IDM tries to call this function twice
+            if (Downloads.Count != 0) // the user already downloaded this paper, check if it was downloaded recently
             {
-                downloads.User = user;
-                downloads.Paper = paper;
-                downloads.Count = 1;
-                downloads.LastDownload = DateTime.UtcNow;
 
                 if (paper.Downloader == null)
                 {
@@ -363,25 +365,28 @@ namespace Portal.Controllers
                 {
                     user.Downloads = new List<Downloads>();
                 }
-                paper.Downloader.Add(downloads);
-                user.Downloads.Add(downloads);
-            } else
+
+                var lastTime = Downloads.Last().DownloadedAt;
+                var currentTime = DateTime.UtcNow;
+
+                if (lastTime.AddSeconds(5) > currentTime)
+                {
+                    _context.Downloads.Add(download);
+                    paper.Downloader.Add(download);
+                    user.Downloads.Add(download);
+                    _context.Update(paper);
+                    _context.Update(user);
+                }
+            }
+            else // not downloaded before
             {
-                downloads = _context.Downloads.Where(d => d.UserId == UserId && d.PaperId == paper.PaperId).Single();
+                _context.Downloads.Add(download);
+                paper.Downloader.Add(download);
+                user.Downloads.Add(download);
+                _context.Update(paper);
+                _context.Update(user);
             }
 
-            var lastTime = downloads.LastDownload;
-            var currentTime = DateTime.UtcNow;
-
-            if (lastTime.AddSeconds(5) < currentTime)
-            {
-                downloads.Count++;
-                downloads.LastDownload = currentTime;
-            }
-
-            _context.Update(downloads);
-            _context.Update(paper);
-            _context.Update(user);
             _context.SaveChanges();
 
             var cd = new System.Net.Mime.ContentDisposition

@@ -18,7 +18,7 @@ namespace Paper_Portal.Models
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
             builder.Entity<ApplicationUser>()
-                 .HasOne(u => u.Department) 
+                 .HasOne(u => u.Department)
                  .WithMany(d => d.Users)
                  .HasForeignKey(u => u.DepartmentId)
                  .IsRequired(false)
@@ -35,7 +35,14 @@ namespace Paper_Portal.Models
                 .HasDefaultValue(0);
 
             builder.Entity<Downloads>()
-                .HasKey(x => new { x.PaperId, x.UserId });
+                .HasOne(d => d.Paper)
+                .WithMany(p => p.Downloader)
+                .HasForeignKey(d => d.PaperId);
+
+            builder.Entity<Downloads>()
+                .HasOne(d => d.User)
+                .WithMany(u => u.Downloads)
+                .HasForeignKey(d => d.UserId);
         }
 
         public DbSet<Paper> Paper { get; set; }
