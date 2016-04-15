@@ -57,7 +57,7 @@ namespace Portal.Controllers
                     .Include(p => p.Uploader.Department)
                     .Include(p => p.Downloaders)
                     .ThenInclude(d => d.User)
-                    .Where(p => p.Uploader.Id == UserId && p.Done == false) // Job is not done
+                    .Where(p => p.Uploader.Id == UserId && p.Done == false && p.Delete == false) // Job is not done
                     .OrderBy(p => p.CreatedAt)
                     .ThenBy(p => p.Due)
                     .ToList();
@@ -68,7 +68,7 @@ namespace Portal.Controllers
                 Papers = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
-                    .Where(p => p.Done == false)
+                    .Where(p => p.Done == false && p.Delete == false)
                     .OrderBy(p => p.CreatedAt)
                     .ThenBy(p => p.Due)
                     .ToList();
@@ -99,7 +99,7 @@ namespace Portal.Controllers
                     .Include(p => p.Uploader.Department)
                     .Include(p => p.Downloaders)
                     .ThenInclude(d => d.User)
-                    .Where(p => p.Uploader.Id == UserId)
+                    .Where(p => p.Uploader.Id == UserId && p.Delete == false)
                     .Where(p => p.Done == true)
                     .ToList();
                 // Store all the remaining papers uploaded by the teacher
@@ -108,7 +108,7 @@ namespace Portal.Controllers
                     .Include(p => p.Uploader.Department)
                     .Include(p => p.Downloaders)
                     .ThenInclude(d => d.User)
-                    .Where(p => p.Uploader.Id == UserId)
+                    .Where(p => p.Uploader.Id == UserId && p.Delete == false)
                     .Where(p => p.Done == false)
                     .ToList();
             }
@@ -132,7 +132,7 @@ namespace Portal.Controllers
                 incomplete = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
-                    .Where(p => p.Done == false)
+                    .Where(p => p.Done == false && p.Delete == false)
                     .ToList();
             }
 
@@ -295,7 +295,8 @@ namespace Portal.Controllers
         public IActionResult DeleteConfirmed(int id)
         {
             Paper paper = _context.Paper.Single(m => m.PaperId == id);
-            _context.Paper.Remove(paper);
+            paper.Delete = true;
+            _context.Update(paper);
             _context.SaveChanges();
             return RedirectToAction("Index", new { Message = ManageMessageId.FileDeletionSuccess });
         }

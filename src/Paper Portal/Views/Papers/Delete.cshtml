@@ -15,7 +15,7 @@
         @Html.Partial("_PaperDetail")
         <div class="form-group col-md-6">
             <a class="btn btn-default" asp-action="Index">Back to List</a>
-            <a class="btn btn-primary" asp-action="Delete" asp-route-id="@Model.PaperId">Delete</a>
+            <button class="btn btn-danger" asp-action="Delete" asp-route-id="@Model.PaperId">Delete</button>
         </div>
     </form>
 </div>
