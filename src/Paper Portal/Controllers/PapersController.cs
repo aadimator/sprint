@@ -12,6 +12,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.Data.Entity;
+using Paper_Portal.Services;
 
 namespace Portal.Controllers
 {
@@ -21,14 +22,16 @@ namespace Portal.Controllers
     {
         private ApplicationDbContext _context;
         private IApplicationEnvironment _appEnvironment;
+        private IEmailSender _emailSender;
 
         // Place to store the Uploaded Encrypted Files
         public string UploadPath { get { return _appEnvironment.ApplicationBasePath + "\\Uploads\\"; } }
 
-        public PapersController(ApplicationDbContext context, IApplicationEnvironment environment)
+        public PapersController(ApplicationDbContext context, IApplicationEnvironment environment, IEmailSender emailSender)
         {
             _appEnvironment = environment;
             _context = context;
+            _emailSender = emailSender;
         }
 
         // GET: Papers
@@ -425,9 +428,10 @@ namespace Portal.Controllers
 
         // GET: Papers/Done?id
         [Authorize(Roles = RoleHelper.Printer)]
-        public IActionResult JobDone(int id)
+        public async Task<IActionResult> JobDone(int id)
         {
             var paper = _context.Paper
+                .Include(p => p.Uploader)
                 .Where(p => p.PaperId == id)
                 .First();
             if (paper.DownloadsNum < 1)
@@ -450,6 +454,13 @@ namespace Portal.Controllers
             _context.Update(paper);
             _context.Update(user);
             _context.SaveChanges();
+
+            // Email to the Uploader
+            var uploader = paper.Uploader;
+            var message = @"The following job has been completed:
+                            
+                    ";
+            await _emailSender.SendEmailAsync(uploader.Email, paper.Title + ", Job Completed!", message);
             return RedirectToAction(nameof(Index), new { Message = ManageMessageId.JobDoneSuccess });
         }
 
