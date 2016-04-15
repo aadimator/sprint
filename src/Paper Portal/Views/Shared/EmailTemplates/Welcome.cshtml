@@ -117,7 +117,7 @@
                     <tr>
                         <td align="center" valign="top" style="padding: 15px 0;" class="logo">
                             <a href="#" target="_blank">
-                                <img alt="Logo" src="~/images/logo.png" width="60" height="60" style="display: block; font-family: Helvetica, Arial, sans-serif; color: #ffffff; font-size: 16px;" border="0">
+                                <img alt="Logo" src=http://i.imgur.com/xGnUPIK.png @*width="60" height="60"*@ style="display: block; font-family: Helvetica, Arial, sans-serif; color: #ffffff; font-size: 16px;" border="0">
                             </a>
                         </td>
                     </tr>
@@ -142,15 +142,36 @@
                             <!-- COPY -->
                             <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
-                                    <td align="center" style="font-size: 32px; font-family: Helvetica, Arial, sans-serif; color: #333333; padding-top: 30px;" class="padding-copy">Welcome to the Sprint, @Model.Name</td>
+                                    <td align="center" style="font-size: 32px; font-family: Helvetica, Arial, sans-serif; color: #333333; padding-top: 30px;" class="padding-copy">
+                                    Welcome to the Sprint, @Model.Name
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td align="left" style="padding: 20px 0 0 0; font-size: 16px; line-height: 25px; font-family: Helvetica, Arial, sans-serif; color: #666666;" class="padding-copy">
+                                        Now you can easily upload your documents for printing and forget about all the hassles of maintaining security. We'll take care of it for you.
+                                        There's just one more step before you could enjoy the benefits of secure printing.
                                         Click on the following link to activate your account :
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td align="center" style="border-radius: 3px;" bgcolor="#256F9C"><a href="@Model.Link" target="_blank" style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; border-radius: 3px; padding: 15px 25px; border: 1px solid #256F9C; display: inline-block;" class="mobile-button">Activate</a></td>
+                                    <td align="center">
+                                        <!-- BULLETPROOF BUTTON -->
+                                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                            <tr>
+                                                <td align="center" style="padding-top: 25px;" class="padding">
+                                                    <table border="0" cellspacing="0" cellpadding="0" class="mobile-button-container">
+                                                        <tr>
+                                                            <td align="center" style="border-radius: 3px;" bgcolor="#256F9C">
+                                                            <a href="@Model.Link" target="_blank" style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; color: #ffffff; text-decoration: none; border-radius: 3px; padding: 15px 25px; border: 1px solid #256F9C; display: inline-block;" class="mobile-button">
+                                                                Activate
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
                                 </tr>
                             </table>
                         </td>
@@ -211,7 +232,7 @@
                             University of Haripur, Haripur, KP, PK
                             <br />
                             <span style="font-family: Arial, sans-serif; font-size: 12px; color: #444444;">Powered by : </span>
-                            <a href="http://litmus.com" target="_blank" style="color: #666666; text-decoration: none;">C &Aacute; CRL</a>
+                            <a href="http://litmus.com" target="_blank" style="color: #666666; text-decoration: none;">C &amp; CRL</a>
                         </td>
                     </tr>
                 </table>

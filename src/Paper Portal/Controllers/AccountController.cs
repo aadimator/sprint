@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -15,12 +16,13 @@ using Paper_Portal.Helpers;
 using Paper_Portal.Models;
 using Paper_Portal.Services;
 using Paper_Portal.ViewModels.Account;
+using Paper_Portal.ViewModels.Email;
 
 namespace Paper_Portal.Controllers
 {
     [RequireHttps]
     [Authorize]
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -132,7 +134,6 @@ namespace Paper_Portal.Controllers
                 .ToList();
 
             ViewBag.Roles = new SelectList(roles, "Value", "Text", roles.First());
-            // TODO: Modify for the Printer
             ViewBag.Departments = new SelectList(departments, "Value", "Text");
             return View();
         }
@@ -173,8 +174,9 @@ namespace Paper_Portal.Controllers
                     // Send an email with this link
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-                    await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
-                        "Please confirm your account by clicking this link: <a href=\"" + callbackUrl + "\">Verify</a>");
+                    var welcomeModel = new WelcomeVM() { Name = model.Name, Link = callbackUrl };
+                    var messgaeBody = base.RenderPartialViewToString("EmailTemplates/Welcome", welcomeModel);
+                    await _emailSender.SendEmailAsync(model.Email, "Confirm your account", messgaeBody);
                     //await _signInManager.SignInAsync(user, isPersistent: false);
                     _logger.LogInformation(3, "User created a new account with password.");
 

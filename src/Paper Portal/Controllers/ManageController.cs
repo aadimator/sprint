@@ -12,6 +12,7 @@ using Paper_Portal.Services;
 using Paper_Portal.ViewModels.Manage;
 using Microsoft.Data.Entity;
 using Paper_Portal.Helpers;
+using Microsoft.AspNet.Mvc.Rendering;
 
 namespace Paper_Portal.Controllers
 {
@@ -45,10 +46,11 @@ namespace Paper_Portal.Controllers
         //
         // GET: /Manage/Index
         [HttpGet]
-        public async Task<IActionResult> Index(ManageMessageId? message = null)
+        public IActionResult Index(ManageMessageId? message = null)
         {
             ViewData["StatusMessage"] =
                 message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
+                : message == ManageMessageId.EditSuccess ? "User Profile has been updated!"
                 : message == ManageMessageId.Error ? "An error has occurred."
                 : "";
 
@@ -57,10 +59,10 @@ namespace Paper_Portal.Controllers
                 .Where(u => u.Id == User.GetUserId())
                 .First();
 
-            var dep = user.Department.Name;
+            var dep = (user.Department != null) ? user.Department.Name : "Printer";
             var model = new IndexViewModel
             {
-                Department = user.Department.Name,
+                Department = dep,
                 Email = user.Email,
                 FullName = user.FullName,
                 UserName = user.UserName,
@@ -68,6 +70,63 @@ namespace Paper_Portal.Controllers
             return View(model);
         }
 
+        //
+        // GET: /Manage/Edit
+        [HttpGet]
+        public IActionResult Edit()
+        {
+
+            var user = _context.Users
+                .Include(u => u.Department)
+                .Where(u => u.Id == User.GetUserId())
+                .First();
+
+            var dep = user.Department.Name;
+            var model = new EditVM
+            {
+                DepartmentId = user.Department.DepartmentId,
+                FullName = user.FullName,
+            };
+
+            var departments = _context.Department
+                .Select(s => new
+                {
+                    Text = s.Name,
+                    Value = s.DepartmentId
+                })
+                .ToList();
+            ViewBag.Departments = new SelectList(departments, "Value", "Text");
+            return View(model);
+        }
+
+        //
+        // Post: /Manage/Edit
+        [HttpPost]
+        public IActionResult Edit(EditVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = _context.Users.Include(u => u.Department).Single(u => u.Id == User.GetUserId());
+                var prevDepartment = user.Department; // remove user from this 
+                var newDepartment = _context.Department.Single(d => d.DepartmentId == model.DepartmentId);
+                prevDepartment.Users.Remove(user);
+
+                user.FullName = model.FullName;
+                user.DepartmentId = model.DepartmentId;
+                user.Department = newDepartment;
+                newDepartment.Users.Add(user);
+
+                _context.Update(user);
+                _context.Update(prevDepartment);
+                _context.Update(newDepartment);
+                _context.SaveChanges();
+
+                return RedirectToAction("Index", new { Message = ManageMessageId.EditSuccess });
+            }
+
+            // If we got this far, something failed, redisplay form
+            return RedirectToAction("Edit");
+        }
         //
         // GET: /Manage/ChangePassword
         [HttpGet]
@@ -166,6 +225,7 @@ namespace Paper_Portal.Controllers
         public enum ManageMessageId
         {
             ChangePasswordSuccess,
+            EditSuccess,
             Error
         }
 
