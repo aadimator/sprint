@@ -15,528 +15,340 @@
  */
 
 body {
-  margin: 0;
+    margin: 0;
 }
 
 /* Disable ugly boxes around images in IE10 */
-a img{
-  border: 0px;
+a img {
+    border: 0px;
 }
 
 ::-moz-selection {
-  background-color: #6ab344;
-  color: #fff;
+    background-color: #6ab344;
+    color: #fff;
 }
 
 ::selection {
-  background-color: #6ab344;
-  color: #fff;
+    background-color: #6ab344;
+    color: #fff;
 }
 
 .sprint-search-box .mdl-textfield__input {
-  color: rgba(0, 0, 0, 0.87);
+    color: rgba(0, 0, 0, 0.87);
 }
 
 .sprint-header .mdl-menu__container {
-  z-index: 50;
-  margin: 0 !important;
+    z-index: 50;
+    margin: 0 !important;
 }
 
 
 .mdl-textfield--expandable {
-  width: auto;
-}
-
-.sprint-fab {
-  position: absolute;
-  right: 20%;
-  bottom: -26px;
-  z-index: 3;
-  background: #64ffda !important;
-  color: black !important;
+    width: auto;
 }
 
 .sprint-mobile-title {
-  display: none !important;
+    display: none !important;
 }
 
 
 .sprint-logo-image {
-  height: 28px;
-  width: 140px;
+    height: 28px;
+    width: 140px;
 }
 
 
 .sprint-header {
-  overflow: visible;
-  background-color: white;
+    overflow: visible;
+    background-color: white;
 }
 
-  .sprint-header .material-icons {
-    color: #767777 !important;
-  }
+    .sprint-header .material-icons {
+        color: #767777 !important;
+    }
 
-  .sprint-header .mdl-layout__drawer-button {
-    background: transparent;
-    color: #767777;
-  }
+    .sprint-header .mdl-layout__drawer-button {
+        background: transparent;
+        color: #767777;
+    }
 
-  .sprint-header .mdl-navigation__link {
-    color: #757575;
-    font-weight: 700;
-    font-size: 14px;
-  }
+    .sprint-header .mdl-navigation__link {
+        color: #757575;
+        font-weight: 700;
+        font-size: 14px;
+    }
 
-  .sprint-navigation-container {
+.sprint-navigation-container {
     /* Simple hack to make the overflow happen to the left instead... */
     direction: rtl;
     -webkit-order: 1;
-        -ms-flex-order: 1;
-            order: 1;
+    -ms-flex-order: 1;
+    order: 1;
     width: 500px;
-    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-        width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-  .sprint-navigation {
+.sprint-navigation {
     /* ... and now make sure the content is actually LTR */
     direction: ltr;
     -webkit-justify-content: flex-end;
-        -ms-flex-pack: end;
-            justify-content: flex-end;
+    -ms-flex-pack: end;
+    justify-content: flex-end;
     width: 800px;
-  }
+}
 
-  .sprint-search-box.is-focused + .sprint-navigation-container {
+.sprint-search-box.is-focused + .sprint-navigation-container {
     opacity: 0;
     width: 100px;
-  }
+}
 
 
-  .sprint-navigation .mdl-navigation__link {
+.sprint-navigation .mdl-navigation__link {
     display: inline-block;
     height: 60px;
     line-height: 68px;
     background-color: transparent !important;
     border-bottom: 4px solid transparent;
-  }
+}
 
     .sprint-navigation .mdl-navigation__link:hover {
-      border-bottom: 4px solid #8bc34a;
+        border-bottom: 4px solid #8bc34a;
     }
 
-  .sprint-search-box {
+.sprint-search-box {
     -webkit-order: 2;
-        -ms-flex-order: 2;
-            order: 2;
+    -ms-flex-order: 2;
+    order: 2;
     margin-left: 16px;
     margin-right: 16px;
-  }
+}
 
-  .sprint-more-button {
+.sprint-more-button {
     -webkit-order: 3;
-        -ms-flex-order: 3;
-            order: 3;
-  }
+    -ms-flex-order: 3;
+    order: 3;
+}
 
 
 .sprint-drawer {
-  border-right: none;
+    border-right: none;
 }
 
-  .sprint-drawer-separator {
+.sprint-drawer-separator {
     height: 1px;
     background-color: #dcdcdc;
     margin: 8px 0;
-  }
+}
 
-  .sprint-drawer .mdl-navigation__link.mdl-navigation__link {
+.sprint-drawer .mdl-navigation__link.mdl-navigation__link {
     font-size: 14px;
     color: #757575;
-  }
+}
 
-  .sprint-drawer span.mdl-navigation__link.mdl-navigation__link {
+.sprint-drawer span.mdl-navigation__link.mdl-navigation__link {
     color: #8bc34a;
-  }
+}
 
-  .sprint-drawer .mdl-layout-title {
+.sprint-drawer .mdl-layout-title {
     position: relative;
     background: #6ab344;
     height: 160px;
-  }
+}
 
-    .sprint-drawer .sprint-logo-image {
-      position: absolute;
-      bottom: 16px;
-    }
+.sprint-drawer .sprint-logo-image {
+    position: absolute;
+    bottom: 16px;
+}
 
-.sprint-be-together-section {
-  position: relative;
-  height: 800px;
-  width: auto;
-  background-color: #f3f3f3;
-  background: url('images/slide01.jpg') center 30% no-repeat;
-  background-size: cover;
+.sprint-slogan-section {
+    position: relative;
+    height: 800px;
+    width: auto;
+    background-color: #f3f3f3;
+    background: url('images/slide01.jpg') center 30% no-repeat;
+    background-size: cover;
 }
 
 .logo-font {
-  font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
-  line-height: 1;
-  color: #767777;
-  font-weight: 500;
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    line-height: 1;
+    color: #767777;
+    font-weight: 500;
 }
 
 .sprint-slogan {
-  font-size: 60px;
-  padding-top: 160px;
+    font-size: 60px;
+    padding-top: 160px;
 }
 
 .sprint-sub-slogan {
-  font-size: 21px;
-  padding-top: 24px;
-}
-
-.sprint-create-character {
-  font-size: 21px;
-  padding-top: 400px;
-}
-
-  .sprint-create-character a {
-    text-decoration: none;
-    color: #767777;
-    font-weight: 300;
-  }
-
-.sprint-screen-section {
-  position: relative;
-  padding-top: 60px;
-  padding-bottom: 80px;
-}
-
-.sprint-screens {
-  text-align: right;
-  width: 100%;
-  white-space: nowrap;
-  overflow-x: auto;
-}
-
-.sprint-screen {
-  text-align: center;
-}
-
-.sprint-screen .sprint-link {
-  margin-top: 16px;
-  display: block;
-  z-index: 2;
+    font-size: 21px;
+    padding-top: 24px;
 }
 
 .sprint-image-link {
-  text-decoration: none;
+    text-decoration: none;
 }
-
-.sprint-wear {
-  display: inline-block;
-  width: 160px;
-  margin-right: 32px;
-}
-
-  .sprint-wear .sprint-screen-image {
-    width: 40%;
-    z-index: 1;
-  }
-
-
-.sprint-phone {
-  display: inline-block;
-  width: 64px;
-  margin-right: 48px;
-}
-
-  .sprint-phone .sprint-screen-image {
-    width: 100%;
-    z-index: 1;
-  }
-
-
-.sprint-tablet {
-  display: inline-block;
-  width: 110px;
-  margin-right: 64px;
-}
-
-  .sprint-tablet .sprint-screen-image {
-    width: 100%;
-    z-index: 1;
-  }
-
-  .sprint-tablet .sprint-link {
-    display: block;
-    z-index: 2;
-  }
-
-
-.sprint-tv {
-  display: inline-block;
-  width: 300px;
-  margin-right: 80px;
-}
-
-  .sprint-tv .sprint-screen-image {
-    width: 100%;
-    z-index: 1;
-  }
-
-
-.sprint-auto {
-  display: inline-block;
-  width: 300px;
-  overflow: hidden;
-}
-
-  .sprint-auto .sprint-screen-image {
-    display: block;
-    height: 300px;
-    z-index: 1;
-  }
-
-
-.sprint-wear-section {
-  position: relative;
-  background: url('images/wear.png') center top no-repeat;
-  background-size: cover;
-  height: 800px;
-}
-
-.sprint-wear-band {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
-  background-color: #37474f;
-}
-
-.sprint-wear-band-text {
-  max-width: 800px;
-  margin-left: 25%;
-  padding: 24px;
-  text-align: left;
-  color: white;
-}
-
-  .sprint-wear-band-text p {
-    padding-top: 8px;
-  }
 
 .sprint-link {
-  text-decoration: none;
-  color: #8bc34a !important;
+    text-decoration: none;
+    color: #8bc34a !important;
 }
 
-  .sprint-link:hover {
-    color: #7cb342 !important;
-  }
+    .sprint-link:hover {
+        color: #7cb342 !important;
+    }
 
-  .sprint-link .material-icons {
-    position: relative;
-    top: -1px;
-    vertical-align: middle;
-  }
+    .sprint-link .material-icons {
+        position: relative;
+        top: -1px;
+        vertical-align: middle;
+    }
 
 .sprint-alt-link {
-  text-decoration: none;
-  color: #64ffda !important;
-  font-size: 16px;
+    text-decoration: none;
+    color: #64ffda !important;
+    font-size: 16px;
 }
 
-  .sprint-alt-link:hover {
-    color: #00bfa5 !important;
-  }
+    .sprint-alt-link:hover {
+        color: #00bfa5 !important;
+    }
 
-  .sprint-alt-link .material-icons {
-    position: relative;
-    top: 6px;
-  }
-
-.sprint-customized-section {
-  text-align: center;
-}
-
-.sprint-customized-section-text {
-  max-width: 500px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 80px 16px 0 16px;
-}
-
-  .sprint-customized-section-text p {
-    padding-top: 16px;
-  }
-
-.sprint-customized-section-image {
-  background: url('images/devices.jpg') center top no-repeat;
-  background-size: cover;
-  height: 400px;
-}
-
-.sprint-more-section {
-  padding: 80px 0;
-  max-width: 1044px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-  .sprint-more-section .sprint-section-title {
-    margin-left: 12px;
-    padding-bottom: 24px;
-  }
+    .sprint-alt-link .material-icons {
+        position: relative;
+        top: 6px;
+    }
 
 .sprint-card-container {
 }
 
-  .sprint-card-container .mdl-card__media {
-    overflow: hidden;
-    background: transparent;
-  }
-
-    .sprint-card-container .mdl-card__media img {
-      width: 100%;
+    .sprint-card-container .mdl-card__media {
+        overflow: hidden;
+        background: transparent;
     }
 
-  .sprint-card-container .mdl-card__title {
-    background: transparent;
-    height: auto;
-  }
+        .sprint-card-container .mdl-card__media img {
+            width: 100%;
+        }
 
-  .sprint-card-container .mdl-card__title-text {
-    color: black;
-    height: auto;
-  }
+    .sprint-card-container .mdl-card__title {
+        background: transparent;
+        height: auto;
+    }
 
-  .sprint-card-container .mdl-card__supporting-text {
-    height: auto;
-    color: black;
-    padding-bottom: 56px;
-  }
+    .sprint-card-container .mdl-card__title-text {
+        color: black;
+        height: auto;
+    }
 
-  .sprint-card-container .mdl-card__actions {
-    position: absolute;
-    bottom: 0;
-  }
+    .sprint-card-container .mdl-card__supporting-text {
+        height: auto;
+        color: black;
+        padding-bottom: 56px;
+    }
 
-  .sprint-card-container .mdl-card__actions a {
-    border-top: none;
-    font-size: 16px;
-  }
+    .sprint-card-container .mdl-card__actions {
+        position: absolute;
+        bottom: 0;
+    }
+
+        .sprint-card-container .mdl-card__actions a {
+            border-top: none;
+            font-size: 16px;
+        }
 
 .sprint-footer {
-  background-color: #fafafa;
-  position: relative;
+    background-color: #fafafa;
+    position: relative;
 }
 
-  .sprint-footer a:hover {
-    color: #8bc34a;
-  }
+    .sprint-footer a:hover {
+        color: #8bc34a;
+    }
 
-  .sprint-footer .mdl-mega-footer--top-section::after {
-    border-bottom: none;
-  }
+    .sprint-footer .mdl-mega-footer--top-section::after {
+        border-bottom: none;
+    }
 
-  .sprint-footer .mdl-mega-footer--middle-section::after {
-    border-bottom: none;
-  }
+    .sprint-footer .mdl-mega-footer--middle-section::after {
+        border-bottom: none;
+    }
 
-  .sprint-footer .mdl-mega-footer--bottom-section {
-    position: relative;
-  }
+    .sprint-footer .mdl-mega-footer--bottom-section {
+        position: relative;
+    }
 
-  .sprint-footer .mdl-mega-footer--bottom-section a {
-    margin-right: 2em;
-  }
+        .sprint-footer .mdl-mega-footer--bottom-section a {
+            margin-right: 2em;
+        }
 
-  .sprint-footer .mdl-mega-footer--right-section a .material-icons {
-    position: relative;
-    top: 6px;
-  }
+    .sprint-footer .mdl-mega-footer--right-section a .material-icons {
+        position: relative;
+        top: 6px;
+    }
 
 
 .sprint-link-menu:hover {
-  cursor: pointer;
+    cursor: pointer;
 }
 
 
 /**** Mobile layout ****/
 @media (max-width: 900px) {
-  .sprint-navigation-container {
-    display: none;
-  }
+    .sprint-navigation-container {
+        display: none;
+    }
 
-  .sprint-title {
-    display: none !important;
-  }
+    .sprint-title {
+        display: none !important;
+    }
 
-  .sprint-mobile-title {
-    display: block !important;
-    position: absolute;
-    left: calc(50% - 70px);
-    top: 12px;
-    transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+    .sprint-mobile-title {
+        display: block !important;
+        position: absolute;
+        left: calc(50% - 70px);
+        top: 12px;
+        transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-  /* WebViews in iOS 9 break the "~" operator, and WebViews in OS X 10.10 break
+    /* WebViews in iOS 9 break the "~" operator, and WebViews in OS X 10.10 break
      consecutive "+" operators in some cases. Therefore, we need to use both
      here to cover all the bases. */
-  .sprint.sprint-search-box.is-focused ~ .sprint-mobile-title,
-  .sprint-search-box.is-focused + .sprint-navigation-container + .sprint-mobile-title {
-    opacity: 0;
-  }
+    .sprint.sprint-search-box.is-focused ~ .sprint-mobile-title,
+    .sprint-search-box.is-focused + .sprint-navigation-container + .sprint-mobile-title {
+        opacity: 0;
+    }
 
-  .sprint-more-button {
-    display: none;
-  }
+    .sprint-more-button {
+        display: none;
+    }
 
-  .sprint-search-box.is-focused {
-    width: calc(100% - 48px);
-  }
+    .sprint-search-box.is-focused {
+        width: calc(100% - 48px);
+    }
 
-  .sprint-search-box .mdl-textfield__expandable-holder {
-    width: 100%;
-  }
+    .sprint-search-box .mdl-textfield__expandable-holder {
+        width: 100%;
+    }
 
-  .sprint-be-together-section {
-    height: 350px;
-  }
+    .sprint-slogan-section {
+        height: 350px;
+    }
 
-  .sprint-slogan {
-    font-size: 26px;
-    margin: 0 16px;
-    padding-top: 24px;
-  }
+    .sprint-slogan {
+        font-size: 26px;
+        margin: 0 16px;
+        padding-top: 24px;
+    }
 
-  .sprint-sub-slogan {
-    font-size: 16px;
-    margin: 0 16px;
-    padding-top: 8px;
-  }
+    .sprint-sub-slogan {
+        font-size: 16px;
+        margin: 0 16px;
+        padding-top: 8px;
+    }
 
-  .sprint-create-character {
-    padding-top: 200px;
-    font-size: 16px;
-  }
-
-  .sprint-create-character img {
-    height: 12px;
-  }
-
-  .sprint-fab {
-    display: none;
-  }
-
-  .sprint-wear-band-text {
-    margin-left: 0;
-    padding: 16px;
-  }
-
-  .sprint-footer .mdl-mega-footer--bottom-section {
-    display: none;
-  }
+    .sprint-footer .mdl-mega-footer--bottom-section {
+        display: none;
+    }
 }
