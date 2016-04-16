@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Rendering;
+using Microsoft.AspNet.Mvc.Routing;
 using Microsoft.Data.Entity;
 using Microsoft.Extensions.Logging;
 using Paper_Portal.Helpers;
@@ -171,7 +172,13 @@ namespace Paper_Portal.Controllers
                     // Send an email with this link
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-                    var welcomeModel = new NameLinkVM() { Name = model.Name, Link = callbackUrl };
+                    var welcomeModel = new NameLinkVM()
+                    {
+                        Name = model.Name,
+                        Link = callbackUrl,
+                        BaseURL = Url.Action("Index", "Home", null, protocol: HttpContext.Request.Scheme),
+                    };
+
                     var messgaeBody = base.RenderPartialViewToString("EmailTemplates/Welcome", welcomeModel);
                     await _emailSender.SendEmailAsync(model.Email, "Confirm your account", messgaeBody);
                     //await _signInManager.SignInAsync(user, isPersistent: false);
@@ -280,7 +287,12 @@ namespace Paper_Portal.Controllers
                 var code = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var callbackUrl = Url.Action("ResetPassword", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
 
-                var viewModel = new NameLinkVM() { Name = user.UserName, Link = callbackUrl };
+                var viewModel = new NameLinkVM()
+                {
+                    Name = user.UserName,
+                    Link = callbackUrl,
+                    BaseURL = Url.Action("Index", "Home", null, protocol: HttpContext.Request.Scheme),
+                };
                 var messageBody = base.RenderPartialViewToString("EmailTemplates/ForgotPassword", viewModel);
                 await _emailSender.SendEmailAsync(model.Email, "Reset Password", messageBody);
                 return View("ForgotPasswordConfirmation");
@@ -372,7 +384,12 @@ namespace Paper_Portal.Controllers
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
 
-                var welcomeModel = new NameLinkVM() { Name = user.UserName, Link = callbackUrl };
+                var welcomeModel = new NameLinkVM()
+                {
+                    Name = user.UserName,
+                    Link = callbackUrl,
+                    BaseURL = Url.Action("Index", "Home", null, protocol: HttpContext.Request.Scheme),
+                };
                 var messgaeBody = base.RenderPartialViewToString("EmailTemplates/Welcome", welcomeModel);
                 await _emailSender.SendEmailAsync(model.Email, "Confirm your account", messgaeBody);
 

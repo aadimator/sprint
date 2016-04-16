@@ -13,12 +13,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.Data.Entity;
 using Paper_Portal.Services;
+using Paper_Portal.Controllers;
+using Paper_Portal.ViewModels.Email;
 
 namespace Portal.Controllers
 {
     [RequireHttps]
     [Authorize]
-    public class PapersController : Controller
+    public class PapersController : BaseController
     {
         private ApplicationDbContext _context;
         private IApplicationEnvironment _appEnvironment;
@@ -457,19 +459,28 @@ namespace Portal.Controllers
 
             // Email to the Uploader
             var uploader = paper.Uploader;
-            var message = @"The following job has been completed:
-                            
-                    ";
-            await _emailSender.SendEmailAsync(uploader.Email, paper.Title + ", Job Completed!", message);
+            var JobStatusVM = new JobStatusVM()
+            {
+                Action = "Done",
+                ActionBy = (user.FullName != null) ? user.FullName : user.UserName,
+                At = DateTime.UtcNow.ToLocalTime(),
+                Copies = paper.Copies,
+                Title = paper.Title,
+                Detail = Url.Action("Details", "Papers", new { id = paper.PaperId }, protocol: HttpContext.Request.Scheme),
+                BaseURL = Url.Action("Index", "Home", null, protocol: HttpContext.Request.Scheme),
+        };
+
+            var messageBody = base.RenderPartialViewToString("EmailTemplates/JobStatus", JobStatusVM);
+            await _emailSender.SendEmailAsync(uploader.Email, paper.Title + ", Job Status!", messageBody);
             return RedirectToAction(nameof(Index), new { Message = ManageMessageId.JobDoneSuccess });
         }
 
         // GET: Papers/UnDone?id
         [Authorize(Roles = RoleHelper.Printer)]
-        public IActionResult JobUnDone(int id)
+        public async Task<IActionResult> JobUnDone(int id)
         {
-            var paper = _context.Paper.Single(p => p.PaperId == id);
-            var user = _context.Users.Single(u => u.Id == User.GetUserId());
+            var paper = _context.Paper.Include(p => p.Uploader).Single(p => p.PaperId == id);
+            var user = _context.Users.Include(u => u.CompletedJobs).Single(u => u.Id == User.GetUserId());
 
             user.CompletedJobs.Remove(paper);
             paper.Done = false;
@@ -479,6 +490,23 @@ namespace Portal.Controllers
             _context.Update(paper);
             _context.Update(user);
             _context.SaveChanges();
+
+            // Email to the Uploader
+            var uploader = paper.Uploader;
+            var JobStatusVM = new JobStatusVM()
+            {
+                Action = "Removed from Done",
+                ActionBy = (user.FullName != null) ? user.FullName : user.UserName,
+                At = DateTime.UtcNow.ToLocalTime(),
+                Copies = paper.Copies,
+                Title = paper.Title,
+                Detail = Url.Action("Details", "Papers", new { id = paper.PaperId }, protocol: HttpContext.Request.Scheme),
+                BaseURL = Url.Action("Index", "Home", null, protocol: HttpContext.Request.Scheme),
+            };
+
+            var messageBody = base.RenderPartialViewToString("EmailTemplates/JobStatus", JobStatusVM);
+            await _emailSender.SendEmailAsync(uploader.Email, paper.Title + ", Job Status!", messageBody);
+
             return RedirectToAction(nameof(Status), new { Message = ManageMessageId.JobUnDoneSuccess });
         }
 
