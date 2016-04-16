@@ -13,12 +13,13 @@ using Paper_Portal.ViewModels.Manage;
 using Microsoft.Data.Entity;
 using Paper_Portal.Helpers;
 using Microsoft.AspNet.Mvc.Rendering;
+using Paper_Portal.ViewModels.Email;
 
 namespace Paper_Portal.Controllers
 {
     [RequireHttps]
     [Authorize]
-    public class ManageController : Controller
+    public class ManageController : BaseController
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
@@ -59,7 +60,7 @@ namespace Paper_Portal.Controllers
                 .Where(u => u.Id == User.GetUserId())
                 .First();
 
-            var dep = (user.Department != null) ? user.Department.Name : "Printer";
+            var dep = (user.Department != null) ? user.Department.Name : null;
             var model = new IndexViewModel
             {
                 Department = dep,
@@ -81,10 +82,9 @@ namespace Paper_Portal.Controllers
                 .Where(u => u.Id == User.GetUserId())
                 .First();
 
-            var dep = user.Department.Name;
             var model = new EditVM
             {
-                DepartmentId = user.Department.DepartmentId,
+                DepartmentId = (user.Department != null) ? user.Department.DepartmentId : -1,
                 FullName = user.FullName,
             };
 
@@ -107,18 +107,23 @@ namespace Paper_Portal.Controllers
             if (ModelState.IsValid)
             {
                 var user = _context.Users.Include(u => u.Department).Single(u => u.Id == User.GetUserId());
-                var prevDepartment = user.Department; // remove user from this 
-                var newDepartment = _context.Department.Single(d => d.DepartmentId == model.DepartmentId);
-                prevDepartment.Users.Remove(user);
+                if (User.IsInRole(RoleHelper.Teacher))
+                {
+                    var prevDepartment = user.Department; // remove user from this 
+                    var newDepartment = _context.Department.Single(d => d.DepartmentId == model.DepartmentId);
+                    prevDepartment.Users.Remove(user);
 
+                    user.DepartmentId = model.DepartmentId;
+                    user.Department = newDepartment;
+                    newDepartment.Users.Add(user);
+
+                    _context.Update(prevDepartment);
+                    _context.Update(newDepartment);
+                }
+
+                // update the FullName for both Teachers and Printers
                 user.FullName = model.FullName;
-                user.DepartmentId = model.DepartmentId;
-                user.Department = newDepartment;
-                newDepartment.Users.Add(user);
-
                 _context.Update(user);
-                _context.Update(prevDepartment);
-                _context.Update(newDepartment);
                 _context.SaveChanges();
 
                 return RedirectToAction("Index", new { Message = ManageMessageId.EditSuccess });
@@ -127,6 +132,21 @@ namespace Paper_Portal.Controllers
             // If we got this far, something failed, redisplay form
             return RedirectToAction("Edit");
         }
+
+        // GET: Manage/Users
+        [HttpGet]
+        [Authorize(Roles = RoleHelper.Admin)]
+        public IActionResult Users(ManageMessageId? message = null)
+        {
+            ViewData["StatusMessage"] =
+                message == ManageMessageId.Error ? "Papers should be downloaded before they are marked as Done"
+                : "";
+
+            var Users = _context.Users.ToList();
+
+            return View(Users);
+        }
+
         //
         // GET: /Manage/ChangePassword
         [HttpGet]
@@ -160,6 +180,72 @@ namespace Paper_Portal.Controllers
             }
             return RedirectToAction(nameof(Index), new { Message = ManageMessageId.Error });
         }
+
+
+        ////
+        //// GET: /Manage/ChangeEmail
+        //[HttpGet]
+        //public IActionResult ChangeEmail()
+        //{
+        //    return View();
+        //}
+
+        ////
+        //// POST: /Manage/ChangeEmail
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> ChangeEmail(ChangeEmailViewModel model)
+        //{
+        //    var modelError = "";
+
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(model);
+        //    }
+
+        //    var user = await GetCurrentUserAsync();
+        //    if (user != null)
+        //    {
+        //        var correctPassword = await _userManager.CheckPasswordAsync(user, model.OldPassword);
+        //        if (correctPassword)
+        //        {
+        //            // Check if email already exists
+        //            if (_context.Users.Where(u => u.Email == model.NewEmail).Count() == 0)
+        //            {
+        //                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        //                var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+
+        //                var EmailChangeNotification = new NameLinkVM()
+        //                {
+        //                    Name = (user.FullName != null) ? user.FullName : user.UserName,
+        //                    BaseURL = Url.Action("Index", "Home", null, protocol: HttpContext.Request.Scheme),
+        //                };
+
+        //                var emailNotification = base.RenderPartialViewToString("EmailTemplates/EmailChanageNotification", EmailChangeNotification);
+        //                await _emailSender.SendEmailAsync(user.Email, "Confirm your account", emailNotification);
+
+
+
+        //                _logger.LogInformation(3, "User changed their email successfully.");
+        //                return RedirectToAction(nameof(Index), new { Message = ManageMessageId.ChangePasswordSuccess });
+        //            }
+        //            else
+        //            {
+        //                modelError = "Email Already Exists!";
+        //            }
+                    
+        //        }
+        //        else
+        //        {
+        //            modelError = "Incorrect Password!";
+        //        }
+
+        //        ModelState.AddModelError(String.Empty, modelError);
+        //        return View(model);
+        //    }
+        //    return RedirectToAction(nameof(Index), new { Message = ManageMessageId.Error });
+        //}
+
 
         // GET: Manage/Verfiy
         [Authorize(Roles = RoleHelper.Admin)]
