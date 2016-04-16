@@ -417,11 +417,11 @@ namespace Portal.Controllers
 
         // POST: Papers/Done
         [Authorize(Roles = RoleHelper.Printer)]
-        public IActionResult Done(int[] selected)
+        public async Task<IActionResult> Done(int[] selected)
         {
             foreach (var userId in selected)
             {
-                JobDone(userId);
+                await JobDone(userId);
             }
             return RedirectToAction(nameof(Index), new { Message = ManageMessageId.JobsDoneSuccess });
         }
