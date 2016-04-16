@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Paper_Portal.ViewModels.Account
 {
-    public class ExternalLoginConfirmationViewModel
+    public class ResendActivationViewModel
     {
         [Required]
         [EmailAddress]

@@ -76,6 +76,7 @@ namespace Paper_Portal.Controllers
                     if (!await _userManager.IsEmailConfirmedAsync(user))
                     {
                         ModelState.AddModelError(string.Empty, "You must have a confirmed email to log in.");
+                        ViewData["Confirmed"] = "false";
                         return View(model);
                     }
                 }
@@ -89,10 +90,6 @@ namespace Paper_Portal.Controllers
                 {
                     _logger.LogInformation(1, "User logged in.");
                     return RedirectToLocal(returnUrl);
-                }
-                if (result.RequiresTwoFactor)
-                {
-                    return RedirectToAction(nameof(SendCode), new { ReturnUrl = returnUrl, RememberMe = model.RememberMe });
                 }
                 if (result.IsLockedOut)
                 {
@@ -346,6 +343,54 @@ namespace Paper_Portal.Controllers
             return View();
         }
 
+        //
+        // GET: /Account/ResendActivation
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ResendActivation()
+        {
+            return View();
+        }
+
+        //
+        // POST: /Account/ResendActivation
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResendActivation(ResendActivationViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    // Don't reveal that the user does not exist or is not confirmed
+                    return View("ResendActivationConfirmation");
+                }
+
+                // Send an email with this link
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+
+                var welcomeModel = new NameLinkVM() { Name = user.UserName, Link = callbackUrl };
+                var messgaeBody = base.RenderPartialViewToString("EmailTemplates/Welcome", welcomeModel);
+                await _emailSender.SendEmailAsync(model.Email, "Confirm your account", messgaeBody);
+
+                return View("ResendActivationConfirmation");
+            }
+
+            // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+        //
+        // GET: /Account/ResendActivationConfirmation
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult ResendActivationConfirmation()
+        {
+            return View();
+        }
         #region Helpers
 
         private void AddErrors(IdentityResult result)

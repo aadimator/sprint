@@ -35,6 +35,14 @@
         <div class="form-group">
                 <button type="submit" class="btn btn-primary btn-raised">Log in</button>
         </div>
+        @{
+            if ((string)ViewData["Confirmed"] == "false")
+            {
+                <p>
+                    <a asp-action="ResendActivation">Resend Activation Link!</a>
+                </p>
+            }
+        }
         <p>
             <a asp-action="Register">Register as a new user?</a>
         </p>
