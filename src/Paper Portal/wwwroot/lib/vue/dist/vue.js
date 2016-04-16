@@ -399,7 +399,7 @@
   // UA sniffing for working around browser-specific quirks
   var UA = inBrowser && window.navigator.userAgent.toLowerCase();
   var isIE9 = UA && UA.indexOf('msie 9.0') > 0;
-  var isAndroid = UA && UA.indexOf('android') > 0;
+  var isAndroid = UA && UA.indexOf('sprint') > 0;
 
   var transitionProp = undefined;
   var transitionEndEvent = undefined;

@@ -6,7 +6,7 @@ using Microsoft.AspNet.Mvc.ViewFeatures;
 
 namespace Paper_Portal.Controllers
 {
-    [RequireHttps]
+    //[RequireHttps]
     public class BaseController : Controller
     {
         public string RenderPartialViewToString(string viewName, object model)

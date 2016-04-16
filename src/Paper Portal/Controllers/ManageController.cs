@@ -17,7 +17,7 @@ using Paper_Portal.ViewModels.Email;
 
 namespace Paper_Portal.Controllers
 {
-    [RequireHttps]
+    //[RequireHttps]
     [Authorize]
     public class ManageController : BaseController
     {
