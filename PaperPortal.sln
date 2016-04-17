@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		global.json = global.json
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "PaperPortal", "src\Paper Portal\PaperPortal.xproj", "{2AB72B8B-F54F-47BE-A867-A7C420B04231}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "PaperPortal", "src\PaperPortal\PaperPortal.xproj", "{2AB72B8B-F54F-47BE-A867-A7C420B04231}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
