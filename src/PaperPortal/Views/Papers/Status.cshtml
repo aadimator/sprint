@@ -4,11 +4,11 @@
     ViewData["Title"] = "Status";
 }
 
-<h2>@ViewData["Title"]</h2>
+<h2 class="text-primary-color">@ViewData["Title"]</h2>
 
 @if ((string)ViewData["StatusMessage"] != "")
 {
-    <div class="alert alert-info alert-dismissible" role="alert">
+    <div class="alert alert-dismissible mdl-color-text--primary-dark" role="alert">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         @ViewData["StatusMessage"]
     </div>
@@ -22,7 +22,6 @@
     </div>
     <div id="completed" class="panel-collapse collapse in">
         <div class="panel-body">
-            <p>Following Papers are completed.</p>
             @Html.Partial("_PapersList", Model.Completed)
         </div>
     </div>
@@ -38,7 +37,6 @@
         </div>
     </div>
 </div>
-
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ModalScriptPartial"); }

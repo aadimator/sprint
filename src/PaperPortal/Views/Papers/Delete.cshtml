@@ -4,18 +4,19 @@
     ViewData["Title"] = "Delete";
 }
 
-<h2>Delete</h2>
+<h2 class="text-primary-color">@ViewData["Title"]</h2>
 
-@*<h3>Are you sure you want to delete this?</h3>*@
-<div class="well col-md-11 col-md-offset-1">
+<div class="well col-md-10 col-md-offset-1">
     <form asp-action="Delete" class="form-horizontal">
         <h4>Paper</h4>
         <hr />
         <div asp-validation-summary="ValidationSummary.ModelOnly" class="text-danger"></div>
         @Html.Partial("_PaperDetail")
-        <div class="form-group col-md-6">
-            <a class="btn btn-default" asp-action="Index">Back to List</a>
-            <button class="btn btn-danger" asp-action="Delete" asp-route-id="@Model.PaperId">Delete</button>
+        <div class="col-md-4 col-md-offset-4">
+            <div class="form-group">
+                <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised" asp-action="Index">Back to List</a>
+                <button class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--accent mdl-button--raised" asp-action="Delete" asp-route-id="@Model.PaperId">Delete</button>
+            </div>
         </div>
     </form>
 </div>

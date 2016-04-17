@@ -159,7 +159,7 @@ namespace Portal.Controllers
                 return HttpNotFound();
             }
 
-            Paper paper = _context.Paper.Include(p => p.Downloaders).Single(m => m.PaperId == id);
+            Paper paper = _context.Paper.Include(p => p.Downloaders).Include(p => p.DoneBy).Single(m => m.PaperId == id);
             if (paper == null)
             {
                 return HttpNotFound();
