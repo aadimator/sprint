@@ -1,5 +1,6 @@
 body {
     margin: 0;
+    overflow:hidden;
 }
 
 /* Disable ugly boxes around images in IE10 */
@@ -90,6 +91,9 @@ a img {
     overflow: visible;
 }
 
+    .sprint-header .mdl-layout__header-row {
+        background: #1976D2; /*dark-primary-color*/
+    }
     .sprint-header .mdl-layout__drawer-button {
         background: transparent;
         /*color: #767777;*/
@@ -220,8 +224,9 @@ a img {
     position: relative;
     margin: 0 auto;
     border-radius:50%;
-    width: 600px;
-	height: 600px;
+    width: 580px;
+	height: 580px;
+    margin-top:20px;
 }
 
 .sprint-slogan-section .sprint-logo-image {
