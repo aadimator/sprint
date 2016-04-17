@@ -3,11 +3,11 @@
 
 @if (User.IsSignedIn())
 {
-    <a class="mdl-navigation__link" asp-controller="Papers" asp-action="Index">Papers</a>
-    <a class="mdl-navigation__link" asp-controller="Papers" asp-action="Status">Status</a>
+    <a class="mdl-navigation__link text-primary-color" asp-controller="Papers" asp-action="Index">Papers</a>
+    <a class="mdl-navigation__link text-primary-color" asp-controller="Papers" asp-action="Status">Status</a>
     @if (User.IsInRole(RoleHelper.Teacher))
     {
-        <a class="mdl-navigation__link" asp-controller="Papers" asp-action="Create">Create</a>
+        <a class="mdl-navigation__link text-primary-color" asp-controller="Papers" asp-action="Create">Upload</a>
     }
     else if (User.IsInRole(RoleHelper.Printer))
     {
@@ -15,7 +15,7 @@
     }
     if (User.IsInRole(RoleHelper.Admin))
     {
-        <a class="mdl-navigation__link" asp-controller="Manage" asp-action="VerifyUsers">Verify</a>
+        <a class="mdl-navigation__link text-primary-color" asp-controller="Manage" asp-action="VerifyUsers">Verify</a>
     }
 }
 

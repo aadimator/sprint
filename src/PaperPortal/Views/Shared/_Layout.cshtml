@@ -1,4 +1,5 @@
-﻿<!doctype html>
+﻿@using Paper_Portal.Helpers;
+<!doctype html>
 
 <html lang="en">
 <head>
@@ -14,9 +15,9 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
         <link href="~/css/fontFace.css" rel="stylesheet" /> <!-- As a fallback -->
+        <link rel="stylesheet" href="~/css/material.min.css">
         <link rel="stylesheet" href="~/css/bootstrap-material-design.css" />
         <link rel="stylesheet" href="~/css/ripples.css" />
-        <link rel="stylesheet" href="~/css/material.css">
         <link rel="stylesheet" href="~/css/template.css">
         <link rel="stylesheet" href="~/css/site.css" />
     </environment>
@@ -34,7 +35,6 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <link rel="stylesheet" href="~/css/bootstrap-material-design.css" />
         <link rel="stylesheet" href="~/css/ripples.css" />
-        <link rel="stylesheet" href="~/css/material.css">
         <link rel="stylesheet" href="~/css/template.css">
         <link rel="stylesheet" href="~/css/site.css" />
     </environment>
@@ -53,10 +53,10 @@
 <body>
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
 
-        <div class="sprint-header mdl-layout__header mdl-layout__header--waterfall">
+        <div class="sprint-header text-primary-color mdl-color--primary mdl-layout__header mdl-layout__header--waterfall">
             <div class="mdl-layout__header-row">
                 <span class="sprint-title mdl-layout-title">
-                    <a asp-controller="Home" asp-action="Index"><img class="sprint-logo-image" src="~/images/logo.png"></a>
+                    <a asp-controller="Home" asp-action="Index"><img class="sprint-logo-image" src="~/images/logo-white.png"></a>
                 </span>
                 <!-- Add spacer, to align navigation to the right in desktop -->
                 <div class="sprint-header-spacer mdl-layout-spacer"></div>
@@ -82,11 +82,10 @@
         </div>
 
         <div class="sprint-drawer mdl-layout__drawer">
-            <span class="mdl-layout-title">
+            <span class="mdl-layout-title mdl-color--primary-dark">
                 <a asp-controller="Home"><img class="sprint-logo-image" src="~/images/logo-white.png"></a>
             </span>
-            <nav class="mdl-navigation">
-                @Html.Partial("_LoginPartial")
+            <nav class="sprint-drawer-navigation mdl-navigation">
                 @Html.Partial("_DrawerPartial")
             </nav>
         </div>
@@ -95,6 +94,16 @@
             <a name="top"></a>
             <div class="container">
                 @RenderBody()
+
+                @{
+                    if (User.IsInRole(RoleHelper.Teacher))
+                    {
+                        <a asp-controller="Papers" asp-action="Create" id="create-fab" class="sprint-fab mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+                            <i class="material-icons">cloud_upload</i>
+                        </a>
+                        <div class="mdl-tooltip mdl-tooltip--left" for="create-fab">Upload</div>
+                    }
+                }
             </div>
             @*<footer class="sprint-footer mdl-mini-footer">
 
@@ -108,8 +117,8 @@
                 <div class="mdl-mini-footer--left-section">
                     <p class="mdl-typography--font-light">Sprint: © 2016 Powered by : C &amp; CRL</p>
                     @*<p class="mdl-typography--font-light">Some features and devices may not be available in all areas</p>*@
-                @*</div>
-            </footer>*@
+            @*</div>
+                </footer>*@
         </div>
     </div>
 
@@ -122,12 +131,6 @@
         <script src="~/js/ripples.js" asp-append-version="true"></script>
         <script src="~/js/mdl.js" asp-append-version="true"></script>
         <script src="~/js/site.js" asp-append-version="true"></script>
-
-        <script>
-
-            $.material.init();
-
-        </script>
     </environment>
     <environment names="Staging,Production">
         <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.1.4.min.js"
