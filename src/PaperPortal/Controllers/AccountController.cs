@@ -157,6 +157,14 @@ namespace Paper_Portal.Controllers
                 {
                     user.DepartmentId = model.DepartmentId;
                     user.Department = department;
+
+                    if (department.Users == null)
+                    {
+                        department.Users = new List<ApplicationUser>(); 
+                    }
+                    department.Users.Add(user);
+                    _context.Update(department);
+                    _context.SaveChanges();
                 }
 
                 var result = await _userManager.CreateAsync(user, model.Password);
@@ -183,14 +191,6 @@ namespace Paper_Portal.Controllers
                     await _emailSender.SendEmailAsync(model.Email, "Confirm your account", messgaeBody);
                     //await _signInManager.SignInAsync(user, isPersistent: false);
                     _logger.LogInformation(3, "User created a new account with password.");
-
-                    // Add user to the Department
-                    if (user.DepartmentId != null)
-                    {
-                        department.Users.Add(user);
-                        _context.Update(department);
-                        _context.SaveChanges();
-                    }
 
                     return RedirectToAction(nameof(HomeController.Index), "Home");
                 }

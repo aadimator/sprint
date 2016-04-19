@@ -7,7 +7,7 @@
 
 <h2 class="text-primary-color">@ViewData["Title"]</h2>
 
-<form asp-action="Edit">
+<form asp-controller="Manage" asp-action="Edit" method="post" class="form-horizontal" role="form">
     <div class="well col-md-offset-1 col-md-10">
         <div class="form-horizontal">
             <h4>Edit</h4>
@@ -28,7 +28,6 @@
                             <div id="dept" class="form-group label-floating">
                                 <label asp-for="DepartmentId" class="control-label"></label>
                                 <select asp-for="DepartmentId" asp-items="@ViewBag.Departments" class="form-control"></select>
-
                                 <span asp-validation-for="DepartmentId" class="text-danger"></span>
                             </div>
                         </div>
@@ -38,7 +37,7 @@
             <div class="form-group">
                 <div class="col-md-offset-4 col-md-4">
                     <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised" asp-action="Index">Back to Profile</a>
-                    <input type="submit" value="Save" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--accent mdl-button--raised" />
+                    <button type="submit" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--accent mdl-button--raised">Save</button>
                 </div>
             </div>
         </div>

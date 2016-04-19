@@ -100,21 +100,29 @@ namespace Paper_Portal.Controllers
         }
 
         //
-        // Post: /Manage/Edit
+        // POST: /Manage/Edit
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Edit(EditVM model)
         {
             if (ModelState.IsValid)
             {
                 var user = _context.Users.Include(u => u.Department).Single(u => u.Id == User.GetUserId());
-                if (User.IsInRole(RoleHelper.Teacher))
+
+                if (User.IsInRole(RoleHelper.Teacher) && user.DepartmentId != model.DepartmentId)
                 {
                     var prevDepartment = user.Department; // remove user from this 
-                    var newDepartment = _context.Department.Single(d => d.DepartmentId == model.DepartmentId);
                     prevDepartment.Users.Remove(user);
+
+                    var newDepartment = _context.Department.Single(d => d.DepartmentId == model.DepartmentId);
 
                     user.DepartmentId = model.DepartmentId;
                     user.Department = newDepartment;
+
+                    if (newDepartment.Users == null)
+                    {
+                        newDepartment.Users = new List<ApplicationUser>();
+                    }
                     newDepartment.Users.Add(user);
 
                     _context.Update(prevDepartment);
@@ -233,7 +241,7 @@ namespace Paper_Portal.Controllers
         //            {
         //                modelError = "Email Already Exists!";
         //            }
-                    
+
         //        }
         //        else
         //        {
@@ -275,7 +283,7 @@ namespace Paper_Portal.Controllers
             return View(UserList);
         }
 
-        [Authorize (Roles = RoleHelper.Admin)]
+        [Authorize(Roles = RoleHelper.Admin)]
         public IActionResult Verify(string[] selected)
         {
             foreach (var userId in selected)
