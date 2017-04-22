@@ -1,0 +1,56 @@
+﻿@model IndexViewModel
+@using Paper_Portal.Helpers;
+@{
+    ViewData["Title"] = "Manage";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if ((string)ViewData["StatusMessage"] != "")
+{
+    <div class="alert alert-info alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        @ViewData["StatusMessage"]
+    </div>
+}
+
+<div class="well col-md-11 col-md-offset-1">
+    <form>
+        <fieldset>
+            <legend>Account Details</legend>
+            <div class="col-md-6">
+                <div class="form-group label-floating">
+                    <label asp-for="UserName" class="control-label"></label>
+                    <input asp-for="UserName" class="form-control input-fields" disabled />
+                </div>
+                <div class="form-group label-floating">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input asp-for="Email" class="form-control input-fields" disabled />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group label-floating">
+                    <label asp-for="FullName" class="control-label"></label>
+                    <input asp-for="FullName" class="form-control input-fields" disabled />
+                </div>
+                @{
+                    if (User.IsInRole(RoleHelper.Teacher))
+                    {
+                        <div class="form-group label-floating">
+                            <label asp-for="Department" class="control-label"></label>
+                            <input asp-for="Department" class="form-control input-fields" disabled />
+                        </div>
+
+                    }
+                }
+            </div>
+        </fieldset>
+            <a asp-controller="Manage" asp-action="Edit" class="btn btn-primary">Edit</a>
+        <hr />
+        <fieldset>
+            @*<a asp-controller="Manage" asp-action="ChangeEmail" class="btn btn-danger">Change Email</a>*@
+            <a asp-controller="Manage" asp-action="ChangePassword" class="btn btn-danger">Change Password</a>
+        </fieldset>
+            
+    </form>
+</div>

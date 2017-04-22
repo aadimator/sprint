@@ -1,0 +1,42 @@
+@model Paper_Portal.Models.Paper
+
+@{
+    ViewData["Title"] = "Download";
+}
+
+<h2>Download</h2>
+
+@{
+
+    if (ViewBag.Verified == "False")
+    {
+        <h3>Verfication Unsuccessful!</h3>
+        <h4>File Can't be downloaded.</h4>
+        <h5>It has been tampered with.</h5>
+
+        <a asp-action="Index">Back to List</a>
+    }
+    else
+    {
+        <h3>Verfication Successful!</h3>
+        <div class="center-block well">
+            <form asp-action="Download" class="form-horizontal">
+                <h4>Paper</h4>
+                <hr />
+                <div asp-validation-summary="ValidationSummary.ModelOnly" class="text-danger"></div>
+                @Html.Partial("_PaperDetail")
+                <div class="form-group">
+                    <a class="btn btn-default" asp-action="Index">Back to List</a>
+                    <input type="submit" class="btn btn-primary" value="Download" />
+                </div>
+            </form>
+        </div>
+    }
+
+    @section Scripts{
+        <script>
+            $(".input-fields").prop("disabled", true); //Disable
+        </script>
+    }
+
+}

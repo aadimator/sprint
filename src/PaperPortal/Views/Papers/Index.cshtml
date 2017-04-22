@@ -1,0 +1,45 @@
+@model IEnumerable<Paper_Portal.Models.Paper>
+@using Paper_Portal.Helpers
+@{
+    ViewData["Title"] = "Papers";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if ((string)ViewData["StatusMessage"] != "")
+{
+    <div class="alert alert-info alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        @ViewData["StatusMessage"]
+    </div>
+}
+
+@if (User.IsInRole(RoleHelper.Teacher))
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
+
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <h3 class="panel-title">Papers</h3>
+    </div>
+    <div class="panel-body">
+        <form asp-controller="Papers" asp-action="Done" method="post" class="form-horizontal" role="form">
+            @Html.Partial("_CheckAllPartial")
+            @{ 
+                ViewData["Checks"] = "true";
+                ViewData["Options"] = "true";
+            }
+            @Html.Partial("_PapersList", Model)
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{ 
+        await Html.RenderPartialAsync("_ModalScriptPartial");
+        await Html.RenderPartialAsync("_CheckAllScriptPartial");
+         }
+}

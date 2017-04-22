@@ -1,0 +1,68 @@
+﻿@model RegisterViewModel
+@using Paper_Portal.Helpers;
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h2>@ViewData["Title"]</h2>
+<form asp-controller="Account" asp-action="Register" method="post" class="form-horizontal" role="form">
+    <div class="col-md-offset-2 col-md-10">
+        <h4>Create a new account.</h4>
+        <hr />
+        <div asp-validation-summary="ValidationSummary.All" class="text-danger"></div>
+        <div class="form-group label-floating">
+            <label asp-for="Name" class="control-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group label-floating">
+            <label asp-for="Email" class="control-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <div class="form-group label-floating">
+            <label asp-for="Password" class="control-label"></label>
+            <input asp-for="Password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <div class="form-group label-floating">
+            <label asp-for="ConfirmPassword" class="control-label"></label>
+
+            <input asp-for="ConfirmPassword" class="form-control" />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+        <div class="form-group label-floating">
+            <label asp-for="Role" class="control-label"></label>
+            <select asp-for="Role" asp-items="@ViewBag.Roles" class="form-control dropdownjs" id="role"></select>
+
+            <span asp-validation-for="Role" class="text-danger"></span>
+        </div>
+        <div id="dept" class="form-group label-floating">
+            <label asp-for="DepartmentId" class="control-label"></label>
+            <select asp-for="DepartmentId" asp-items="@ViewBag.Departments" class="form-control"></select>
+
+            <span asp-validation-for="DepartmentId" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-raised">Register</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+
+    <script>
+        $(function () {
+            $("#dept").hide();
+
+            $("#role").change(function () {
+                if ($("#role").val() == '@RoleHelper.Printer') {
+                    $("#dept").hide();
+                } else if ($("#role").val() == '@RoleHelper.Teacher') {
+                    $("#dept").show();
+                }
+            });
+        });
+    </script>
+}

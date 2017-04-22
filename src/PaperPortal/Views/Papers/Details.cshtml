@@ -1,0 +1,33 @@
+@model Paper_Portal.Models.Paper
+@using Paper_Portal.Helpers;
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+<div class="well col-lg-11 col-lg-offset-1">
+    <form asp-action="Details" class="form-horizontal">
+        <h4>
+            Paper
+            <i id="done" class="material-icons md-dark @(@Model.Done == true ? "md-active" : "md-inactive" ) md-inactive md-48 pull-right">done</i>
+        </h4>
+        <div class="mdl-tooltip" for="done">@(@Model.Done == true ? "Done" : "Not Done" )</div>
+        <hr />
+        <div asp-validation-summary="ValidationSummary.ModelOnly" class="text-danger">
+        </div>
+        @Html.Partial("_PaperDetail")
+        <div class="form-group col-md-6">
+            <a class="btn btn-default" asp-action="Index">Back to List</a>
+            @if (User.IsInRole(RoleHelper.Teacher))
+            {
+                <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.PaperId">Edit</a>
+            }
+        </div>
+    </form>
+</div>
+@section Scripts{
+    <script>
+        $(".input-fields").prop("disabled", true); //Disable
+    </script>
+}

@@ -1,0 +1,167 @@
+@model IEnumerable<Paper_Portal.Models.Paper>
+@using Paper_Portal.Helpers
+@using Microsoft.Data.Entity;
+<table class="table">
+    <thead>
+        <tr>
+            @* If User is Printer, show the checklist for Job Completion *@
+            @if (User.IsInRole(RoleHelper.Printer) && ViewBag.Checks == "true")
+            {
+                <th>
+                    @Html.Raw("Done")
+                </th>
+            }
+            <th>
+                @Html.Raw("Downloaded")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Copies)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Instructor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Uploader.Department.Name)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+            {
+            <tr>
+                @* If User is Printer, show the checklist for Job Completion *@
+                @if (User.IsInRole(RoleHelper.Printer) && ViewBag.Checks == "true")
+                {
+                    <td>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="selected" value="@item.PaperId" />
+                            </label>
+                        </div>
+                    </td>
+                }
+                @* Downloaded Column *@
+                <td style="vertical-align:middle;">
+                    @* Downloaders Model *@
+                    @if (User.IsInRole(RoleHelper.Teacher) && item.DownloadsNum >= 1)
+                    {
+                        var downloaders = item.Downloaders.GroupBy(d => d.User)
+                            .Select(g => new { g.Key, Count = g.Count() })
+                            .ToDictionary(p => p.Key, p => p.Count);
+                        var id = "downloaders" + item.PaperId;
+                        var btnId = "#" + id;
+                        <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=@btnId>
+                            Downloaders
+                        </button>
+
+                        <div class="modal fade" id=@id tabindex="-1" role="dialog">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title">Downloaders</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <ul>
+                                            @{
+                                                foreach (var entry in downloaders)
+                                                {
+                                                    var name = (entry.Key.FullName != null) ? entry.Key.FullName : entry.Key.UserName;
+                                                    <li>@name <span class="badge">@entry.Value</span></li>
+
+                                                }
+                                            }
+                                        </ul>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                                                }
+                                                // If User is Printer, Show tick or cross
+                                                else if (item.DownloadsNum >= 1)
+                                                {
+                                                    @Html.Raw("&#10004;")
+                                                }
+                                                // If No Downloaders
+                                                else
+                                                {
+                                                    @Html.Raw("&#10008;")
+                                                }
+                </td>
+                <td style="vertical-align:middle;">
+                    @Html.DisplayFor(modelItem => item.Copies)
+                </td>
+                <td style="vertical-align:middle;">
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td style="vertical-align:middle;">
+                    @Html.DisplayFor(modelItem => item.Instructor)
+                </td>
+                <td style="vertical-align:middle;">
+                    @Html.DisplayFor(modelItem => item.Uploader.Department.Name)
+                </td>
+                <td>
+
+                    <div class="btn-group-xs">
+                        <a asp-action="Details" asp-route-id="@item.PaperId" class="btn btn-info">Details</a>
+
+                        @if (User.IsInRole(RoleHelper.Printer))
+                        {
+                            if (item.Done == true)
+                            {
+                                <a asp-action="JobUnDone" asp-route-id="@item.PaperId" class="btn btn-danger">Undo Done</a>
+                            }
+                            if (ViewBag.Options == "true")
+                            {
+                                <a asp-action="Download" asp-route-id="@item.PaperId" class="btn btn-primary">Download</a>
+                                <a asp-action="JobDone" asp-route-id="@item.PaperId" class="btn btn-success">Done</a>
+
+                                // Comment Model Box
+                                @if (item.Comment != null)
+                                {
+                                    var id = "comments" + item.PaperId;
+                                    var btnId = "#" + id;
+                                    <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=@btnId>
+                                        Comment
+                                    </button>
+
+                                    <div class="modal fade" id=@id tabindex="-1" role="dialog">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                    <h4 class="modal-title">Comment</h4>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>@item.Comment</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+
+
+                        }
+                        @if (User.IsInRole(RoleHelper.Teacher) && ViewBag.Options == "true")
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.PaperId" class="btn btn-primary">Edit</a>
+                                <a asp-action="Delete" asp-route-id="@item.PaperId" class="btn btn-danger">Delete</a>
+                        }
+                    </div>
+                </td>
+
+            </tr>
+                                                }
+    </tbody>
+</table>
