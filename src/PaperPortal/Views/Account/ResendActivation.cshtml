@@ -3,23 +3,26 @@
     ViewData["Title"] = "Resend Activation Link!";
 }
 
-<h2>@ViewData["Title"].</h2>
+<h2 class="text-primary-color">@ViewData["Title"]</h2>
 
-<form asp-controller="Account" asp-action="ResendActivation" method="post" class="form-horizontal" role="form">
-    <div class="col-md-offset-2 col-md-10">
+<div class="well col-md-4 col-md-offset-4">
+
+    <form asp-controller="Account" asp-action="ResendActivation" method="post" class="form-horizontal" role="form">
         <h4>Enter your email.</h4>
         <hr />
         <div asp-validation-summary="ValidationSummary.All" class="text-danger"></div>
         <div class="form-group label-floating">
             <label asp-for="Email" class="control-label"></label>
             <input asp-for="Email" class="form-control" />
-            <span asp-validation-for="Email" class="text-danger" />
+            <span asp-validation-for="Email" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <input type="submit" value="Send Link" class="btn btn-primary" />
+            <div class="col-md-offset-4 col-md-4">
+                <button type="submit" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--accent mdl-button--raised">Send Link</button>
+            </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }

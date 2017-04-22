@@ -8,7 +8,7 @@ namespace Paper_Portal.Helpers
     {
 
         public const string Admin = "Admin";
-        public const string Teacher = "Faculty Memeber";
+        public const string Teacher = "Faculty Member";
         public const string Printer = "Printer";
 
         private static async Task EnsureRoleCreated(RoleManager<IdentityRole> roleManager, string roleName)
