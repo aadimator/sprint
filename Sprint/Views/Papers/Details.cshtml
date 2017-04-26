@@ -1,0 +1,36 @@
+@model Sprint.Models.Paper
+@using Sprint.Helpers;
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2 class="text-primary-color">@ViewData["Title"]</h2>
+<div class="well col-lg-10 col-lg-offset-1">
+    <form asp-action="Details" class="form-horizontal">
+        <h4>
+            Paper
+            <i id="done" class="material-icons md-dark @(@Model.Done == true ? "md-active" : "md-inactive" ) md-inactive md-48 pull-right">done</i>
+        </h4>
+        <div class="mdl-tooltip" for="done">@(@Model.Done == true ? "Done by " + @Model.DoneBy.UserName :  "Not Done" )</div>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger">
+        </div>
+        @Html.Partial("_PaperDetail")
+
+        <div class="col-md-4 col-md-offset-4">
+            <div class="form-group">
+                <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised" asp-action="Index">Back to List</a>
+                @if (User.IsInRole(RoleHelper.Teacher))
+                {
+                    <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary mdl-button--raised" asp-action="Edit" asp-route-id="@Model.PaperId">Edit</a>
+                }
+            </div>
+        </div>
+    </form>
+</div>
+@section Scripts{
+    <script>
+        $(".input-fields").prop("disabled", true); //Disable
+    </script>
+}

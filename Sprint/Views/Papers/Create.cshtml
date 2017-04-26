@@ -1,0 +1,76 @@
+@model Sprint.Models.PaperViewModels.CreateViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2 class="text-primary-color">@ViewData["Title"]</h2>
+
+<div class="well col-md-offset-1 col-md-10">
+    <form asp-action="Create" enctype="multipart/form-data" class="form-horizontal">
+
+        <h4>Paper</h4>
+        <hr />
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group label-floating">
+                    <label asp-for="Title" class="control-label"></label>
+                    <input asp-for="Title" class="form-control input-fields" />
+                    <span asp-validation-for="Title" class="text-danger" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group label-floating">
+                    <label asp-for="Instructor" class="control-label"></label>
+                    <input asp-for="Instructor" class="form-control input-fields" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group label-floating">
+                    <label asp-for="Due" class="control-label"></label>
+                    <input asp-for="Due" class="form-control input-fields" />
+                    <span asp-validation-for="Due" class="text-danger" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group label-floating">
+                    <label asp-for="Copies" class="control-label"></label>
+                    <input asp-for="Copies" class="form-control input-fields" />
+                    <span asp-validation-for="Copies" class="text-danger" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group label-floating">
+                    <label asp-for="Comment" class="control-label"></label>
+                    <textarea asp-for="Comment" class="form-control input-fields"></textarea>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="File" class="control-label"></label>
+                    <input asp-for="File" class="form-control" />
+                    <div class="input-group">
+                        <input type="text" readonly="" class="form-control" placeholder="Browse....">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 col-md-offset-4">
+            <div class="form-group">
+                <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised" asp-action="Index">Back to List</a>
+                <input type="submit" value="Create" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary mdl-button--raised" />
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}

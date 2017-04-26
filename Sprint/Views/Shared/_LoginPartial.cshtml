@@ -1,0 +1,21 @@
+﻿@using System.Security.Principal
+
+@inject UserManager<ApplicationUser> UserManager
+
+@if (User.Identity.IsAuthenticated)
+{
+    <button class="sprint-account-button mdl-button mdl-js-button mdl-button--icon mdl-js-ripple-effect" id="more-button">
+        <i class="material-icons md-36 text-primary-color">account_circle</i>
+    </button>
+    <ul class="sprint-dropdown__menu mdl-menu mdl-js-menu mdl-menu--bottom-right mdl-js-ripple-effect" for="more-button">
+        <li disabled class="mdl-menu__item mdl-menu__item--full-bleed-divider">Hello&nbsp;@UserManager.GetUserName(User)!</li> <!--TODO-->
+        <li class="mdl-menu__item"><a class="mdl-navigation__link" asp-controller="Manage" asp-action="Index" title="Manage">Profile</a></li>
+        <li class="mdl-menu__item"><a class="mdl-navigation__link" asp-controller="Manage" asp-action="Edit" title="Manage">Edit</a></li>
+        <li class="mdl-menu__item"><a class="mdl-navigation__link" asp-controller="Account" asp-action="LogOff">Log&nbsp;off</a></li>
+    </ul>
+}
+else
+{
+    <a class="mdl-navigation__link" asp-controller="Account" asp-action="Register">Register</a>
+    <a class="mdl-navigation__link" asp-controller="Account" asp-action="Login">Log&nbsp;in</a>
+}

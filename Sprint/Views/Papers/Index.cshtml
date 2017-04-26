@@ -1,0 +1,39 @@
+@model IEnumerable<Sprint.Models.Paper>
+@using Sprint.Helpers
+@{
+    ViewData["Title"] = "Papers";
+}
+
+<h2 class="text-primary-color">@ViewData["Title"]</h2>
+
+@if ((string)ViewData["StatusMessage"] != "")
+{
+    <div class="alert alert-dismissible mdl-color-text--primary-dark" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        @ViewData["StatusMessage"]
+    </div>
+}
+
+
+<div class="well">
+    @*<div class="panel-heading mdl-color--primary-dark">
+            <h3 class="panel-title text-primary-color">Papers</h3>
+        </div>
+        <div class="panel-body">*@
+    <form asp-controller="Papers" asp-action="Done" method="post" class="form-horizontal" role="form">
+        @Html.Partial("_CheckAllPartial")
+        @{
+            ViewData["Checks"] = "true";
+            ViewData["Options"] = "true";
+        }
+        @Html.Partial("_PapersList", Model)
+    </form>
+</div>
+@*</div>*@
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ModalScriptPartial");
+        await Html.RenderPartialAsync("_CheckAllScriptPartial");
+    }
+}

@@ -1,0 +1,59 @@
+﻿@model IndexViewModel
+@using Sprint.Helpers;
+@{
+    ViewData["Title"] = "Manage";
+}
+
+<h2 class="text-primary-color">@ViewData["Title"]</h2>
+
+@if ((string)ViewData["StatusMessage"] != "")
+{
+    <div class="alert alert-info alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        @ViewData["StatusMessage"]
+    </div>
+}
+
+<div class="well col-md-10 col-md-offset-1">
+    <form>
+        <fieldset>
+            <legend>Account Details</legend>
+            <div class="col-md-6">
+                <div class="form-group label-floating">
+                    <label asp-for="UserName" class="control-label"></label>
+                    <input asp-for="UserName" class="form-control input-fields" disabled />
+                </div>
+                <div class="form-group label-floating">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input asp-for="Email" class="form-control input-fields" disabled />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group label-floating">
+                    <label asp-for="FullName" class="control-label"></label>
+                    <input asp-for="FullName" class="form-control input-fields" disabled />
+                </div>
+                @{
+                    if (User.IsInRole(RoleHelper.Teacher))
+                    {
+                        <div class="form-group label-floating">
+                            <label asp-for="Department" class="control-label"></label>
+                            <input asp-for="Department" class="form-control input-fields" disabled />
+                        </div>
+
+                    }
+                }
+            </div>
+            <a asp-controller="Manage" asp-action="Edit" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary mdl-button--raised">Edit</a>
+
+        </fieldset>
+        <hr />
+        <fieldset>
+            @*<a asp-controller="Manage" asp-action="ChangeEmail" class="btn btn-danger">Change Email</a>*@
+            <div class="col-md-4 col-md-offset-4">
+                <a asp-controller="Manage" asp-action="ChangePassword" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--accent ">Change Password</a>
+            </div>
+        </fieldset>
+
+    </form>
+</div>

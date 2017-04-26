@@ -1,0 +1,63 @@
+@model IEnumerable<Sprint.Models.ApplicationUser>
+
+@{
+    ViewData["Title"] = "Users";
+}
+
+<h2 class="text-primary-color">@ViewData["Title"]</h2>
+
+@if ((string)ViewData["StatusMessage"] != "")
+{
+    <div class="alert alert-info alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        @ViewData["StatusMessage"]
+    </div>
+}
+<div class="well col-md-10 col-md-offset-1">
+    <form>
+        <table class="table">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Email)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EmailConfirmed)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FullName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.UserName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Verified)
+                </th>
+                <th></th>
+            </tr>
+
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td style="vertical-align:middle;">
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    <td style="vertical-align:middle;">
+                        @Html.DisplayFor(modelItem => item.EmailConfirmed)
+                    </td>
+                    <td style="vertical-align:middle;">
+                        @Html.DisplayFor(modelItem => item.FullName)
+                    </td>
+                    <td style="vertical-align:middle;">
+                        @Html.DisplayFor(modelItem => item.UserName)
+                    </td>
+                    <td style="vertical-align:middle;">
+                        @Html.DisplayFor(modelItem => item.Verified)
+                    </td>
+                    <td style="vertical-align:middle;">
+                        <a asp-action="Unverify" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Un-Verify</a>
+                    </td>
+                </tr>
+            }
+        </table>
+    </form>
+</div>

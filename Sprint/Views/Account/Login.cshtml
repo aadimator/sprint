@@ -1,0 +1,71 @@
+﻿@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@model LoginViewModel
+
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
+
+<h2 class="text-primary-color">@ViewData["Title"]</h2>
+
+<div class="well col-md-11 col-md-offset-1">
+
+    <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
+        <h4>Use a local account to log in.</h4>
+        <hr />
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group label-floating">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group label-floating">
+                    <label asp-for="Password" class="control-label"></label>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label asp-for="RememberMe">
+                            <input asp-for="RememberMe" /> Remember Me
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-md-offset-2">
+            <div class="form-group">
+                <button type="submit" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--accent mdl-button--raised">Log in</button>
+            </div>
+        </div>
+        @{
+            if ((string)ViewData["Confirmed"] == "false")
+            {
+                <p>
+                    <a asp-action="ResendActivation">Resend Activation Link!</a>
+                </p>
+            }
+        }
+        <p>
+            <a asp-action="Register">Register as a new user?</a>
+        </p>
+        <p>
+            <a asp-action="ForgotPassword">Forgot your password?</a>
+        </p>
+    </form>
+</div>
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
