@@ -141,38 +141,6 @@ namespace Sprint.Controllers
             return RedirectToAction("Edit");
         }
 
-        // GET: Manage/Users
-        [HttpGet]
-        [Authorize(Roles = RoleHelper.Admin + "," + RoleHelper.SuperAdmin)]
-        public async Task<IActionResult> Users(ManageMessageId? message = null)
-        {
-            ViewData["StatusMessage"] =
-                message == ManageMessageId.Error ? "Error Message"
-                : "";
-
-
-            var userList = new List<UsersViewModel>();
-
-            var users = _context.Users.Include(u => u.Department).ToList();
-
-            foreach (var user in users)
-            {
-                var roles = await _userManager.GetRolesAsync(user);
-
-                userList.Add(new UsersViewModel(
-                    user.Id,
-                    user.FullName,
-                    user.Email,
-                    user.Department.Name,
-                    user.EmailConfirmed,
-                    user.Verified,
-                    roles)
-                    );
-            }
-
-            return View(userList);
-        }
-
         //
         // GET: /Manage/ChangePassword
         [HttpGet]
@@ -207,6 +175,105 @@ namespace Sprint.Controllers
             return RedirectToAction(nameof(Index), new { Message = ManageMessageId.Error });
         }
 
+        // GET: Manage/Users
+        [HttpGet]
+        [Authorize(Roles = RoleHelper.Admin + "," + RoleHelper.SuperAdmin)]
+        public async Task<IActionResult> Users(ManageMessageId? message = null)
+        {
+            ViewData["StatusMessage"] =
+                message == ManageMessageId.Error ? "Error Message"
+                : "";
+
+
+            var userList = new List<UsersViewModel>();
+
+            var users = _context.Users.Include(u => u.Department).ToList();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+
+                // don't show the details of super admin and other admins 
+                // to the Admin
+                if (User.IsInRole(RoleHelper.Admin))
+                {
+                    if (roles.Contains(RoleHelper.SuperAdmin) || roles.Contains(RoleHelper.Admin))
+                        continue;
+                }
+
+                userList.Add(new UsersViewModel(
+                    user.Id,
+                    user.FullName,
+                    user.Email,
+                    user.Department.Name,
+                    user.EmailConfirmed,
+                    user.Verified,
+                    roles)
+                    );
+            }
+
+            return View(userList);
+        }
+
+        // GET: Manage/Verfiy
+        [Authorize(Roles = RoleHelper.Admin + "," + RoleHelper.SuperAdmin)]
+        public IActionResult VerifyUsers()
+        {
+            List<VerifyUsersViewModel> UserList = new List<VerifyUsersViewModel>();
+
+            var Data = _userManager.Users
+                .Where(p => p.Verified == false)
+                .ToList();
+
+            foreach (var user in Data)
+            {
+                var department = _context.Users.Include(u => u.Department).Where(u => u.Id == user.Id).First().Department.Name;
+
+                UserList.Add(new VerifyUsersViewModel(
+                    user.Id,
+                    user.FullName,
+                    user.Email,
+                    department,
+                    user.EmailConfirmed)
+                    );
+            }
+            return View(UserList);
+        }
+
+        [Authorize(Roles = RoleHelper.Admin)]
+        public IActionResult Verify(string[] selected)
+        {
+            foreach (var userId in selected)
+            {
+                VerifyUser(userId);
+            }
+            _context.SaveChanges();
+            return RedirectToAction(nameof(VerifyUsers));
+        }
+
+        [Authorize(Roles = RoleHelper.Admin)]
+        public IActionResult VerifyUser(string id)
+        {
+            var temp = _context.Users
+                .Where(u => u.Id == id)
+                .First();
+            temp.Verified = true;
+            _context.Update(temp);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(VerifyUsers));
+        }
+
+        [Authorize(Roles = RoleHelper.Admin)]
+        public IActionResult UnverifyUser(string id)
+        {
+            var temp = _context.Users
+                .Where(u => u.Id == id)
+                .First();
+            temp.Verified = false;
+            _context.Update(temp);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Users));
+        }
 
         ////
         //// GET: /Manage/ChangeEmail
@@ -271,67 +338,6 @@ namespace Sprint.Controllers
         //    }
         //    return RedirectToAction(nameof(Index), new { Message = ManageMessageId.Error });
         //}
-
-
-        // GET: Manage/Verfiy
-        [Authorize(Roles = RoleHelper.Admin + "," + RoleHelper.SuperAdmin)]
-        public IActionResult VerifyUsers()
-        {
-            List<VerifyUsersViewModel> UserList = new List<VerifyUsersViewModel>();
-
-            var Data = _userManager.Users
-                .Where(p => p.Verified == false)
-                .ToList();
-
-            foreach (var user in Data)
-            {
-                var department = _context.Users.Include(u => u.Department).Where(u => u.Id == user.Id).First().Department.Name;
-
-                UserList.Add(new VerifyUsersViewModel(
-                    user.Id,
-                    user.FullName,
-                    user.Email,
-                    department,
-                    user.EmailConfirmed)
-                    );
-            }
-            return View(UserList);
-        }
-
-        [Authorize(Roles = RoleHelper.Admin)]
-        public IActionResult Verify(string[] selected)
-        {
-            foreach (var userId in selected)
-            {
-                VerifyUser(userId);
-            }
-            _context.SaveChanges();
-            return RedirectToAction(nameof(VerifyUsers));
-        }
-
-        [Authorize(Roles = RoleHelper.Admin)]
-        public IActionResult VerifyUser(string id)
-        {
-            var temp = _context.Users
-                .Where(u => u.Id == id)
-                .First();
-            temp.Verified = true;
-            _context.Update(temp);
-            _context.SaveChanges();
-            return RedirectToAction(nameof(VerifyUsers));
-        }
-
-        [Authorize(Roles = RoleHelper.Admin)]
-        public IActionResult UnverifyUser(string id)
-        {
-            var temp = _context.Users
-                .Where(u => u.Id == id)
-                .First();
-            temp.Verified = false;
-            _context.Update(temp);
-            _context.SaveChanges();
-            return RedirectToAction(nameof(Users));
-        }
 
         #region Helpers
 
