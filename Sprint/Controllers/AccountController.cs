@@ -155,13 +155,15 @@ namespace Sprint.Controllers
                     _context.SaveChanges();
 
 
-                    //if (_context.Admin.Where(a => a.Email == model.Email).Count() == 1)
-                    //{
-                    //    await _userManager.AddToRoleAsync(user, RoleHelper.Admin);
-                    //    user.Verified = true;
-                    //    _context.Update(user);
-                    //    _context.SaveChanges();
-                    //}
+                    // if this is the first User in the DB,
+                    // then make him the super admin
+                    if (_context.Users.Count() == 1)
+                    {
+                        await _userManager.AddToRoleAsync(user, RoleHelper.SuperAdmin);
+                        user.Verified = true;
+                        _context.Update(user);
+                        _context.SaveChanges();
+                    }
 
                     // Adds the Selected Role
                     await _userManager.AddToRoleAsync(user, RoleHelper.Teacher);
