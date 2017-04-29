@@ -11,19 +11,19 @@
 *.userprefs
 
 #Uploads
-Uploads/
+Sprint/Uploads/
 
 # Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-build/
-bld/
-[Bb]in/
-[Oo]bj/
+Sprint/[Dd]ebug/
+Sprint/[Dd]ebugPublic/
+Sprint/[Rr]elease/
+Sprint/[Rr]eleases/
+Sprint/x64/
+Sprint/x86/
+Sprint/build/
+Sprint/bld/
+Sprint/[Bb]in/
+Sprint/[Oo]bj/
 
 # Visual Studio 2015 cache/options directory
 .vs/
