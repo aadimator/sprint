@@ -44,13 +44,6 @@
         </div>
         <div class="row">
             <div class="col-md-6">
-                <div class="form-group label-floating">
-                    <label asp-for="Role" class="control-label"></label>
-                    <select asp-for="Role" asp-items="@ViewBag.Roles" class="form-control dropdownjs" id="role"></select>
-                    <span asp-validation-for="Role" class="text-danger"></span>
-                </div>
-            </div>
-            <div class="col-md-6">
                 <div id="dept" class="form-group label-floating">
                     <label asp-for="DepartmentId" class="control-label"></label>
                     <select asp-for="DepartmentId" asp-items="@ViewBag.Departments" class="form-control"></select>
@@ -67,18 +60,4 @@
 </div>
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
-
-    <script>
-        $(function () {
-            $("#dept").hide();
-
-            $("#role").change(function () {
-                if ($("#role").val() == '@RoleHelper.Printer') {
-                    $("#dept").hide();
-                } else if ($("#role").val() == '@RoleHelper.Teacher') {
-                    $("#dept").show();
-                }
-            });
-        });
-    </script>
 }

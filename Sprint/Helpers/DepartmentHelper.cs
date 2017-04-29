@@ -24,7 +24,7 @@ namespace Sprint.Helpers
             "Psychology"
             };
 
-        public static async Task EnsureDepartmentsCreated(this ApplicationDbContext context)
+        public static async Task EnsureDepartmentsCreated(ApplicationDbContext context)
         {
             // add all roles, that should be in database, here
             foreach (var department in Departments)

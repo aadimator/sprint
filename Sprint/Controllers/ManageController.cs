@@ -33,7 +33,7 @@ namespace Sprint.Controllers
         ISmsSender smsSender,
         ICompositeViewEngine viewEngine,
         ILoggerFactory loggerFactory,
-        ApplicationDbContext context) :base(viewEngine)
+        ApplicationDbContext context) : base(viewEngine)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -109,7 +109,7 @@ namespace Sprint.Controllers
                     .Include(u => u.Department)
                     .Single(u => u.Id == _userManager.GetUserId(User));
 
-                if (User.IsInRole(RoleHelper.Teacher) && user.DepartmentId != model.DepartmentId)
+                if (user.DepartmentId != model.DepartmentId)
                 {
                     var prevDepartment = user.Department; // remove user from this 
                     prevDepartment.Users.Remove(user);
@@ -146,9 +146,9 @@ namespace Sprint.Controllers
         [Authorize(Roles = RoleHelper.Admin)]
         public IActionResult Users(ManageMessageId? message = null)
         {
-            ViewData["StatusMessage"] =
-                message == ManageMessageId.Error ? "Papers should be downloaded before they are marked as Done"
-                : "";
+            //ViewData["StatusMessage"] =
+            //    message == ManageMessageId.Error ? "Papers should be downloaded before they are marked as Done"
+            //    : "";
 
             var Users = _context.Users.ToList();
 
@@ -257,7 +257,7 @@ namespace Sprint.Controllers
 
         // GET: Manage/Verfiy
         [Authorize(Roles = RoleHelper.Admin)]
-        public async Task<IActionResult> VerifyUsers()
+        public IActionResult VerifyUsers()
         {
             List<VerifyUsersViewModel> UserList = new List<VerifyUsersViewModel>();
 
@@ -267,11 +267,8 @@ namespace Sprint.Controllers
 
             foreach (var user in Data)
             {
-                var department = "Printer";
-                if (await _userManager.IsInRoleAsync(user, RoleHelper.Teacher))
-                {
-                    department = _context.Users.Include(u => u.Department).Where(u => u.Id == user.Id).First().Department.Name;
-                }
+                var department = _context.Users.Include(u => u.Department).Where(u => u.Id == user.Id).First().Department.Name;
+
                 UserList.Add(new VerifyUsersViewModel(
                     user.Id,
                     user.FullName,

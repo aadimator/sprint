@@ -4,7 +4,7 @@
     <thead>
         <tr>
             @* If User is Printer, show the checklist for Job Completion *@
-            @if (User.IsInRole(RoleHelper.Printer) && ViewBag.Checks == "true")
+            @if (User.IsInRole(RoleHelper.IC) && ViewBag.Checks == "true")
             {
                 <th>
                     @Html.Raw("Done")
@@ -33,7 +33,7 @@
             {
             <tr>
                 @* If User is Printer, show the checklist for Job Completion *@
-                @if (User.IsInRole(RoleHelper.Printer) && ViewBag.Checks == "true")
+                @if (User.IsInRole(RoleHelper.IC) && ViewBag.Checks == "true")
                 {
                     <td>
                         <div class="checkbox">
@@ -111,7 +111,7 @@
                     <div class="btn-group-xs">
                         <a asp-action="Details" asp-route-id="@item.PaperId" class="btn btn-info">Details</a>
 
-                        @if (User.IsInRole(RoleHelper.Printer))
+                        @if (User.IsInRole(RoleHelper.IC))
                         {
                             if (item.Done == true)
                             {

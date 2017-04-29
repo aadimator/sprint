@@ -110,15 +110,6 @@ namespace Sprint.Controllers
         [AllowAnonymous]
         public IActionResult Register()
         {
-            var ti = new CultureInfo("en-US", true).TextInfo; // to convert the lowercase string to Title Case
-            // select all roles except the Admin
-            var roles = _context.Roles.Where(r => r.Name != RoleHelper.Admin).ToList()
-                .Select(s => new
-                {
-                    Text = ti.ToTitleCase(s.Name),
-                    Value = s.Name
-                });
-
             var departments = _context.Department
                 .Select(s => new
                 {
@@ -126,8 +117,6 @@ namespace Sprint.Controllers
                     Value = s.DepartmentId
                 })
                 .ToList();
-
-            ViewBag.Roles = new SelectList(roles, "Value", "Text", roles.First());
             ViewBag.Departments = new SelectList(departments, "Value", "Text");
             return View();
         }
@@ -141,6 +130,7 @@ namespace Sprint.Controllers
         {
             if (ModelState.IsValid)
             {
+                model.Role = RoleHelper.Teacher;
                 var department = _context.Department.Where(d => d.DepartmentId == model.DepartmentId).First();
                 var user = new ApplicationUser
                 {
@@ -149,34 +139,33 @@ namespace Sprint.Controllers
                     Downloads = new List<Downloads>(),
                 };
 
-                if (model.Role.Equals(RoleHelper.Teacher))
-                {
-                    user.DepartmentId = model.DepartmentId;
-                    user.Department = department;
-                }
+
+                user.DepartmentId = model.DepartmentId;
+                user.Department = department;
 
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    if (model.Role.Equals(RoleHelper.Teacher))
+                    if (department.Users == null)
                     {
-                        if (department.Users == null)
-                        {
-                            department.Users = new List<ApplicationUser>();
-                        }
-                        department.Users.Add(user);
-                        _context.Update(department);
-                        _context.SaveChanges();
+                        department.Users = new List<ApplicationUser>();
                     }
+                    department.Users.Add(user);
+                    _context.Update(department);
+                    _context.SaveChanges();
 
-                    if (_context.Admin.Where(a => a.Email == model.Email).Count() == 1)
-                    {
-                        await _userManager.AddToRoleAsync(user, RoleHelper.Admin);
-                    }
+
+                    //if (_context.Admin.Where(a => a.Email == model.Email).Count() == 1)
+                    //{
+                    //    await _userManager.AddToRoleAsync(user, RoleHelper.Admin);
+                    //    user.Verified = true;
+                    //    _context.Update(user);
+                    //    _context.SaveChanges();
+                    //}
+
                     // Adds the Selected Role
                     await _userManager.AddToRoleAsync(user, model.Role);
-                    // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
-                    // Send an email with this link
+
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
                     var welcomeModel = new NameLinkViewModel()
@@ -188,7 +177,7 @@ namespace Sprint.Controllers
 
                     var messgaeBody = base.RenderViewAsString(welcomeModel, "EmailTemplates/Welcome");
                     await _emailSender.SendEmailAsync(model.Email, "Confirm your account", messgaeBody);
-                    //await _signInManager.SignInAsync(user, isPersistent: false);
+                    
                     _logger.LogInformation(3, "User created a new account with password.");
 
                     return RedirectToAction(nameof(HomeController.Index), "Home");
@@ -196,26 +185,15 @@ namespace Sprint.Controllers
                 AddErrors(result);
             }
 
-            // If we got this far, something failed, redisplay form
-            var ti = new CultureInfo("en-US", true).TextInfo; // to convert the lowercase string to Title Case
-            // select all roles except the Admin
-            var roles = _context.Roles.Where(r => r.Name != RoleHelper.Admin).ToList()
-                .Select(s => new
-                {
-                    Text = ti.ToTitleCase(s.Name),
-                    Value = s.Name
-                });
-            var departments = _context.Department
-               .Select(s => new
-               {
-                   Text = s.Name,
-                   Value = s.DepartmentId
-               })
-               .ToList();
+            //var departments = _context.Department
+            //   .Select(s => new
+            //   {
+            //       Text = s.Name,
+            //       Value = s.DepartmentId
+            //   })
+            //   .ToList();
 
-            ViewBag.Roles = new SelectList(roles, "Value", "Text", roles.First());
-            // TODO: Modify for the Printer
-            ViewBag.Departments = new SelectList(departments, "Value", "Text");
+            //ViewBag.Departments = new SelectList(departments, "Value", "Text");
 
             return View(model);
         }

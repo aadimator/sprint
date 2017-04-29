@@ -3,7 +3,11 @@ D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\Sprint.deps.json
 D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\Sprint.runtimeconfig.json
 D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\Sprint.runtimeconfig.dev.json
 D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\Sprint.exe
+D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\Sprint.pdb
 D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\libuv.dll
+D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\EntityFramework.SqlServer.dll
+D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\EntityFramework.dll
+D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\itextsharp.dll
 D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\Microsoft.ApplicationInsights.dll
 D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\Microsoft.AI.Agent.Intercept.dll
 D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\Microsoft.ApplicationInsights.AspNetCore.dll
@@ -152,11 +156,7 @@ D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\System.Xml.XPath.dll
 D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\System.Xml.XPath.XDocument.dll
 D:\workspace\Sprint\Sprint\obj\Debug\net461\win7-x86\Sprint.csprojResolveAssemblyReference.cache
 D:\workspace\Sprint\Sprint\obj\Debug\net461\win7-x86\Sprint.csproj.Sprint.exe.config
-D:\workspace\Sprint\Sprint\obj\Debug\net461\win7-x86\Sprint.AssemblyInfo.cs
-D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\EntityFramework.SqlServer.dll
-D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\EntityFramework.dll
 D:\workspace\Sprint\Sprint\obj\Debug\net461\win7-x86\UserSecretsAssemblyInfo.cs
-D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\Sprint.pdb
-D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\itextsharp.dll
+D:\workspace\Sprint\Sprint\obj\Debug\net461\win7-x86\Sprint.AssemblyInfo.cs
 D:\workspace\Sprint\Sprint\obj\Debug\net461\win7-x86\Sprint.exe
 D:\workspace\Sprint\Sprint\obj\Debug\net461\win7-x86\Sprint.pdb

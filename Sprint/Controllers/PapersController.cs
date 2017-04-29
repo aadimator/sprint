@@ -44,7 +44,7 @@ namespace Portal.Controllers
         }
 
         // GET: Papers
-        public IActionResult Index(ManageMessageId? message = null)
+        public async Task<IActionResult> IndexAsync(ManageMessageId? message = null)
         {
             ViewData["StatusMessage"] =
                 message == ManageMessageId.FileUploadSuccess ? "Your Paper has been uploaded!"
@@ -63,7 +63,7 @@ namespace Portal.Controllers
             // If user is a Teacher, only show the PDF that he uploaded
             if (User.IsInRole(RoleHelper.Teacher))
             {
-                string UserId = _userManager.GetUserId(HttpContext.User);
+                string UserId = _userManager.GetUserId(User);
                 Papers = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
@@ -74,7 +74,21 @@ namespace Portal.Controllers
                     .ThenBy(p => p.Due)
                     .ToList();
             }
-            // otherwise (printer), show all the PDFs
+            // show only the department's PDFs which haven't been printed yet
+            else if (User.IsInRole(RoleHelper.HOD) || User.IsInRole(RoleHelper.IC))
+            {
+                var user = await _userManager.GetUserAsync(User);
+                var depId = user.DepartmentId;
+                Papers = _context.Paper
+                     .Include(p => p.Uploader)
+                     .Include(p => p.Uploader.Department)
+                     .ThenInclude(d => d.DepartmentId)
+                     .Where(p => p.Done == false && p.Delete == false && p.Uploader.DepartmentId == depId)
+                     .OrderBy(p => p.CreatedAt)
+                     .ThenBy(p => p.Due)
+                     .ToList();
+            }
+            // otherwise (admin, super admin), show all the PDFs which haven't been printed yet
             else
             {
                 Papers = _context.Paper
@@ -182,7 +196,7 @@ namespace Portal.Controllers
             var user = _context.Users.Where(u => u.Id == _userManager.GetUserId(User)).First();
             if (!user.Verified)
             {
-                return RedirectToAction(nameof(Index), new { Message = ManageMessageId.NotVerfied });
+                return RedirectToAction(nameof(IndexAsync), new { Message = ManageMessageId.NotVerfied });
             }
             return View(new CreateViewModel()
             {
@@ -315,13 +329,13 @@ namespace Portal.Controllers
 
         // GET: Papers/Download/5
         [ActionName("Download")]
-        [Authorize(Roles = RoleHelper.Printer)]
+        [Authorize(Roles = RoleHelper.IC)]
         public IActionResult Download(int id)
         {
             var user = _context.Users.Where(u => u.Id == _userManager.GetUserId(User)).First();
             if (!user.Verified)
             {
-                return RedirectToAction(nameof(Index), new { Message = ManageMessageId.NotVerfied });
+                return RedirectToAction(nameof(IndexAsync), new { Message = ManageMessageId.NotVerfied });
             }
 
             Paper paper = _context.Paper.Single(m => m.PaperId == id);
@@ -345,14 +359,14 @@ namespace Portal.Controllers
         // POST: Papers/Download/5
         [HttpPost, ActionName("Download")]
         //[ValidateAntiForgeryToken]
-        [Authorize(Roles = RoleHelper.Printer)]
+        [Authorize(Roles = RoleHelper.IC)]
         public IActionResult DownloadConfirmed(int id)
         {
             var userId = _userManager.GetUserId(User);
             var user = _context.Users.Include(u => u.Downloads).Single(u => u.Id == userId);
             if (!user.Verified)
             {
-                return RedirectToAction(nameof(Index), new { Message = ManageMessageId.NotVerfied });
+                return RedirectToAction(nameof(IndexAsync), new { Message = ManageMessageId.NotVerfied });
             }
 
             Paper paper = _context.Paper.Include(p => p.Downloaders).Single(m => m.PaperId == id);
@@ -425,18 +439,18 @@ namespace Portal.Controllers
 
 
         // POST: Papers/Done
-        [Authorize(Roles = RoleHelper.Printer)]
+        [Authorize(Roles = RoleHelper.IC)]
         public async Task<IActionResult> Done(int[] selected)
         {
             foreach (var userId in selected)
             {
                 await JobDone(userId);
             }
-            return RedirectToAction(nameof(Index), new { Message = ManageMessageId.JobsDoneSuccess });
+            return RedirectToAction(nameof(IndexAsync), new { Message = ManageMessageId.JobsDoneSuccess });
         }
 
         // GET: Papers/Done?id
-        [Authorize(Roles = RoleHelper.Printer)]
+        [Authorize(Roles = RoleHelper.IC)]
         public async Task<IActionResult> JobDone(int id)
         {
             var paper = _context.Paper
@@ -445,7 +459,7 @@ namespace Portal.Controllers
                 .First();
             if (paper.DownloadsNum < 1)
             {
-                return RedirectToAction(nameof(Index), new { Message = ManageMessageId.JobDoneFailure });
+                return RedirectToAction(nameof(IndexAsync), new { Message = ManageMessageId.JobDoneFailure });
             }
 
             paper.Done = true;
@@ -479,11 +493,11 @@ namespace Portal.Controllers
 
             var messageBody = base.RenderViewAsString(JobStatusVM, "EmailTemplates/JobStatus");
             await _emailSender.SendEmailAsync(uploader.Email, paper.Title + ", Job Status!", messageBody);
-            return RedirectToAction(nameof(Index), new { Message = ManageMessageId.JobDoneSuccess });
+            return RedirectToAction(nameof(IndexAsync), new { Message = ManageMessageId.JobDoneSuccess });
         }
 
         // GET: Papers/UnDone?id
-        [Authorize(Roles = RoleHelper.Printer)]
+        [Authorize(Roles = RoleHelper.IC)]
         public async Task<IActionResult> JobUnDone(int id)
         {
             var paper = _context.Paper.Include(p => p.Uploader).Single(p => p.PaperId == id);
