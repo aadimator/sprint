@@ -5,13 +5,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Sprint.Models;
-using Sprint.Services;
-using Sprint.Helpers;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Sprint.Models.ManageViewModels;
+using Sprint.Models;
+using Sprint.Services;
+using Sprint.Helpers;
 
 namespace Sprint.Controllers
 {
@@ -143,16 +143,34 @@ namespace Sprint.Controllers
 
         // GET: Manage/Users
         [HttpGet]
-        [Authorize(Roles = RoleHelper.Admin)]
-        public IActionResult Users(ManageMessageId? message = null)
+        [Authorize(Roles = RoleHelper.Admin + "," + RoleHelper.SuperAdmin)]
+        public async Task<IActionResult> Users(ManageMessageId? message = null)
         {
-            //ViewData["StatusMessage"] =
-            //    message == ManageMessageId.Error ? "Papers should be downloaded before they are marked as Done"
-            //    : "";
+            ViewData["StatusMessage"] =
+                message == ManageMessageId.Error ? "Error Message"
+                : "";
 
-            var Users = _context.Users.ToList();
 
-            return View(Users);
+            var userList = new List<UsersViewModel>();
+
+            var users = _context.Users.Include(u => u.Department).ToList();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+
+                userList.Add(new UsersViewModel(
+                    user.Id,
+                    user.FullName,
+                    user.Email,
+                    user.Department.Name,
+                    user.EmailConfirmed,
+                    user.Verified,
+                    roles)
+                    );
+            }
+
+            return View(userList);
         }
 
         //
@@ -256,7 +274,7 @@ namespace Sprint.Controllers
 
 
         // GET: Manage/Verfiy
-        [Authorize(Roles = RoleHelper.Admin)]
+        [Authorize(Roles = RoleHelper.Admin + "," + RoleHelper.SuperAdmin)]
         public IActionResult VerifyUsers()
         {
             List<VerifyUsersViewModel> UserList = new List<VerifyUsersViewModel>();
@@ -301,6 +319,18 @@ namespace Sprint.Controllers
             _context.Update(temp);
             _context.SaveChanges();
             return RedirectToAction(nameof(VerifyUsers));
+        }
+
+        [Authorize(Roles = RoleHelper.Admin)]
+        public IActionResult UnverifyUser(string id)
+        {
+            var temp = _context.Users
+                .Where(u => u.Id == id)
+                .First();
+            temp.Verified = false;
+            _context.Update(temp);
+            _context.SaveChanges();
+            return RedirectToAction(nameof(Users));
         }
 
         #region Helpers

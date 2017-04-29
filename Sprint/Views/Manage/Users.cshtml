@@ -1,4 +1,4 @@
-@model IEnumerable<Sprint.Models.ApplicationUser>
+@model IEnumerable<Sprint.Models.ManageViewModels.UsersViewModel>
 
 @{
     ViewData["Title"] = "Users";
@@ -18,19 +18,19 @@
         <table class="table">
             <tr>
                 <th>
+                    @Html.DisplayNameFor(model => model.FullName)
+                </th>
+                <th>
                     @Html.DisplayNameFor(model => model.Email)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.EmailConfirmed)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.FullName)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.UserName)
-                </th>
-                <th>
                     @Html.DisplayNameFor(model => model.Verified)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Roles)
                 </th>
                 <th></th>
             </tr>
@@ -39,19 +39,33 @@
             {
                 <tr>
                     <td style="vertical-align:middle;">
-                        @Html.DisplayFor(modelItem => item.Email)
-                    </td>
-                    <td style="vertical-align:middle;">
-                        @Html.DisplayFor(modelItem => item.EmailConfirmed)
-                    </td>
-                    <td style="vertical-align:middle;">
                         @Html.DisplayFor(modelItem => item.FullName)
                     </td>
                     <td style="vertical-align:middle;">
-                        @Html.DisplayFor(modelItem => item.UserName)
+                        @Html.DisplayFor(modelItem => item.Email)
                     </td>
                     <td style="vertical-align:middle;">
-                        @Html.DisplayFor(modelItem => item.Verified)
+                        <div class="checkbox checkbox-inline">
+                            <label>
+                                <input asp-for="@item.EmailConfirmed" class="checkbox checkbox-inline" disabled />
+                            </label>
+                        </div>
+                    </td>
+                    
+                    <td style="vertical-align:middle;">
+                        <div class="checkbox checkbox-inline">
+                            <label>
+                                <input asp-for="@item.Verified" class="checkbox checkbox-inline" disabled />
+                            </label>
+                        </div>
+                    </td>
+                    <td style="vertical-align:middle;">
+                        <ul style="list-style:none; padding-left:2px;">
+                            @foreach (var role in item.Roles)
+                            {
+                                <li>@role</li>
+                            }
+                        </ul>
                     </td>
                     <td style="vertical-align:middle;">
                         <a asp-action="Unverify" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Un-Verify</a>
