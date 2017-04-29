@@ -15,10 +15,4 @@ namespace Sprint.Models
         public ICollection<Downloads> Downloads { get; set; } // for printers
         public ICollection<Paper> CompletedJobs { get; set; } // All the completed jobs by the Priner
     }
-
-    public class Admin
-    {
-        public int AdminId { get; set; }
-        public string Email { get; set; }
-    }
 }

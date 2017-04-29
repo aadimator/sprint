@@ -184,7 +184,6 @@ namespace Sprint.Controllers
                 message == ManageMessageId.Error ? "Error Message"
                 : "";
 
-
             var userList = new List<UsersViewModel>();
 
             var users = _context.Users.Include(u => u.Department).ToList();
