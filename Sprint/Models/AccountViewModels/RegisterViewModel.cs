@@ -16,7 +16,7 @@ namespace Sprint.Models.AccountViewModels
 
         [Required]
         [StringLength(75, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 5)]
-        [Display(Name = "User Name")]
+        [Display(Name = "Full Name")]
         public string Name { get; set; }
 
         [Required]
@@ -29,9 +29,6 @@ namespace Sprint.Models.AccountViewModels
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
-
-        [Required]
-        public string Role { get; set; }
 
         [Display(Name = "Department")]
         public int DepartmentId { get; set; }

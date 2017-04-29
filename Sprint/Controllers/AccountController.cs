@@ -130,12 +130,12 @@ namespace Sprint.Controllers
         {
             if (ModelState.IsValid)
             {
-                model.Role = RoleHelper.Teacher;
                 var department = _context.Department.Where(d => d.DepartmentId == model.DepartmentId).First();
                 var user = new ApplicationUser
                 {
-                    UserName = model.Name,
+                    UserName = model.Email,
                     Email = model.Email,
+                    FullName = model.Name,
                     Downloads = new List<Downloads>(),
                 };
 
@@ -164,7 +164,7 @@ namespace Sprint.Controllers
                     //}
 
                     // Adds the Selected Role
-                    await _userManager.AddToRoleAsync(user, model.Role);
+                    await _userManager.AddToRoleAsync(user, RoleHelper.Teacher);
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.Action("ConfirmEmail", "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
@@ -185,15 +185,15 @@ namespace Sprint.Controllers
                 AddErrors(result);
             }
 
-            //var departments = _context.Department
-            //   .Select(s => new
-            //   {
-            //       Text = s.Name,
-            //       Value = s.DepartmentId
-            //   })
-            //   .ToList();
+            var departments = _context.Department
+               .Select(s => new
+               {
+                   Text = s.Name,
+                   Value = s.DepartmentId
+               })
+               .ToList();
 
-            //ViewBag.Departments = new SelectList(departments, "Value", "Text");
+            ViewBag.Departments = new SelectList(departments, "Value", "Text");
 
             return View(model);
         }
