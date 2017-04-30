@@ -13,7 +13,7 @@
     {
 
     }
-    if (User.IsInRole(RoleHelper.Admin))
+    if (User.IsInRole(RoleHelper.Admin) || User.IsInRole(RoleHelper.SuperAdmin))
     {
         <a class="mdl-navigation__link text-primary-color" asp-controller="Manage" asp-action="VerifyUsers">Verify</a>
     }

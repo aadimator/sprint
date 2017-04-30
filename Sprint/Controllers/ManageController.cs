@@ -51,6 +51,7 @@ namespace Sprint.Controllers
             ViewData["StatusMessage"] =
                 message == ManageMessageId.ChangePasswordSuccess ? "Your password has been changed."
                 : message == ManageMessageId.EditSuccess ? "User Profile has been updated!"
+                : message == ManageMessageId.RoleChangeSuccess ? "Roles have been successfully updated"
                 : message == ManageMessageId.Error ? "An error has occurred."
                 : "";
 
@@ -59,7 +60,7 @@ namespace Sprint.Controllers
                 .Where(u => u.Id == _userManager.GetUserId(this.User))
                 .First();
 
-            var dep = (user.Department != null) ? user.Department.Name : null;
+            var dep = user.Department?.Name;
             var model = new IndexViewModel
             {
                 Department = dep,
@@ -214,7 +215,84 @@ namespace Sprint.Controllers
             return View(userList);
         }
 
+        // GET: Manage/Roles/5
+        [HttpGet]
+        [Authorize(Roles = RoleHelper.Admin + "," + RoleHelper.SuperAdmin)]
+        public async Task<IActionResult> Roles(string id)
+        {
+
+            var user = _context.Users.Where(u => u.Id == id).First();
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var allRoles = _context.Roles.Select(u => u.Name).ToList();
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            if (User.IsInRole(RoleHelper.Admin))
+            {
+                if (userRoles.Contains(RoleHelper.SuperAdmin) || userRoles.Contains(RoleHelper.Admin))
+                    return Unauthorized();
+                allRoles.Remove(RoleHelper.Admin);
+                allRoles.Remove(RoleHelper.SuperAdmin);
+            }
+
+            var roles = new List<Roles>();
+            foreach (var role in allRoles)
+            {
+                roles.Add(new Roles
+                {
+                    Name = role,
+                    Selected = userRoles.Contains(role)
+                }
+                );
+            }
+
+            var model = new RolesViewModel
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email,
+                Roles = roles
+                
+            };
+
+            return View(model);
+        }
+
+        // POST: Manage/Roles/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = RoleHelper.Admin + "," + RoleHelper.SuperAdmin)]
+        public async Task<IActionResult> Roles(RolesViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = _userManager.Users.Where(u => u.Id == model.Id).First();
+                var userRoles = await _userManager.GetRolesAsync(user);
+
+                var selectedRoles = model.Roles
+                                        .Where(x => x.Selected == true && !userRoles.Contains(x.Name))
+                                        .Select(x => x.Name)
+                                        .ToList();
+                var unselectedRoles = model.Roles
+                                            .Where(x => x.Selected == false && userRoles.Contains(x.Name))
+                                            .Select(x => x.Name)
+                                            .ToList();
+
+                await _userManager.AddToRolesAsync(user, selectedRoles);
+                await _userManager.RemoveFromRolesAsync(user, unselectedRoles);
+
+                return RedirectToAction("Users", new { Message = ManageMessageId.RoleChangeSuccess });
+            }
+
+            return View(model);
+        }
+
         // GET: Manage/Verfiy
+        [HttpGet]
         [Authorize(Roles = RoleHelper.Admin + "," + RoleHelper.SuperAdmin)]
         public IActionResult VerifyUsers()
         {
@@ -239,7 +317,7 @@ namespace Sprint.Controllers
             return View(UserList);
         }
 
-        [Authorize(Roles = RoleHelper.Admin)]
+        [Authorize(Roles = RoleHelper.Admin + "," + RoleHelper.SuperAdmin)]
         public IActionResult Verify(string[] selected)
         {
             foreach (var userId in selected)
@@ -250,19 +328,25 @@ namespace Sprint.Controllers
             return RedirectToAction(nameof(VerifyUsers));
         }
 
-        [Authorize(Roles = RoleHelper.Admin)]
+        [Authorize(Roles = RoleHelper.Admin + "," + RoleHelper.SuperAdmin)]
         public IActionResult VerifyUser(string id)
         {
             var temp = _context.Users
                 .Where(u => u.Id == id)
                 .First();
+
+            if (temp == null)
+            {
+                return NotFound();
+            }
+
             temp.Verified = true;
             _context.Update(temp);
             _context.SaveChanges();
             return RedirectToAction(nameof(VerifyUsers));
         }
 
-        [Authorize(Roles = RoleHelper.Admin)]
+        [Authorize(Roles = RoleHelper.Admin + "," + RoleHelper.SuperAdmin)]
         public IActionResult UnverifyUser(string id)
         {
             var temp = _context.Users
@@ -352,6 +436,7 @@ namespace Sprint.Controllers
         {
             ChangePasswordSuccess,
             EditSuccess,
+            RoleChangeSuccess,
             Error
         }
 

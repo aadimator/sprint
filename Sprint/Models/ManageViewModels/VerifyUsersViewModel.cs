@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Sprint.Models.ManageViewModels
 {
@@ -27,7 +23,7 @@ namespace Sprint.Models.ManageViewModels
             Email = email;
             Department = department;
             EmailConfirmed = emailConfirmed;
-            FullName = (name == null) ? "Not Set" : name;
+            FullName = name;
         }
     }
 }

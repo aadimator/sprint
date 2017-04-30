@@ -16,14 +16,10 @@
 
     <a class="mdl-navigation__link" asp-controller="Manage" asp-action="Index"><i class="material-icons">account_box</i><span>Profile</span></a>
     <a class="mdl-navigation__link" asp-controller="Manage" asp-action="Edit"><i class="material-icons">edit</i><span>Edit</span></a>
-    if (User.IsInRole(RoleHelper.Admin))
+    if (User.IsInRole(RoleHelper.Admin) || User.IsInRole(RoleHelper.SuperAdmin))
     {
         <a class="mdl-navigation__link" asp-controller="Manage" asp-action="VerifyUsers"><i class="material-icons">verified_user</i><span>Verify&nbsp;Users</span></a>
         <a class="mdl-navigation__link" asp-controller="Manage" asp-action="Users"><i class="material-icons">view_list</i><span>Manage&nbsp;Users</span></a>
-    }
-    else if (User.IsInRole(RoleHelper.IC))
-    {
-
     }
 
 }
