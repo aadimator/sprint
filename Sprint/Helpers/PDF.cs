@@ -13,16 +13,16 @@ namespace Sprint.Helpers
         public string EncKey { get; set; }
         public string Hash { get; set; }
 
-        public bool upload(IFormFile InputFile, string FilePath)
+        public bool Upload(IFormFile InputFile, string FilePath)
         {
             // Validate if the file is in correct format
-            if (!validate(InputFile))
+            if (!Validate(InputFile))
             {
                 Error = "Only PDF files are supported as of now !";
                 return false;
             }
             // Check if the file is encrypted or not
-            if (!encrypt(InputFile.OpenReadStream(), FilePath))
+            if (!Encrypt(InputFile.OpenReadStream(), FilePath))
             {
                 Error = "File couldn't be Encrypted!";
                 return false;
@@ -31,13 +31,13 @@ namespace Sprint.Helpers
             return true; // everything went great
         }
 
-        public byte[] download(string filePath, string DownloaderID, int downloads, string encKey = "")
+        public byte[] Download(string filePath, string DownloaderID, string encKey = "")
         {
             EncKey = (encKey != "") ? encKey : null;
-            var decryptedStream = decrypt(filePath, EncKey);
+            var decryptedStream = Decrypt(filePath, EncKey);
 
             // Add QrCode and TimeStamp
-            var fileContents = AddInfo(DownloaderID, downloads, decryptedStream);
+            var fileContents = AddInfo(DownloaderID, decryptedStream);
             return fileContents;
         }
 
@@ -49,7 +49,7 @@ namespace Sprint.Helpers
             return encrypt.VerifyHash(originalHash, fileHash);
         }
 
-        private bool validate(IFormFile file)
+        private bool Validate(IFormFile file)
         {
             // TODO: Add functionality like format conversion (docx -> pdf) etc
             if (file.ContentType.Equals("application/pdf"))
@@ -58,7 +58,7 @@ namespace Sprint.Helpers
             return false;
         }
 
-        private bool encrypt(Stream input, string output)
+        private bool Encrypt(Stream input, string output)
         {
             Encrypt encrypt = new Encrypt();
             encrypt.EncryptFile(input, output);
@@ -67,14 +67,14 @@ namespace Sprint.Helpers
             return true;
         }
 
-        private MemoryStream decrypt(string input, string encKey = "")
+        private MemoryStream Decrypt(string input, string encKey = "")
         {
             var encrypt = new Encrypt();
             encrypt.Password = encKey;
             return encrypt.DecryptFile(input);
         }
 
-        private byte[] AddInfo(string msg, int downloads, Stream input)
+        private byte[] AddInfo(string msg, Stream input)
         {
             using (MemoryStream ms = new MemoryStream())
             {
@@ -98,7 +98,7 @@ namespace Sprint.Helpers
 
                         //var downloads = "# " + downloads.ToString();
                         AddQRCode(ContentByte, msg, Rightx, Righty, 3);
-                        AddText(ContentByte, "# " + downloads.ToString(), Centerx, Centery, 3);
+                        //AddText(ContentByte, "# " + downloads.ToString(), Centerx, Centery, 3);
                         AddTimeStamp(ContentByte, Leftx, Lefty, 3);
                     }
                 }

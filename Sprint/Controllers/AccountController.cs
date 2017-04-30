@@ -135,8 +135,7 @@ namespace Sprint.Controllers
                 {
                     UserName = model.Email,
                     Email = model.Email,
-                    FullName = model.Name,
-                    Downloads = new List<Downloads>(),
+                    FullName = model.Name
                 };
 
 

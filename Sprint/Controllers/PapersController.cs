@@ -31,7 +31,7 @@ namespace Portal.Controllers
         public string UploadPath { get { return _hostingEnvironment.ContentRootPath + "\\Uploads\\"; } }
 
         public PapersController(
-            ApplicationDbContext context, 
+            ApplicationDbContext context,
             IHostingEnvironment environment,
             UserManager<ApplicationUser> userManager,
             ICompositeViewEngine viewEngine,
@@ -44,7 +44,7 @@ namespace Portal.Controllers
         }
 
         // GET: Papers
-        public async Task<IActionResult> IndexAsync(ManageMessageId? message = null)
+        public async Task<IActionResult> Index(ManageMessageId? message = null)
         {
             ViewData["StatusMessage"] =
                 message == ManageMessageId.FileUploadSuccess ? "Your Paper has been uploaded!"
@@ -67,11 +67,10 @@ namespace Portal.Controllers
                 Papers = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
-                    .Include(p => p.Downloaders)
-                    .ThenInclude(d => d.User)
-                    .Where(p => p.Uploader.Id == UserId && p.Done == false && p.Delete == false) // Job is not done
+                    .Where(p => p.Uploader.Id == UserId
+                                && p.Done == false
+                                && p.Delete == false)
                     .OrderBy(p => p.CreatedAt)
-                    .ThenBy(p => p.Due)
                     .ToList();
             }
             // show only the department's PDFs which haven't been printed yet
@@ -83,9 +82,10 @@ namespace Portal.Controllers
                      .Include(p => p.Uploader)
                      .Include(p => p.Uploader.Department)
                      .ThenInclude(d => d.DepartmentId)
-                     .Where(p => p.Done == false && p.Delete == false && p.Uploader.DepartmentId == depId)
+                     .Where(p => p.Done == false
+                                && p.Delete == false
+                                && p.Uploader.DepartmentId == depId)
                      .OrderBy(p => p.CreatedAt)
-                     .ThenBy(p => p.Due)
                      .ToList();
             }
             // otherwise (admin, super admin), show all the PDFs which haven't been printed yet
@@ -96,7 +96,6 @@ namespace Portal.Controllers
                     .Include(p => p.Uploader.Department)
                     .Where(p => p.Done == false && p.Delete == false)
                     .OrderBy(p => p.CreatedAt)
-                    .ThenBy(p => p.Due)
                     .ToList();
             }
 
@@ -104,70 +103,58 @@ namespace Portal.Controllers
         }
 
         // GET: Papers/Status
-        public IActionResult Status(ManageMessageId? message = null)
+        public async Task<IActionResult> Status(ManageMessageId? message = null)
         {
             ViewData["StatusMessage"] =
                 message == ManageMessageId.JobUnDoneSuccess ? "Job Done Status changed to not Done!"
                 : "";
+
             // List of Papers according to the user
-            List<Paper> completed = null;
-            List<Paper> incomplete = null;
+            List<Paper> Papers = null;
 
             // Get the Currently logged in User
-            string UserId =_userManager.GetUserId(User);
+            var user = await _userManager.GetUserAsync(User);
 
             // Only show the current teachers incomplete papers
             if (User.IsInRole(RoleHelper.Teacher))
             {
-                // Store all the completed Papers in the list
-                completed = _context.Paper
+                Papers = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
-                    .Include(p => p.Downloaders)
-                    .ThenInclude(d => d.User)
-                    .Where(p => p.Uploader.Id == UserId && p.Delete == false)
-                    .Where(p => p.Done == true)
-                    .ToList();
-                // Store all the remaining papers uploaded by the teacher
-                incomplete = _context.Paper
-                    .Include(p => p.Uploader)
-                    .Include(p => p.Uploader.Department)
-                    .Include(p => p.Downloaders)
-                    .ThenInclude(d => d.User)
-                    .Where(p => p.Uploader.Id == UserId && p.Delete == false)
-                    .Where(p => p.Done == false)
+                    .Where(p => p.Uploader.Id == user.Id && p.Delete == false)
                     .ToList();
             }
-            else // for printers
+            // show only the department's PDFs which haven't been printed yet
+            else if (User.IsInRole(RoleHelper.HOD) || User.IsInRole(RoleHelper.IC))
             {
-                // Store all the completed Papers by the printer in the list
-                var temp = _context.Users
-                    .Where(u => u.Id ==_userManager.GetUserId(User))
-                    .Include(u => u.CompletedJobs)
-                    .Single()
-                    .CompletedJobs;
-
-                completed = temp != null ? temp.ToList() : new List<Paper>();
-                //completed = _context.Downloads
-                //    .Where(d => d.User.Id == UserId)
-                //    .Select(d => d.Paper)
-                //    .Where(p => p.Done == true)
-                //    .Include(p => p.Uploader)
-                //    .ToList();
-
-                incomplete = _context.Paper
+                var depId = user.DepartmentId;
+                Papers = _context.Paper
+                     .Include(p => p.Uploader)
+                     .Include(p => p.Uploader.Department)
+                     .ThenInclude(d => d.DepartmentId)
+                     .Where(p => p.Delete == false
+                                 && p.Uploader.DepartmentId == depId)
+                     .OrderBy(p => p.CreatedAt)
+                     .ToList();
+            }
+            else
+            {
+                Papers = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
                     .Where(p => p.Done == false && p.Delete == false)
+                    .OrderBy(p => p.CreatedAt)
                     .ToList();
             }
+
+            var completed = Papers.Where(p => p.Done == true).ToList();
+            var incomplete = Papers.Where(p => p.Done == false).ToList();
 
             var StatusVM = new StatusViewModel
             {
                 Completed = completed,
                 Incomplete = incomplete,
             };
-
 
             return View(StatusVM);
         }
@@ -180,7 +167,7 @@ namespace Portal.Controllers
                 return NotFound();
             }
 
-            Paper paper = _context.Paper.Include(p => p.Downloaders).Include(p => p.DoneBy).Single(m => m.PaperId == id);
+            Paper paper = _context.Paper.Include(p => p.Uploader).Single(m => m.PaperId == id);
             if (paper == null)
             {
                 return NotFound();
@@ -196,13 +183,11 @@ namespace Portal.Controllers
             var user = _context.Users.Where(u => u.Id == _userManager.GetUserId(User)).First();
             if (!user.Verified)
             {
-                return RedirectToAction(nameof(IndexAsync), new { Message = ManageMessageId.NotVerfied });
+                return RedirectToAction(nameof(Index), new { Message = ManageMessageId.NotVerfied });
             }
             return View(new CreateViewModel()
             {
-                Copies = 20,
-                Instructor = user.FullName,
-                Due = DateTime.Now.AddDays(2),
+                Copies = 20
             });
         }
 
@@ -218,28 +203,24 @@ namespace Portal.Controllers
             string filePath = UploadPath + fileName;
 
             var pdf = new PDF();
-            bool uploaded = pdf.upload(model.File, filePath);
+            bool uploaded = pdf.Upload(model.File, filePath);
 
             if (uploaded && ModelState.IsValid)
             {
-                Paper paper = new Paper();
+                Paper paper = new Paper()
+                {
+                    Copies = model.Copies,
+                    CreatedAt = DateTime.Now,
+                    Title = model.Title,
+                    Comment = model.Comment,
 
-                paper.Copies = model.Copies;
-                paper.Due = model.Due;
-                paper.CreatedAt = DateTime.Now;
-                paper.Instructor = model.Instructor;
-                paper.Title = model.Title;
-                paper.Comment = model.Comment;
+                    FileName = fileName,
+                    EncKey = pdf.EncKey,
+                    Hash = pdf.Hash,
 
-                paper.FileName = fileName;
-                paper.EncKey = pdf.EncKey;
-                paper.Hash = pdf.Hash;
-
-
-                paper.UploaderId = _userManager.GetUserId(User);
+                    UploaderId = _userManager.GetUserId(User)
+                };
                 paper.Uploader = _context.Users.Where(u => u.Id == paper.UploaderId).First();
-
-                paper.Downloaders = new List<Downloads>();
 
                 _context.Paper.Add(paper);
                 _context.SaveChanges();
@@ -279,8 +260,6 @@ namespace Portal.Controllers
             Paper original = _context.Paper.Single(m => m.PaperId == paper.PaperId);
             // modify the values recieved from the form
             original.Copies = paper.Copies;
-            original.Due = paper.Due;
-            original.Instructor = paper.Instructor;
             original.Title = paper.Title;
 
             // save changes to the DB
@@ -335,7 +314,7 @@ namespace Portal.Controllers
             var user = _context.Users.Where(u => u.Id == _userManager.GetUserId(User)).First();
             if (!user.Verified)
             {
-                return RedirectToAction(nameof(IndexAsync), new { Message = ManageMessageId.NotVerfied });
+                return RedirectToAction(nameof(Index), new { Message = ManageMessageId.NotVerfied });
             }
 
             Paper paper = _context.Paper.Single(m => m.PaperId == id);
@@ -363,63 +342,21 @@ namespace Portal.Controllers
         public IActionResult DownloadConfirmed(int id)
         {
             var userId = _userManager.GetUserId(User);
-            var user = _context.Users.Include(u => u.Downloads).Single(u => u.Id == userId);
+            var user = _context.Users.Single(u => u.Id == userId);
             if (!user.Verified)
             {
-                return RedirectToAction(nameof(IndexAsync), new { Message = ManageMessageId.NotVerfied });
+                return RedirectToAction(nameof(Index), new { Message = ManageMessageId.NotVerfied });
             }
 
-            Paper paper = _context.Paper.Include(p => p.Downloaders).Single(m => m.PaperId == id);
-
-            paper.DownloadsNum = paper.DownloadsNum + 1;
-
+            Paper paper = _context.Paper.Single(m => m.PaperId == id);
 
             var filePath = UploadPath + paper.FileName;
 
             var pdf = new PDF();
-            var fileContents = pdf.download(filePath, userId, paper.DownloadsNum, paper.EncKey);
+            var fileContents = pdf.Download(filePath, userId, paper.EncKey);
 
-            var Downloads = _context.Downloads.Where(d => d.UserId == userId && d.PaperId == paper.PaperId).OrderBy(d => d.DownloadedAt).ToList();
-
-            var download = new Downloads();
-
-            download.User = user;
-            download.Paper = paper;
-            download.DownloadedAt = DateTime.UtcNow;
-
-            // Want this because IDM tries to call this function twice
-            if (Downloads.Count != 0) // the user already downloaded this paper, check if it was downloaded recently
-            {
-
-                if (paper.Downloaders == null)
-                {
-                    paper.Downloaders = new List<Downloads>();
-                }
-                if (user.Downloads == null)
-                {
-                    user.Downloads = new List<Downloads>();
-                }
-
-                var lastTime = Downloads.Last().DownloadedAt;
-                var currentTime = DateTime.UtcNow;
-
-                if (currentTime > lastTime.AddSeconds(5))
-                {
-                    _context.Downloads.Add(download);
-                    paper.Downloaders.Add(download);
-                    user.Downloads.Add(download);
-                    _context.Update(paper);
-                    _context.Update(user);
-                }
-            }
-            else // not downloaded before
-            {
-                _context.Downloads.Add(download);
-                paper.Downloaders.Add(download);
-                user.Downloads.Add(download);
-                _context.Update(paper);
-                _context.Update(user);
-            }
+            _context.Update(paper);
+            _context.Update(user);
 
             _context.SaveChanges();
 
@@ -446,7 +383,7 @@ namespace Portal.Controllers
             {
                 await JobDone(userId);
             }
-            return RedirectToAction(nameof(IndexAsync), new { Message = ManageMessageId.JobsDoneSuccess });
+            return RedirectToAction(nameof(Index), new { Message = ManageMessageId.JobsDoneSuccess });
         }
 
         // GET: Papers/Done?id
@@ -457,43 +394,28 @@ namespace Portal.Controllers
                 .Include(p => p.Uploader)
                 .Where(p => p.PaperId == id)
                 .First();
-            if (paper.DownloadsNum < 1)
-            {
-                return RedirectToAction(nameof(IndexAsync), new { Message = ManageMessageId.JobDoneFailure });
-            }
 
             paper.Done = true;
 
-            var user = _context.Users.Include(u => u.CompletedJobs).Single(u => u.Id == _userManager.GetUserId(User));
-            paper.DoneById = user.Id;
-            paper.DoneBy = user;
-            
-            if (user.CompletedJobs == null)
-            {
-                user.CompletedJobs = new List<Paper>();
-            }
-            user.CompletedJobs.Add(paper);
-
             _context.Update(paper);
-            _context.Update(user);
             _context.SaveChanges();
 
             // Email to the Uploader
-            var uploader = paper.Uploader;
-            var JobStatusVM = new JobStatusViewModel()
-            {
-                Action = "Done",
-                ActionBy = (user.FullName != null) ? user.FullName : user.UserName,
-                At = DateTime.UtcNow.ToLocalTime(),
-                Copies = paper.Copies,
-                Title = paper.Title,
-                Detail = Url.Action("Details", "Papers", new { id = paper.PaperId }, protocol: HttpContext.Request.Scheme),
-                BaseURL = Url.Action("Index", "Home", null, protocol: HttpContext.Request.Scheme),
-        };
+            //var uploader = paper.Uploader;
+            //var JobStatusVM = new JobStatusViewModel()
+            //{
+            //    Action = "Done",
+            //    ActionBy = user.FullName,
+            //    At = DateTime.UtcNow.ToLocalTime(),
+            //    Copies = paper.Copies,
+            //    Title = paper.Title,
+            //    Detail = Url.Action("Details", "Papers", new { id = paper.PaperId }, protocol: HttpContext.Request.Scheme),
+            //    BaseURL = Url.Action("Index", "Home", null, protocol: HttpContext.Request.Scheme),
+            //};
 
-            var messageBody = base.RenderViewAsString(JobStatusVM, "EmailTemplates/JobStatus");
-            await _emailSender.SendEmailAsync(uploader.Email, paper.Title + ", Job Status!", messageBody);
-            return RedirectToAction(nameof(IndexAsync), new { Message = ManageMessageId.JobDoneSuccess });
+            //var messageBody = base.RenderViewAsString(JobStatusVM, "EmailTemplates/JobStatus");
+            //await _emailSender.SendEmailAsync(uploader.Email, paper.Title + ", Job Status!", messageBody);
+            return RedirectToAction(nameof(Index), new { Message = ManageMessageId.JobDoneSuccess });
         }
 
         // GET: Papers/UnDone?id
@@ -501,32 +423,27 @@ namespace Portal.Controllers
         public async Task<IActionResult> JobUnDone(int id)
         {
             var paper = _context.Paper.Include(p => p.Uploader).Single(p => p.PaperId == id);
-            var user = _context.Users.Include(u => u.CompletedJobs).Single(u => u.Id == _userManager.GetUserId(User));
 
-            user.CompletedJobs.Remove(paper);
             paper.Done = false;
-            paper.DoneBy = null;
-            paper.DoneById = null;
 
             _context.Update(paper);
-            _context.Update(user);
             _context.SaveChanges();
 
             // Email to the Uploader
-            var uploader = paper.Uploader;
-            var JobStatusVM = new JobStatusViewModel()
-            {
-                Action = "Removed from Done",
-                ActionBy = (user.FullName != null) ? user.FullName : user.UserName,
-                At = DateTime.UtcNow.ToLocalTime(),
-                Copies = paper.Copies,
-                Title = paper.Title,
-                Detail = Url.Action("Details", "Papers", new { id = paper.PaperId }, protocol: HttpContext.Request.Scheme),
-                BaseURL = Url.Action("Index", "Home", null, protocol: HttpContext.Request.Scheme),
-            };
+            //var uploader = paper.Uploader;
+            //var JobStatusVM = new JobStatusViewModel()
+            //{
+            //    Action = "Removed from Done",
+            //    ActionBy = user.FullName ?? user.UserName,
+            //    At = DateTime.UtcNow.ToLocalTime(),
+            //    Copies = paper.Copies,
+            //    Title = paper.Title,
+            //    Detail = Url.Action("Details", "Papers", new { id = paper.PaperId }, protocol: HttpContext.Request.Scheme),
+            //    BaseURL = Url.Action("Index", "Home", null, protocol: HttpContext.Request.Scheme),
+            //};
 
-            var messageBody = base.RenderViewAsString(JobStatusVM, "EmailTemplates/JobStatus");
-            await _emailSender.SendEmailAsync(uploader.Email, paper.Title + ", Job Status!", messageBody);
+            //var messageBody = base.RenderViewAsString(JobStatusVM, "EmailTemplates/JobStatus");
+            //await _emailSender.SendEmailAsync(uploader.Email, paper.Title + ", Job Status!", messageBody);
 
             return RedirectToAction(nameof(Status), new { Message = ManageMessageId.JobUnDoneSuccess });
         }

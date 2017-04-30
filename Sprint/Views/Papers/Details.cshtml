@@ -12,7 +12,7 @@
             Paper
             <i id="done" class="material-icons md-dark @(@Model.Done == true ? "md-active" : "md-inactive" ) md-inactive md-48 pull-right">done</i>
         </h4>
-        <div class="mdl-tooltip" for="done">@(@Model.Done == true ? "Done by " + @Model.DoneBy.UserName :  "Not Done" )</div>
+        <div class="mdl-tooltip" for="done">@(@Model.Done == true ? "Done" :  "Not Done" )</div>
         <hr />
         <div asp-validation-summary="ModelOnly" class="text-danger">
         </div>

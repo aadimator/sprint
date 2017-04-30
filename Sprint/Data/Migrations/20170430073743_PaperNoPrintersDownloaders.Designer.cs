@@ -8,8 +8,8 @@ using Sprint.Models;
 namespace Sprint.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170429144234_RemoveAdminTable")]
-    partial class RemoveAdminTable
+    [Migration("20170430073743_PaperNoPrintersDownloaders")]
+    partial class PaperNoPrintersDownloaders
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -194,30 +194,12 @@ namespace Sprint.Migrations
                     b.ToTable("Department");
                 });
 
-            modelBuilder.Entity("Sprint.Models.Downloads", b =>
-                {
-                    b.Property<int>("DownloadsId")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("DownloadedAt");
-
-                    b.Property<int>("PaperId");
-
-                    b.Property<string>("UserId");
-
-                    b.HasKey("DownloadsId");
-
-                    b.HasIndex("PaperId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Downloads");
-                });
-
             modelBuilder.Entity("Sprint.Models.Paper", b =>
                 {
                     b.Property<int>("PaperId")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Approved");
 
                     b.Property<string>("Comment");
 
@@ -229,32 +211,26 @@ namespace Sprint.Migrations
 
                     b.Property<bool>("Done");
 
-                    b.Property<string>("DoneById");
-
-                    b.Property<int>("DownloadsNum")
-                        .ValueGeneratedOnAdd()
-                        .HasDefaultValue(0);
-
-                    b.Property<DateTime>("Due");
-
                     b.Property<string>("EncKey");
 
-                    b.Property<string>("FileName");
+                    b.Property<string>("FileName")
+                        .IsRequired();
 
                     b.Property<string>("Hash");
 
-                    b.Property<string>("Instructor");
+                    b.Property<bool>("Locked");
 
                     b.Property<string>("Report");
 
-                    b.Property<string>("Title");
+                    b.Property<string>("Title")
+                        .IsRequired();
+
+                    b.Property<DateTime>("UnlockedAt");
 
                     b.Property<string>("UploaderId")
                         .IsRequired();
 
                     b.HasKey("PaperId");
-
-                    b.HasIndex("DoneById");
 
                     b.HasIndex("UploaderId");
 
@@ -305,24 +281,8 @@ namespace Sprint.Migrations
                         .HasForeignKey("DepartmentId");
                 });
 
-            modelBuilder.Entity("Sprint.Models.Downloads", b =>
-                {
-                    b.HasOne("Sprint.Models.Paper", "Paper")
-                        .WithMany("Downloaders")
-                        .HasForeignKey("PaperId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("Sprint.Models.ApplicationUser", "User")
-                        .WithMany("Downloads")
-                        .HasForeignKey("UserId");
-                });
-
             modelBuilder.Entity("Sprint.Models.Paper", b =>
                 {
-                    b.HasOne("Sprint.Models.ApplicationUser", "DoneBy")
-                        .WithMany("CompletedJobs")
-                        .HasForeignKey("DoneById");
-
                     b.HasOne("Sprint.Models.ApplicationUser", "Uploader")
                         .WithMany("Uploads")
                         .HasForeignKey("UploaderId");

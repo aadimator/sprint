@@ -347,7 +347,7 @@ namespace Sprint.Controllers
         }
 
         [Authorize(Roles = RoleHelper.Admin + "," + RoleHelper.SuperAdmin)]
-        public IActionResult UnverifyUser(string id)
+        public IActionResult Unverify(string id)
         {
             var temp = _context.Users
                 .Where(u => u.Id == id)

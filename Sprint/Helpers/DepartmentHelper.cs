@@ -21,7 +21,9 @@ namespace Sprint.Helpers
             "Education",
             "Islamic & Religious Studies",
             "Management Sciences",
-            "Psychology"
+            "Psychology", 
+            "Examination",
+            "Administration"
             };
 
         public static async Task EnsureDepartmentsCreated(ApplicationDbContext context)

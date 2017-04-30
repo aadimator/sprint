@@ -29,32 +29,10 @@ namespace Sprint.Models
                 .WithMany(u => u.Uploads)
                 .IsRequired(true)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<Paper>()
-                .HasOne(p => p.DoneBy)
-                .WithMany(u => u.CompletedJobs)
-                .IsRequired(false)
-                .HasForeignKey(p => p.DoneById)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            builder.Entity<Paper>()
-                .Property(p => p.DownloadsNum)
-                .HasDefaultValue(0);
-
-            builder.Entity<Downloads>()
-                .HasOne(d => d.Paper)
-                .WithMany(p => p.Downloaders)
-                .HasForeignKey(d => d.PaperId);
-
-            builder.Entity<Downloads>()
-                .HasOne(d => d.User)
-                .WithMany(u => u.Downloads)
-                .HasForeignKey(d => d.UserId);
         }
 
         public DbSet<Paper> Paper { get; set; }
         public DbSet<Department> Department { get; set; }
-        public DbSet<Downloads> Downloads { get; set; }
         public DbSet<ApplicationUser> ApplicationUser { get; set; }
     }
 }

@@ -20,7 +20,7 @@
                 @Html.DisplayNameFor(model => model.Title)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Instructor)
+                @Html.DisplayNameFor(model => model.Uploader.FullName)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Uploader.Department.Name)
@@ -45,54 +45,14 @@
                 }
                 @* Downloaded Column *@
                 <td style="vertical-align:middle;">
-                    @* Downloaders Model *@
-                    @if (User.IsInRole(RoleHelper.Teacher) && item.DownloadsNum >= 1)
+                    @if (item.Done)
                     {
-                        var downloaders = item.Downloaders.GroupBy(d => d.User)
-                            .Select(g => new { g.Key, Count = g.Count() })
-                            .ToDictionary(p => p.Key, p => p.Count);
-                        var id = "downloaders" + item.PaperId;
-                        var btnId = "#" + id;
-                        <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=@btnId>
-                            Downloaders
-                        </button>
-
-                        <div class="modal fade" id=@id tabindex="-1" role="dialog">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                        <h4 class="modal-title">Downloaders</h4>
-                                    </div>
-                                    <div class="modal-body">
-                                        <ul>
-                                            @{
-                                                foreach (var entry in downloaders)
-                                                {
-                                                    var name = (entry.Key.FullName != null) ? entry.Key.FullName : entry.Key.UserName;
-                                                    <li>@name <span class="badge">@entry.Value</span></li>
-
-                                                }
-                                            }
-                                        </ul>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                                                }
-                                                // If User is Printer, Show tick or cross
-                                                else if (item.DownloadsNum >= 1)
-                                                {
-                                                    @Html.Raw("&#10004;")
-                                                }
-                                                // If No Downloaders
-                                                else
-                                                {
-                                                    @Html.Raw("&#10008;")
-                                                }
+                        @Html.Raw("&#10004;")
+                    }
+                    else
+                    {
+                        @Html.Raw("&#10008;")
+                    }
                 </td>
                 <td style="vertical-align:middle;">
                     @Html.DisplayFor(modelItem => item.Copies)
@@ -101,7 +61,7 @@
                     @Html.DisplayFor(modelItem => item.Title)
                 </td>
                 <td style="vertical-align:middle;">
-                    @Html.DisplayFor(modelItem => item.Instructor)
+                    @Html.DisplayFor(modelItem => item.Uploader.FullName)
                 </td>
                 <td style="vertical-align:middle;">
                     @Html.DisplayFor(modelItem => item.Uploader.Department.Name)
@@ -155,12 +115,12 @@
                         @if (User.IsInRole(RoleHelper.Teacher) && ViewBag.Options == "true")
                         {
                             <a asp-action="Edit" asp-route-id="@item.PaperId" class="btn btn-primary">Edit</a>
-                                <a asp-action="Delete" asp-route-id="@item.PaperId" class="btn btn-danger">Delete</a>
+                            <a asp-action="Delete" asp-route-id="@item.PaperId" class="btn btn-danger">Delete</a>
                         }
                     </div>
                 </td>
 
             </tr>
-                                                }
+        }
     </tbody>
 </table>

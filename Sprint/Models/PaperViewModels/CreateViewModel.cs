@@ -15,11 +15,6 @@ namespace Sprint.Models.PaperViewModels
 
         public int Copies { get; set; }
 
-        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        public DateTime Due { get; set; }
-
-        public string Instructor { get; set; }
-
         [Required]
         public IFormFile File { get; set; }
 
