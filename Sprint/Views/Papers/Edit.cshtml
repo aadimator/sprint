@@ -9,7 +9,8 @@
     <form asp-action="Edit" class="form-horizontal">
         <h4>Paper</h4>
         <hr />
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div asp-validation-summary="All" class="text-danger"></div>
+        @Html.HiddenFor(m => m.FileName)
         @Html.Partial("_PaperDetail")
         <div class="col-md-4 col-md-offset-4">
             <div class="form-group">

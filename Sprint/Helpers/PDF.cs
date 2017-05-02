@@ -69,8 +69,10 @@ namespace Sprint.Helpers
 
         private MemoryStream Decrypt(string input, string encKey = "")
         {
-            var encrypt = new Encrypt();
-            encrypt.Password = encKey;
+            var encrypt = new Encrypt()
+            {
+                Password = encKey
+            };
             return encrypt.DecryptFile(input);
         }
 

@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Sprint.Models.PaperViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Sprint.Models.EmailViewModels;
+using Microsoft.AspNetCore.Http;
 
 namespace Portal.Controllers
 {
@@ -73,15 +74,14 @@ namespace Portal.Controllers
                     .OrderBy(p => p.CreatedAt)
                     .ToList();
             }
-            // show only the department's PDFs which haven't been printed yet
-            else if (User.IsInRole(RoleHelper.HOD) || User.IsInRole(RoleHelper.IC))
+            // show the department's PDFs which haven't been printed yet
+            if (User.IsInRole(RoleHelper.HOD) || User.IsInRole(RoleHelper.IC))
             {
                 var user = await _userManager.GetUserAsync(User);
                 var depId = user.DepartmentId;
                 Papers = _context.Paper
                      .Include(p => p.Uploader)
                      .Include(p => p.Uploader.Department)
-                     .ThenInclude(d => d.DepartmentId)
                      .Where(p => p.Done == false
                                 && p.Delete == false
                                 && p.Uploader.DepartmentId == depId)
@@ -89,12 +89,23 @@ namespace Portal.Controllers
                      .ToList();
             }
             // otherwise (admin, super admin), show all the PDFs which haven't been printed yet
-            else
+            if (User.IsInRole(RoleHelper.SuperAdmin)
+                || User.IsInRole(RoleHelper.Admin))
             {
                 Papers = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
                     .Where(p => p.Done == false && p.Delete == false)
+                    .OrderBy(p => p.CreatedAt)
+                    .ToList();
+            }
+            // if "Examiner", then show only the PDFs that have been approved
+            if (User.IsInRole(RoleHelper.Examiner))
+            {
+                Papers = _context.Paper
+                    .Include(p => p.Uploader)
+                    .Include(p => p.Uploader.Department)
+                    .Where(p => p.Done == false && p.Delete == false && p.Approved == true)
                     .OrderBy(p => p.CreatedAt)
                     .ToList();
             }
@@ -124,25 +135,36 @@ namespace Portal.Controllers
                     .Where(p => p.Uploader.Id == user.Id && p.Delete == false)
                     .ToList();
             }
-            // show only the department's PDFs which haven't been printed yet
-            else if (User.IsInRole(RoleHelper.HOD) || User.IsInRole(RoleHelper.IC))
+            // show the department's PDFs which haven't been printed yet
+            if (User.IsInRole(RoleHelper.HOD) || User.IsInRole(RoleHelper.IC))
             {
                 var depId = user.DepartmentId;
                 Papers = _context.Paper
                      .Include(p => p.Uploader)
                      .Include(p => p.Uploader.Department)
-                     .ThenInclude(d => d.DepartmentId)
                      .Where(p => p.Delete == false
                                  && p.Uploader.DepartmentId == depId)
                      .OrderBy(p => p.CreatedAt)
                      .ToList();
             }
-            else
+            if (User.IsInRole(RoleHelper.SuperAdmin)
+                || User.IsInRole(RoleHelper.Admin))
             {
                 Papers = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
                     .Where(p => p.Done == false && p.Delete == false)
+                    .OrderBy(p => p.CreatedAt)
+                    .ToList();
+            }
+
+            // if "Examiner", then show only the PDFs that have been approved
+            if (User.IsInRole(RoleHelper.Examiner))
+            {
+                Papers = _context.Paper
+                    .Include(p => p.Uploader)
+                    .Include(p => p.Uploader.Department)
+                    .Where(p => p.Done == false && p.Delete == false && p.Approved == true)
                     .OrderBy(p => p.CreatedAt)
                     .ToList();
             }
@@ -177,7 +199,9 @@ namespace Portal.Controllers
         }
 
         // GET: Papers/Create
-        [Authorize(Roles = RoleHelper.Teacher)]
+        [Authorize(Roles = RoleHelper.Teacher + "," +
+                           RoleHelper.Admin + "," + 
+                           RoleHelper.SuperAdmin)]
         public IActionResult Create()
         {
             var user = _context.Users.Where(u => u.Id == _userManager.GetUserId(User)).First();
@@ -194,14 +218,17 @@ namespace Portal.Controllers
         // POST: Papers/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = RoleHelper.Teacher)]
-        public IActionResult Create(CreateViewModel model)
+        [Authorize(Roles = RoleHelper.Teacher + "," +
+                           RoleHelper.Admin + "," +
+                           RoleHelper.SuperAdmin)]
+        public async Task<IActionResult> Create(CreateViewModel model)
         {
             // create a unique fileName using TimeStamp, Remove the whitespace from the Title
             string fileName = DateTime.UtcNow.ToFileTimeUtc() + "-" + model.Title.Replace(" ", String.Empty);
 
             string filePath = UploadPath + fileName;
 
+            var uploader = await _userManager.GetUserAsync(User);
             var pdf = new PDF();
             bool uploaded = pdf.Upload(model.File, filePath);
 
@@ -213,7 +240,9 @@ namespace Portal.Controllers
                     CreatedAt = DateTime.Now,
                     Title = model.Title,
                     Comment = model.Comment,
-
+                    Approved = (User.IsInRole(RoleHelper.Admin)
+                            || User.IsInRole(RoleHelper.SuperAdmin) ? true : false),
+                    Locked = true,
                     FileName = fileName,
                     EncKey = pdf.EncKey,
                     Hash = pdf.Hash,
@@ -234,7 +263,9 @@ namespace Portal.Controllers
         }
 
         // GET: Papers/Edit/5
-        [Authorize(Roles = RoleHelper.Teacher)]
+        [Authorize(Roles = RoleHelper.Teacher + "," +
+                           RoleHelper.Admin + "," +
+                           RoleHelper.SuperAdmin)]
         public IActionResult Edit(int? id)
         {
             if (id == null)
@@ -253,7 +284,9 @@ namespace Portal.Controllers
         // POST: Papers/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = RoleHelper.Teacher)]
+        [Authorize(Roles = RoleHelper.Teacher + "," +
+                           RoleHelper.Admin + "," +
+                           RoleHelper.SuperAdmin)]
         public IActionResult Edit(Paper paper)
         {
             // Retrieve the original paper from DB for modification
@@ -261,6 +294,7 @@ namespace Portal.Controllers
             // modify the values recieved from the form
             original.Copies = paper.Copies;
             original.Title = paper.Title;
+            original.Comment = paper.Comment;
 
             // save changes to the DB
             if (ModelState.IsValid)
@@ -270,13 +304,14 @@ namespace Portal.Controllers
                 return RedirectToAction("Index", new { Message = ManageMessageId.FileEditSuccess });
             }
 
-            ViewData["UploaderId"] = new SelectList(_context.Users, "Id", "Uploader", paper.UploaderId);
             return View(paper);
         }
 
         // GET: Papers/Delete/5
         [ActionName("Delete")]
-        [Authorize(Roles = RoleHelper.Teacher)]
+        [Authorize(Roles = RoleHelper.Teacher + "," +
+                           RoleHelper.Admin + "," +
+                           RoleHelper.SuperAdmin)]
         public IActionResult Delete(int? id)
         {
             if (id == null)
@@ -296,7 +331,9 @@ namespace Portal.Controllers
         // POST: Papers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = RoleHelper.Teacher)]
+        [Authorize(Roles = RoleHelper.Teacher + "," +
+                           RoleHelper.Admin + "," +
+                           RoleHelper.SuperAdmin)]
         public IActionResult DeleteConfirmed(int id)
         {
             Paper paper = _context.Paper.Single(m => m.PaperId == id);
@@ -306,9 +343,94 @@ namespace Portal.Controllers
             return RedirectToAction("Index", new { Message = ManageMessageId.FileDeletionSuccess });
         }
 
+        // GET: Papers/Approve/5
+        [Authorize(Roles = RoleHelper.IC + "," +
+                           RoleHelper.HOD + "," +
+                           RoleHelper.Admin + "," +
+                           RoleHelper.SuperAdmin)]
+        public IActionResult Approve(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            Paper paper = _context.Paper.Include(p => p.Uploader).Single(m => m.PaperId == id);
+            if (paper == null)
+            {
+                return NotFound();
+            }
+
+            var filePath = UploadPath + paper.FileName;
+
+            var pdf = new PDF();
+            bool verified = pdf.Verify(paper.Hash, filePath);
+            var fileContents = pdf.Download(filePath, userId, paper.EncKey);
+
+            if (!verified)
+            {
+                ViewBag.Verified = "False";
+            }
+            return View(new ShowViewModel
+            {
+                Paper = paper,
+                PdfBytes = fileContents
+            });
+        }
+
+        // GET: Papers/Approved/5
+        [Authorize(Roles = RoleHelper.IC + "," +
+                           RoleHelper.HOD + "," +
+                           RoleHelper.Admin + "," +
+                           RoleHelper.SuperAdmin)]
+        public IActionResult Approved(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Paper paper = _context.Paper.Single(m => m.PaperId == id);
+            if (paper == null)
+            {
+                return NotFound();
+            }
+            paper.Approved = true;
+
+            _context.Update(paper);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+
+        // GET: Papers/Rejected/5
+        [Authorize(Roles = RoleHelper.IC + "," +
+                           RoleHelper.HOD + "," +
+                           RoleHelper.Admin + "," +
+                           RoleHelper.SuperAdmin)]
+        public IActionResult Rejected(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Paper paper = _context.Paper.Single(m => m.PaperId == id);
+            if (paper == null)
+            {
+                return NotFound();
+            }
+            paper.Approved = false;
+
+            _context.Update(paper);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+
         // GET: Papers/Download/5
         [ActionName("Download")]
-        [Authorize(Roles = RoleHelper.IC)]
+        [Authorize(Roles = RoleHelper.IC + "," +
+                           RoleHelper.HOD + "," +
+                           RoleHelper.Admin + "," +
+                           RoleHelper.SuperAdmin)]
         public IActionResult Download(int id)
         {
             var user = _context.Users.Where(u => u.Id == _userManager.GetUserId(User)).First();
@@ -338,7 +460,10 @@ namespace Portal.Controllers
         // POST: Papers/Download/5
         [HttpPost, ActionName("Download")]
         //[ValidateAntiForgeryToken]
-        [Authorize(Roles = RoleHelper.IC)]
+        [Authorize(Roles = RoleHelper.IC + "," +
+                           RoleHelper.HOD + "," +
+                           RoleHelper.Admin + "," +
+                           RoleHelper.SuperAdmin)]
         public IActionResult DownloadConfirmed(int id)
         {
             var userId = _userManager.GetUserId(User);
@@ -376,7 +501,10 @@ namespace Portal.Controllers
 
 
         // POST: Papers/Done
-        [Authorize(Roles = RoleHelper.IC)]
+        [Authorize(Roles = RoleHelper.IC + "," +
+                           RoleHelper.HOD + "," +
+                           RoleHelper.Admin + "," +
+                           RoleHelper.SuperAdmin)]
         public async Task<IActionResult> Done(int[] selected)
         {
             foreach (var userId in selected)
@@ -387,9 +515,13 @@ namespace Portal.Controllers
         }
 
         // GET: Papers/Done?id
-        [Authorize(Roles = RoleHelper.IC)]
+        [Authorize(Roles = RoleHelper.IC + "," +
+                           RoleHelper.HOD + "," +
+                           RoleHelper.Admin + "," +
+                           RoleHelper.SuperAdmin)]
         public async Task<IActionResult> JobDone(int id)
         {
+            var user = await _userManager.GetUserAsync(User);
             var paper = _context.Paper
                 .Include(p => p.Uploader)
                 .Where(p => p.PaperId == id)
@@ -419,9 +551,13 @@ namespace Portal.Controllers
         }
 
         // GET: Papers/UnDone?id
-        [Authorize(Roles = RoleHelper.IC)]
+        [Authorize(Roles = RoleHelper.IC + "," +
+                           RoleHelper.HOD + "," +
+                           RoleHelper.Admin + "," +
+                           RoleHelper.SuperAdmin)]
         public async Task<IActionResult> JobUnDone(int id)
         {
+            var user = await _userManager.GetUserAsync(User);
             var paper = _context.Paper.Include(p => p.Uploader).Single(p => p.PaperId == id);
 
             paper.Done = false;

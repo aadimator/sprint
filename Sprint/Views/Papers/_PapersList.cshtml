@@ -11,7 +11,7 @@
                 </th>
             }
             <th>
-                @Html.Raw("Downloaded")
+                @Html.DisplayNameFor(model => model.Approved)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Copies)
@@ -45,13 +45,26 @@
                 }
                 @* Downloaded Column *@
                 <td style="vertical-align:middle;">
-                    @if (item.Done)
+                    @if (item.Approved)
                     {
                         @Html.Raw("&#10004;")
                     }
                     else
                     {
-                        @Html.Raw("&#10008;")
+                        if (User.IsInRole(RoleHelper.HOD) ||
+                    User.IsInRole(RoleHelper.Admin) ||
+                    User.IsInRole(RoleHelper.SuperAdmin))
+                        {
+                            <div class="btn-group-xs">
+                                <a asp-action="Approve" asp-route-id="@item.PaperId" class="btn btn-info">Approve</a>
+                            </div>
+                        }
+                        else
+                        {
+                            @Html.Raw("&#10008;")
+
+                        }
+
                     }
                 </td>
                 <td style="vertical-align:middle;">
