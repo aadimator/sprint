@@ -28,7 +28,20 @@
                 <div class="col-md-4 col-md-offset-4">
                     <div class="form-group">
                         <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised" asp-action="Index">Back to List</a>
-                        <input type="submit" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary mdl-button--raised" value="Download" />
+                        @if (Model.Locked)
+                        {
+                            <input type="submit"
+                                   class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary mdl-button--raised"
+                                   disabled
+                                   value="Locked" />
+
+                        }
+                        else
+                        {
+                            <input type="submit"
+                                   class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary mdl-button--raised"
+                                   value="Download" />
+                        }
                     </div>
                 </div>
             </form>

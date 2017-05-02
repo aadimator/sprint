@@ -130,6 +130,11 @@
                             <a asp-action="Edit" asp-route-id="@item.PaperId" class="btn btn-primary">Edit</a>
                             <a asp-action="Delete" asp-route-id="@item.PaperId" class="btn btn-danger">Delete</a>
                         }
+                        @if (User.IsInRole(RoleHelper.Examiner))
+                        {
+                            <a asp-action="Unlock" asp-route-id="@item.PaperId" class="btn btn-primary">Unlock</a>
+
+                        }
                     </div>
                 </td>
 

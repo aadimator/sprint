@@ -57,6 +57,7 @@ namespace Portal.Controllers
                 : message == ManageMessageId.JobsDoneSuccess ? "All Downloaded Jobs are Completed Successfully!"
                 : message == ManageMessageId.JobDoneSuccess ? "Job Completed Successfully!"
                 : message == ManageMessageId.JobDoneFailure ? "Papers should be downloaded before they are marked as Done"
+                : message == ManageMessageId.UnlockSuccess ? "Paper was unlocked successfull."
                 : "";
 
             // List of Papers according to the user
@@ -99,13 +100,14 @@ namespace Portal.Controllers
                     .OrderBy(p => p.CreatedAt)
                     .ToList();
             }
-            // if "Examiner", then show only the PDFs that have been approved
+            // if "Examiner", then show only the PDFs that have been approved and locked
             if (User.IsInRole(RoleHelper.Examiner))
             {
                 Papers = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
-                    .Where(p => p.Done == false && p.Delete == false && p.Approved == true)
+                    .Where(p => p.Done == false && p.Delete == false && 
+                            p.Approved == true && p.Locked == true)
                     .OrderBy(p => p.CreatedAt)
                     .ToList();
             }
@@ -158,13 +160,14 @@ namespace Portal.Controllers
                     .ToList();
             }
 
-            // if "Examiner", then show only the PDFs that have been approved
+            // if "Examiner", then show only the PDFs that have been approved and locked
             if (User.IsInRole(RoleHelper.Examiner))
             {
                 Papers = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
-                    .Where(p => p.Done == false && p.Delete == false && p.Approved == true)
+                    .Where(p => p.Done == false && p.Delete == false && 
+                            p.Approved == true && p.Locked == true)
                     .OrderBy(p => p.CreatedAt)
                     .ToList();
             }
@@ -200,7 +203,7 @@ namespace Portal.Controllers
 
         // GET: Papers/Create
         [Authorize(Roles = RoleHelper.Teacher + "," +
-                           RoleHelper.Admin + "," + 
+                           RoleHelper.Admin + "," +
                            RoleHelper.SuperAdmin)]
         public IActionResult Create()
         {
@@ -425,6 +428,29 @@ namespace Portal.Controllers
             return RedirectToAction("Index");
         }
 
+        // GET: Papers/Unlock/5
+        [Authorize(Roles = RoleHelper.Examiner)]
+        public IActionResult Unlock(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Paper paper = _context.Paper.Single(m => m.PaperId == id);
+            if (paper == null)
+            {
+                return NotFound();
+            }
+            paper.Locked = false;
+            paper.UnlockedAt = DateTime.Now;
+
+            _context.Update(paper);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index", new { Message = ManageMessageId.UnlockSuccess });
+        }
+
         // GET: Papers/Download/5
         [ActionName("Download")]
         [Authorize(Roles = RoleHelper.IC + "," +
@@ -449,6 +475,15 @@ namespace Portal.Controllers
 
             var pdf = new PDF();
             bool verified = pdf.Verify(paper.Hash, filePath);
+
+            var currentTime = DateTime.Now;
+
+            if (paper.Locked == false && currentTime.Subtract(paper.UnlockedAt).Minutes > 5)
+            {
+                paper.Locked = true;
+                _context.Update(paper);
+                _context.SaveChanges();
+            }
 
             if (!verified)
             {
@@ -604,6 +639,7 @@ namespace Portal.Controllers
             JobDoneSuccess,
             JobDoneFailure,
             JobUnDoneSuccess,
+            UnlockSuccess,
             NotVerfied,
             Error
         }
