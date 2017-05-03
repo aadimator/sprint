@@ -182,7 +182,8 @@ namespace Sprint.Controllers
         public async Task<IActionResult> Users(ManageMessageId? message = null)
         {
             ViewData["StatusMessage"] =
-                message == ManageMessageId.Error ? "Error Message"
+                message == ManageMessageId.Error ? "Error Message" :
+                message == ManageMessageId.RoleChangeSuccess ? "Successfully Changed the Roles"
                 : "";
 
             var userList = new List<UsersViewModel>();

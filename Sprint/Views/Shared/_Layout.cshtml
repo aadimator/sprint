@@ -90,13 +90,26 @@
             </nav>
         </div>
 
+
         <div class="sprint-content mdl-layout__content">
+
             <a name="top"></a>
             <div class="container">
+                @if (ViewData.ContainsKey("StatusMessage") && (string)ViewData["StatusMessage"] != "")
+            {
+                    <div class="alert alert-dismissible mdl-color-text--primary-dark" role="alert" style="margin-top:2em;">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        @ViewData["StatusMessage"]
+                    </div>
+                }
+
                 @RenderBody()
 
                 @{
-                    if (User.IsInRole(RoleHelper.Teacher))
+                    if (User.IsInRole(RoleHelper.Teacher) ||
+                        User.IsInRole(RoleHelper.Admin) ||
+                        User.IsInRole(RoleHelper.SuperAdmin) ||
+                        User.IsInRole(RoleHelper.HOD))
                     {
                         <a asp-controller="Papers" asp-action="Create" id="create-fab" class="sprint-fab mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
                             <i class="material-icons">cloud_upload</i>

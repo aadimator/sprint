@@ -6,14 +6,6 @@
 
 <h2 class="text-primary-color">@ViewData["Title"]</h2>
 
-@if ((string)ViewData["StatusMessage"] != "")
-{
-    <div class="alert alert-info alert-dismissible" role="alert">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        @ViewData["StatusMessage"]
-    </div>
-}
-
 <div class="well col-md-10 col-md-offset-1">
     <form>
         <fieldset>
