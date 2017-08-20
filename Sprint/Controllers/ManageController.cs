@@ -65,8 +65,7 @@ namespace Sprint.Controllers
             {
                 Department = dep,
                 Email = user.Email,
-                FullName = user.FullName,
-                UserName = user.UserName,
+                FullName = user.FullName
             };
             return View(model);
         }
@@ -183,12 +182,14 @@ namespace Sprint.Controllers
         {
             ViewData["StatusMessage"] =
                 message == ManageMessageId.Error ? "Error Message" :
-                message == ManageMessageId.RoleChangeSuccess ? "Successfully Changed the Roles"
-                : "";
+                message == ManageMessageId.RoleChangeSuccess ? "Successfully Changed the Roles" :
+                message == ManageMessageId.VerificationSuccess ? "Successfully Verified the User" :
+                message == ManageMessageId.UnverificationSuccess ? "User was Un-verified" :
+                "";
 
             var userList = new List<UsersViewModel>();
 
-            var users = _context.Users.Include(u => u.Department).ToList();
+            var users = _context.Users.Include(u => u.Department).ToList().OrderBy(m => m.FullName);
 
             foreach (var user in users)
             {
@@ -326,11 +327,14 @@ namespace Sprint.Controllers
                 VerifyUser(userId);
             }
             _context.SaveChanges();
-            return RedirectToAction(nameof(VerifyUsers));
+            return RedirectToAction(nameof(VerifyUsers), new { Message = ManageMessageId.VerificationSuccess });
         }
 
         [Authorize(Roles = RoleHelper.Admin + "," + RoleHelper.SuperAdmin)]
-        public IActionResult VerifyUser(string id)
+        public IActionResult VerifyUser 
+            (
+                string id, 
+                string returnUrl = nameof(VerifyUsers))
         {
             var temp = _context.Users
                 .Where(u => u.Id == id)
@@ -344,11 +348,11 @@ namespace Sprint.Controllers
             temp.Verified = true;
             _context.Update(temp);
             _context.SaveChanges();
-            return RedirectToAction(nameof(VerifyUsers));
+            return RedirectToAction(returnUrl, new { Message = ManageMessageId.VerificationSuccess });
         }
 
         [Authorize(Roles = RoleHelper.Admin + "," + RoleHelper.SuperAdmin)]
-        public IActionResult Unverify(string id)
+        public IActionResult Unverify(string id, string returnUrl = nameof(Users))
         {
             var temp = _context.Users
                 .Where(u => u.Id == id)
@@ -356,7 +360,7 @@ namespace Sprint.Controllers
             temp.Verified = false;
             _context.Update(temp);
             _context.SaveChanges();
-            return RedirectToAction(nameof(Users));
+            return RedirectToAction(returnUrl, new { Message = ManageMessageId.UnverificationSuccess } );
         }
 
         ////
@@ -438,6 +442,8 @@ namespace Sprint.Controllers
             ChangePasswordSuccess,
             EditSuccess,
             RoleChangeSuccess,
+            VerificationSuccess,
+            UnverificationSuccess,
             Error
         }
 

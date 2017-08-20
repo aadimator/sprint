@@ -364,6 +364,10 @@ a img {
     cursor: pointer;
 }
 
+.sprint-card-square.mdl-card {
+    width: 240px;
+    height: 240px;
+}
 
 /**** Mobile layout ****/
 @media (max-width: 900px) {

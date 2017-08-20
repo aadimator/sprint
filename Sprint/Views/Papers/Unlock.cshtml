@@ -1,0 +1,60 @@
+﻿@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@model UnlockViewModel
+
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = "Unlock";
+}
+
+
+<h2 class="text-primary-color">@ViewData["Title"]</h2>
+
+<div class="well col-md-11 col-md-offset-1">
+
+    <form asp-action="Unlock">
+        <h4>@Model.DeptName</h4>
+        @Html.HiddenFor(m => m.DeptId)
+        @Html.HiddenFor(m => m.DeptName)
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label asp-for="@Model.ICEmail" class="mdl-textfield__label"></label>
+                    <input asp-for="@Model.ICEmail" class="mdl-textfield__input" />
+                    <span asp-validation-for="@Model.ICEmail" class="mdl-textfield__error"></span>
+                </div>
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label asp-for="@Model.ICPassword" class="mdl-textfield__label"></label>
+                    <input asp-for="@Model.ICPassword" class="mdl-textfield__input" />
+                    <span asp-validation-for="@Model.ICPassword" class="mdl-textfield__error"></span>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label asp-for="@Model.ExaminerEmail" class="mdl-textfield__label"></label>
+                    <input asp-for="@Model.ExaminerEmail" class="mdl-textfield__input" />
+                    <span asp-validation-for="@Model.ExaminerEmail" class="mdl-textfield__error"></span>
+                </div>
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label asp-for="@Model.ExaminerPassword" class="mdl-textfield__label"></label>
+                    <input asp-for="@Model.ExaminerPassword" class="mdl-textfield__input" />
+                    <span asp-validation-for="@Model.ExaminerPassword" class="mdl-textfield__error"></span>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="col-sm-6 col-sm-offset-4">
+            <div class="form-group">
+                <a href="javascript:history.back()" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised">Back to List</a>
+                <button type="submit" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--accent mdl-button--raised">Unlock</button>
+            </div>
+        </div>
+    </form>
+</div>
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

@@ -1,7 +1,5 @@
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.PlatformAbstractions;
 using Sprint.Helpers;
 using Sprint.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -15,8 +13,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Sprint.Models.PaperViewModels;
 using Microsoft.AspNetCore.Hosting;
-using Sprint.Models.EmailViewModels;
 using Microsoft.AspNetCore.Http;
+using Sprint.Models.AccountViewModels;
+using iTextSharp.text.pdf;
 
 namespace Portal.Controllers
 {
@@ -24,6 +23,11 @@ namespace Portal.Controllers
     [Authorize]
     public class PapersController : BaseController
     {
+        public const string SessionLocked = "_Locked";
+        public const string SessionDeptId = "_DepartmentId";
+        public const string SessionInternalControllerId = "_InternalControllerId";
+        public const string SessionExaminerId = "_ExaminerId";
+
         private ApplicationDbContext _context;
         private IHostingEnvironment _hostingEnvironment;
         private IEmailSender _emailSender;
@@ -45,7 +49,7 @@ namespace Portal.Controllers
         }
 
         // GET: Papers
-        public async Task<IActionResult> Index(ManageMessageId? message = null)
+        public async Task<IActionResult> Index(int? id, ManageMessageId? message = null)
         {
             ViewData["StatusMessage"] =
                 message == ManageMessageId.FileUploadSuccess ? "Your Paper has been uploaded!"
@@ -89,30 +93,71 @@ namespace Portal.Controllers
                      .OrderBy(p => p.CreatedAt)
                      .ToList();
             }
-            // otherwise (admin, super admin), show all the PDFs which haven't been printed yet
-            if (User.IsInRole(RoleHelper.SuperAdmin)
-                || User.IsInRole(RoleHelper.Admin))
-            {
-                Papers = _context.Paper
-                    .Include(p => p.Uploader)
-                    .Include(p => p.Uploader.Department)
-                    .Where(p => p.Done == false && p.Delete == false)
-                    .OrderBy(p => p.CreatedAt)
-                    .ToList();
-            }
             // if "Examiner", then show only the PDFs that have been approved and locked
             if (User.IsInRole(RoleHelper.Examiner))
             {
-                Papers = _context.Paper
-                    .Include(p => p.Uploader)
-                    .Include(p => p.Uploader.Department)
-                    .Where(p => p.Done == false && p.Delete == false && 
-                            p.Approved == true && p.Locked == true)
-                    .OrderBy(p => p.CreatedAt)
-                    .ToList();
+                if (id != null)
+                {
+                    Papers = _context.Paper
+                        .Include(p => p.Uploader)
+                        .Include(p => p.Uploader.Department)
+                        .Where(p => p.Delete == false &&
+                               p.Approved == true && p.Uploader.DepartmentId == id)
+                        .OrderBy(p => p.Title)
+                        .ToList();
+
+                    if (HttpContext.Session.GetString(SessionLocked) == "false" &&
+                        HttpContext.Session.GetInt32(SessionDeptId) == id)
+                    {
+                        ViewData["Locked"] = "false";
+                    }
+                }
+                else
+                {
+                    return RedirectToAction(nameof(Depts));
+                }
             }
 
             return View(Papers);
+        }
+
+        // GET: Papers/Depts
+        [Authorize(Roles = RoleHelper.Examiner)]
+        public IActionResult Depts()
+        {
+            List<Department> Departments = _context.Department.ToList();
+            // List of Papers according to the user
+            List<Paper> Papers = _context.Paper
+                .Include(p => p.Uploader)
+                .Include(p => p.Uploader.Department)
+                .Where(p => p.Delete == false && p.Approved == true)
+                .OrderBy(p => p.Title)
+                .ToList();
+            List<DeptViewModel> deptViewModel = new List<DeptViewModel>();
+
+            foreach (var dept in Departments)
+            {
+                if (dept.Name != DepartmentHelper.Administration && dept.Name != DepartmentHelper.Examination)
+                {
+                    List<Paper> deptPapers = Papers
+                        .Where(p => p.Uploader.Department.DepartmentId == dept.DepartmentId)
+                        .ToList();
+
+                    int done = deptPapers.Where(p => p.Done == true).Count();
+                    int undone = deptPapers.Where(p => p.Done == false).Count();
+                    deptViewModel.Add(new DeptViewModel
+                    {
+                        DeptId = dept.DepartmentId,
+                        DeptName = dept.Name,
+                        Done = done,
+                        Undone = undone
+                    });
+                }
+            }
+
+            deptViewModel = deptViewModel.OrderByDescending(p => p.Undone).ThenBy(p => p.DeptName).ToList();
+
+            return View(deptViewModel);
         }
 
         // GET: Papers/Status
@@ -166,7 +211,7 @@ namespace Portal.Controllers
                 Papers = _context.Paper
                     .Include(p => p.Uploader)
                     .Include(p => p.Uploader.Department)
-                    .Where(p => p.Done == false && p.Delete == false && 
+                    .Where(p => p.Done == false && p.Delete == false &&
                             p.Approved == true && p.Locked == true)
                     .OrderBy(p => p.CreatedAt)
                     .ToList();
@@ -221,9 +266,7 @@ namespace Portal.Controllers
         // POST: Papers/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = RoleHelper.Teacher + "," +
-                           RoleHelper.Admin + "," +
-                           RoleHelper.SuperAdmin)]
+        [Authorize(Roles = RoleHelper.Teacher)]
         public async Task<IActionResult> Create(CreateViewModel model)
         {
             // create a unique fileName using TimeStamp, Remove the whitespace from the Title
@@ -266,9 +309,7 @@ namespace Portal.Controllers
         }
 
         // GET: Papers/Edit/5
-        [Authorize(Roles = RoleHelper.Teacher + "," +
-                           RoleHelper.Admin + "," +
-                           RoleHelper.SuperAdmin)]
+        [Authorize(Roles = RoleHelper.Teacher)]
         public IActionResult Edit(int? id)
         {
             if (id == null)
@@ -287,9 +328,7 @@ namespace Portal.Controllers
         // POST: Papers/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = RoleHelper.Teacher + "," +
-                           RoleHelper.Admin + "," +
-                           RoleHelper.SuperAdmin)]
+        [Authorize(Roles = RoleHelper.Teacher)]
         public IActionResult Edit(Paper paper)
         {
             // Retrieve the original paper from DB for modification
@@ -312,9 +351,7 @@ namespace Portal.Controllers
 
         // GET: Papers/Delete/5
         [ActionName("Delete")]
-        [Authorize(Roles = RoleHelper.Teacher + "," +
-                           RoleHelper.Admin + "," +
-                           RoleHelper.SuperAdmin)]
+        [Authorize(Roles = RoleHelper.Teacher)]
         public IActionResult Delete(int? id)
         {
             if (id == null)
@@ -334,9 +371,7 @@ namespace Portal.Controllers
         // POST: Papers/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = RoleHelper.Teacher + "," +
-                           RoleHelper.Admin + "," +
-                           RoleHelper.SuperAdmin)]
+        [Authorize(Roles = RoleHelper.Teacher)]
         public IActionResult DeleteConfirmed(int id)
         {
             Paper paper = _context.Paper.Single(m => m.PaperId == id);
@@ -348,9 +383,7 @@ namespace Portal.Controllers
 
         // GET: Papers/Approve/5
         [Authorize(Roles = RoleHelper.IC + "," +
-                           RoleHelper.HOD + "," +
-                           RoleHelper.Admin + "," +
-                           RoleHelper.SuperAdmin)]
+                           RoleHelper.HOD)]
         public IActionResult Approve(int id)
         {
             var userId = _userManager.GetUserId(User);
@@ -380,9 +413,7 @@ namespace Portal.Controllers
 
         // GET: Papers/Approved/5
         [Authorize(Roles = RoleHelper.IC + "," +
-                           RoleHelper.HOD + "," +
-                           RoleHelper.Admin + "," +
-                           RoleHelper.SuperAdmin)]
+                           RoleHelper.HOD)]
         public IActionResult Approved(int? id)
         {
             if (id == null)
@@ -405,9 +436,7 @@ namespace Portal.Controllers
 
         // GET: Papers/Rejected/5
         [Authorize(Roles = RoleHelper.IC + "," +
-                           RoleHelper.HOD + "," +
-                           RoleHelper.Admin + "," +
-                           RoleHelper.SuperAdmin)]
+                           RoleHelper.HOD)]
         public IActionResult Rejected(int? id)
         {
             if (id == null)
@@ -437,26 +466,110 @@ namespace Portal.Controllers
                 return NotFound();
             }
 
+            Department dept = _context.Department.Single(m => m.DepartmentId == id);
+            if (dept == null)
+            {
+                return NotFound();
+            }
+
+            return View(new UnlockViewModel
+            {
+                DeptId = dept.DepartmentId,
+                DeptName = dept.Name
+            });
+        }
+
+        // POST: Papers/Unlock/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Unlock(UnlockViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var ic = await _userManager.FindByEmailAsync(model.ICEmail);
+                var examiner = await _userManager.FindByEmailAsync(model.ExaminerEmail);
+
+                var examinationDept = _context.Department
+                                        .Where(m => m.Name == DepartmentHelper.Examination)
+                                        .Single();
+
+                if (ic != null && examiner != null)
+                {
+                    if (ic.DepartmentId == model.DeptId && examiner.DepartmentId == examinationDept.DepartmentId)
+                    {
+                        var ic_verified = await _userManager.CheckPasswordAsync(ic, model.ICPassword);
+                        var examiner_verified = await _userManager.CheckPasswordAsync(examiner, model.ExaminerPassword);
+
+                        if (ic_verified && examiner_verified)
+                        {
+                            HttpContext.Session.SetString(SessionLocked, "false");
+                            HttpContext.Session.SetString(SessionExaminerId, examiner.Id);
+                            HttpContext.Session.SetString(SessionInternalControllerId, ic.Id);
+                            HttpContext.Session.SetInt32(SessionDeptId, model.DeptId);
+
+                            return RedirectToAction(nameof(Index), new { id = model.DeptId });
+                        }
+                    }
+                }
+            }
+
+            ModelState.AddModelError(string.Empty, "Invalid credentials.");
+            return View(model);
+        }
+
+        // GET: Papers/Print/5
+        [ActionName("Print")]
+        [Authorize(Roles = RoleHelper.IC + "," +
+                           RoleHelper.HOD + "," +
+                           RoleHelper.Examiner)]
+        public async Task<IActionResult> Print(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (!user.Verified)
+            {
+                return RedirectToAction(nameof(Index), new { Message = ManageMessageId.NotVerfied });
+            }
+
             Paper paper = _context.Paper.Single(m => m.PaperId == id);
             if (paper == null)
             {
                 return NotFound();
             }
-            paper.Locked = false;
-            paper.UnlockedAt = DateTime.Now;
 
-            _context.Update(paper);
-            _context.SaveChanges();
+            var filePath = UploadPath + paper.FileName;
 
-            return RedirectToAction("Index", new { Message = ManageMessageId.UnlockSuccess });
+            var pdf = new PDF();
+            bool verified = pdf.Verify(paper.Hash, filePath);
+            var fileContents = pdf.Print(filePath, user.Id, paper.EncKey);
+
+            //var cd = new System.Net.Mime.ContentDisposition
+            //{
+            //    FileName = paper.Title + ".pdf",
+
+            //    // always prompt the user for downloading, set to true if you want 
+            //    // the browser to try to show the file inline
+            //    Inline = true
+            //};
+
+            //Response.Headers.Add("Content-Disposition", cd.ToString());
+            //return File(fileContents, "application/pdf");
+
+            if (!verified)
+            {
+                ViewBag.Verified = "False";
+            }
+            return View(new ShowViewModel
+            {
+                Paper = paper,
+                PdfBytes = fileContents
+            });
         }
 
         // GET: Papers/Download/5
         [ActionName("Download")]
         [Authorize(Roles = RoleHelper.IC + "," +
                            RoleHelper.HOD + "," +
-                           RoleHelper.Admin + "," +
-                           RoleHelper.SuperAdmin)]
+                           RoleHelper.Examiner)]
         public IActionResult Download(int id)
         {
             var user = _context.Users.Where(u => u.Id == _userManager.GetUserId(User)).First();
@@ -496,9 +609,7 @@ namespace Portal.Controllers
         [HttpPost, ActionName("Download")]
         //[ValidateAntiForgeryToken]
         [Authorize(Roles = RoleHelper.IC + "," +
-                           RoleHelper.HOD + "," +
-                           RoleHelper.Admin + "," +
-                           RoleHelper.SuperAdmin)]
+                           RoleHelper.HOD)]
         public IActionResult DownloadConfirmed(int id)
         {
             var userId = _userManager.GetUserId(User);
@@ -533,13 +644,46 @@ namespace Portal.Controllers
             return File(fileContents, "application/pdf");
         }
 
+        public IActionResult DownloadPdf(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+            var user = _context.Users.Single(u => u.Id == userId);
+            if (!user.Verified)
+            {
+                return RedirectToAction(nameof(Index), new { Message = ManageMessageId.NotVerfied });
+            }
+
+            Paper paper = _context.Paper.Single(m => m.PaperId == id);
+
+            var filePath = UploadPath + paper.FileName;
+
+            var pdf = new PDF();
+            var fileContents = pdf.Download(filePath, userId, paper.EncKey);
+
+            _context.Update(paper);
+            _context.Update(user);
+
+            _context.SaveChanges();
+
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = paper.Title + ".pdf",
+
+                // always prompt the user for downloading, set to true if you want 
+                // the browser to try to show the file inline
+                Inline = true,
+            };
+
+            Response.Headers.Add("Content-Disposition", cd.ToString());
+            return File(fileContents, "application/pdf");
+        }
+
 
 
         // POST: Papers/Done
         [Authorize(Roles = RoleHelper.IC + "," +
-                           RoleHelper.HOD + "," +
-                           RoleHelper.Admin + "," +
-                           RoleHelper.SuperAdmin)]
+                           RoleHelper.HOD + "," + 
+                           RoleHelper.Examiner)]
         public async Task<IActionResult> Done(int[] selected)
         {
             foreach (var userId in selected)
@@ -552,8 +696,7 @@ namespace Portal.Controllers
         // GET: Papers/Done?id
         [Authorize(Roles = RoleHelper.IC + "," +
                            RoleHelper.HOD + "," +
-                           RoleHelper.Admin + "," +
-                           RoleHelper.SuperAdmin)]
+                           RoleHelper.Examiner)]
         public async Task<IActionResult> JobDone(int id)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -588,8 +731,7 @@ namespace Portal.Controllers
         // GET: Papers/UnDone?id
         [Authorize(Roles = RoleHelper.IC + "," +
                            RoleHelper.HOD + "," +
-                           RoleHelper.Admin + "," +
-                           RoleHelper.SuperAdmin)]
+                           RoleHelper.Examiner)]
         public async Task<IActionResult> JobUnDone(int id)
         {
             var user = await _userManager.GetUserAsync(User);

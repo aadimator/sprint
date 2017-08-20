@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="Introducing Lollipop, a sweet new take on Android.">
+    <meta name="description" content="Sprint - Secure Paper Printing">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
     <title>@ViewData["Title"] - Sprint</title>
     <link rel='shortcut icon' href='~/images/favicon.png' type='image/x-icon' />
@@ -15,8 +15,9 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en" />
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
         <link href="~/css/fontFace.css" rel="stylesheet" /> <!-- As a fallback -->
+        @*<link rel="stylesheet" href="~/css/bootstrap-material-design.css" />*@
         <link rel="stylesheet" href="~/css/material.min.css">
-        <link rel="stylesheet" href="~/css/bootstrap-material-design.css" />
+        <link rel="stylesheet" href="~/css/material.blue.red.min.css" />
         <link rel="stylesheet" href="~/css/ripples.css" />
         <link rel="stylesheet" href="~/css/template.css">
         <link rel="stylesheet" href="~/css/site.css" />
@@ -53,21 +54,13 @@
 <body>
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
 
-        <div class="sprint-header text-primary-color mdl-color--primary mdl-layout__header mdl-layout__header--waterfall">
+        <div class="sprint-header mdl-color-text--primary mdl-color--primary mdl-layout__header mdl-layout__header--waterfall">
             <div class="mdl-layout__header-row">
                 <span class="sprint-title mdl-layout-title">
                     <a asp-controller="Home" asp-action="Index"><img class="sprint-logo-image" src="~/images/logo-white.png"></a>
                 </span>
                 <!-- Add spacer, to align navigation to the right in desktop -->
                 <div class="sprint-header-spacer mdl-layout-spacer"></div>
-                @*<div class="sprint-search-box mdl-textfield mdl-js-textfield mdl-textfield--expandable mdl-textfield--floating-label mdl-textfield--align-right mdl-textfield--full-width">
-                        <label class="mdl-button mdl-js-button mdl-button--icon" for="search-field">
-                            <i class="material-icons">search</i>
-                        </label>
-                        <div class="mdl-textfield__expandable-holder">
-                            <input class="mdl-textfield__input" type="text" id="search-field">
-                        </div>
-                    </div>*@
                 <!-- Navigation -->
                 <div class="sprint-navigation-container">
                     <nav class="sprint-navigation mdl-navigation">
@@ -97,7 +90,7 @@
             <div class="container">
                 @if (ViewData.ContainsKey("StatusMessage") && (string)ViewData["StatusMessage"] != "")
             {
-                    <div class="alert alert-dismissible mdl-color-text--primary-dark" role="alert" style="margin-top:2em;">
+                    <div class="alert alert-dismissible mdl-color--primary-contrast mdl-color-text--primary-dark" role="alert" style="margin-top:2em;">
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         @ViewData["StatusMessage"]
                     </div>
@@ -106,15 +99,12 @@
                 @RenderBody()
 
                 @{
-                    if (User.IsInRole(RoleHelper.Teacher) ||
-                        User.IsInRole(RoleHelper.Admin) ||
-                        User.IsInRole(RoleHelper.SuperAdmin) ||
-                        User.IsInRole(RoleHelper.HOD))
+                    if (User.IsInRole(RoleHelper.Teacher))
                     {
                         <a asp-controller="Papers" asp-action="Create" id="create-fab" class="sprint-fab mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
                             <i class="material-icons">cloud_upload</i>
                         </a>
-                        <div class="mdl-tooltip mdl-tooltip--left" for="create-fab">Upload</div>
+                        <div class="mdl-tooltip mdl-tooltip--left" data-mdl-for="create-fab">Upload</div>
                     }
                 }
 
@@ -148,12 +138,7 @@
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
         <script src="~/js/material.js" asp-append-version="true"></script>
         <script src="~/js/ripples.js" asp-append-version="true"></script>
-        <script src="~/js/mdl.js" asp-append-version="true"></script>
         <script src="~/js/site.js" asp-append-version="true"></script>
-
-        <script>
-            $.material.init();
-        </script>
     </environment>
     <environment names="Staging,Production">
         <script src="https://ajax.AspNetCorecdn.com/ajax/jquery/jquery-2.1.4.min.js"

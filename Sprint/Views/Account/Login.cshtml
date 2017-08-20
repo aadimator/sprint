@@ -10,39 +10,36 @@
 }
 
 
-<h2 class="text-primary-color">@ViewData["Title"]</h2>
+<h2 class="mdl-color-text--primary-contrast">@ViewData["Title"]</h2>
 
 <div class="well col-md-11 col-md-offset-1">
 
     <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" role="form">
-        <h4>Use a local account to log in.</h4>
+        <h4>Use a local account to log in</h4>
         <hr />
         <div asp-validation-summary="All" class="text-danger"></div>
         <div class="row">
             <div class="col-md-6">
-                <div class="form-group label-floating">
-                    <label asp-for="Email" class="control-label"></label>
-                    <input asp-for="Email" class="form-control" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label asp-for="Email" class="mdl-textfield__label"></label>
+                    <input asp-for="Email" class="mdl-textfield__input" />
+                    <span asp-validation-for="Email" class="mdl-textfield__error"></span>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="form-group label-floating">
-                    <label asp-for="Password" class="control-label"></label>
-                    <input asp-for="Password" class="form-control" />
-                    <span asp-validation-for="Password" class="text-danger"></span>
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label asp-for="Password" class="mdl-textfield__label"></label>
+                    <input asp-for="Password" class="mdl-textfield__input" />
+                    <span asp-validation-for="Password" class="mdl-textfield__error"></span>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-md-6">
-                <div class="form-group">
-                    <div class="checkbox">
-                        <label asp-for="RememberMe">
-                            <input asp-for="RememberMe" /> Remember Me
-                        </label>
-                    </div>
-                </div>
+                <label asp-for="RememberMe" class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect">
+                    <input asp-for="RememberMe" class="mdl-checkbox__input">
+                    <span class="mdl-checkbox__label">Remember Me</span>
+                </label>
             </div>
         </div>
         <div class="col-md-6 col-md-offset-2">

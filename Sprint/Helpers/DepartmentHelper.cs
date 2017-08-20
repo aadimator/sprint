@@ -8,22 +8,39 @@ namespace Sprint.Helpers
 {
     public static class DepartmentHelper
     {
+        public const string AgriculturalSciences = "Agriculture Sciences";
+        public const string EnvironmentalSciences = "Environmental Sciences";
+        public const string Forestry = "Forestry & Wildlife Management";
+        public const string Geology = "Geology";
+        public const string IT = "Information Technology";
+        public const string MLT = "Medical Lab Technology";
+        public const string Microbiology = "Microbiology";
+        public const string PublicHealth = "Public Health";
+        public const string Economics = "Economics";
+        public const string Education = "Education";
+        public const string IslamicStudies = "Islamic & Religious Studies";
+        public const string ManagementSciences = "Management Sciences";
+        public const string Psychology = "Psychology";
+        public const string Examination = "Examination";
+        public const string Administration = "Administration";
+
+
         public static readonly string[] Departments = {
-            "Agriculture Sciences",
-            "Environmental Sciences",
-            "Forestry & Wildlife Management",
-            "Geology",
-            "Information Technology",
-            "Medical Lab Technology",
-            "Microbiology",
-            "Public Health",
-            "Economics",
-            "Education",
-            "Islamic & Religious Studies",
-            "Management Sciences",
-            "Psychology", 
-            "Examination",
-            "Administration"
+            AgriculturalSciences,
+            EnvironmentalSciences,
+            Forestry,
+            Geology,
+            IT,
+            MLT,
+            Microbiology,
+            PublicHealth,
+            Economics,
+            Education,
+            IslamicStudies,
+            ManagementSciences,
+            Psychology,
+            Examination,
+            Administration
             };
 
         public static async Task EnsureDepartmentsCreated(ApplicationDbContext context)

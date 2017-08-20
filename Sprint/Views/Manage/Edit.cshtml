@@ -5,30 +5,29 @@
     ViewData["Title"] = "Edit";
 }
 
-<h2 class="text-primary-color">@ViewData["Title"]</h2>
+<h2 class="mdl-color-text--primary-contrast">@ViewData["Title"]</h2>
 
 <form asp-controller="Manage" asp-action="Edit" method="post" class="form-horizontal" role="form">
     <div class="well col-md-offset-1 col-md-10">
         <div class="form-horizontal">
             <h4>Edit</h4>
-            <hr />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="row">
                 <div class="col-md-6">
-                    <div class="form-group label-floating">
-                        <label asp-for="FullName" class="control-label"></label>
-                        <input asp-for="FullName" class="form-control" />
-                        <span asp-validation-for="FullName" class="text-danger"></span>
+                    <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <label asp-for="FullName" class="mdl-textfield__label"></label>
+                        <input asp-for="FullName" class="mdl-textfield__input" />
+                        <span asp-validation-for="FullName" class="mdl-textfield__error"></span>
                     </div>
                 </div>
                 @{
                     if (User.IsInRole(RoleHelper.Teacher))
                     {
                         <div class="col-md-6">
-                            <div id="dept" class="form-group label-floating">
-                                <label asp-for="DepartmentId" class="control-label"></label>
-                                <select asp-for="DepartmentId" asp-items="@ViewBag.Departments" class="form-control"></select>
-                                <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                            <div id="dept" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <label asp-for="DepartmentId" class="mdl-textfield__label"></label>
+                                <select asp-for="DepartmentId" asp-items="@ViewBag.Departments" class="mdl-textfield__input"></select>
+                                <span asp-validation-for="DepartmentId" class="mdl-textfield__error"></span>
                             </div>
                         </div>
                     }

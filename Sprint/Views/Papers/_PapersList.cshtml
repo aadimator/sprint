@@ -1,29 +1,23 @@
 @model IEnumerable<Sprint.Models.Paper>
 @using Sprint.Helpers
-<table class="table">
+
+<table style="width:100%" class="mdl-data-table mdl-js-data-table mdl-shadow--2dp @(ViewBag.Checks == "true" ? "mdl-data-table--selectable" : "")">
     <thead>
         <tr>
-            @* If User is Printer, show the checklist for Job Completion *@
-            @if (User.IsInRole(RoleHelper.IC) && ViewBag.Checks == "true")
-            {
-                <th>
-                    @Html.Raw("Done")
-                </th>
-            }
-            <th>
-                @Html.DisplayNameFor(model => model.Approved)
+            <th class="mdl-data-table__cell--non-numeric">
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th class="mdl-data-table__cell--non-numeric">
+                @Html.DisplayNameFor(model => model.Uploader.Department.Name)
+            </th>
+            <th class="mdl-data-table__cell--non-numeric">
+                Uploader
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Copies)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Uploader.FullName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Uploader.Department.Name)
+            <th class="mdl-data-table__cell--non-numeric">
+                @Html.DisplayNameFor(model => model.Approved)
             </th>
             <th></th>
         </tr>
@@ -32,109 +26,130 @@
         @foreach (var item in Model)
             {
             <tr>
-                @* If User is Printer, show the checklist for Job Completion *@
-                @if (User.IsInRole(RoleHelper.IC) && ViewBag.Checks == "true")
-                {
-                    <td>
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" name="selected" value="@item.PaperId" />
-                            </label>
-                        </div>
-                    </td>
-                }
-                @* Downloaded Column *@
-                <td style="vertical-align:middle;">
+
+                <td class="mdl-data-table__cell--non-numeric" style="vertical-align:middle;">
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td class="mdl-data-table__cell--non-numeric" style="vertical-align:middle;">
+                    @Html.DisplayFor(modelItem => item.Uploader.Department.Name)
+                </td>
+                <td class="mdl-data-table__cell--non-numeric" style="vertical-align:middle;">
+                    @Html.DisplayFor(modelItem => item.Uploader.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Copies)
+                </td>
+
+                <td class="mdl-data-table__cell--non-numeric" style="vertical-align:middle;">
                     @if (item.Approved)
                     {
-                        @Html.Raw("&#10004;")
+                        <i class="material-icons mdl-button--primary">check_circle</i>
                     }
                     else
                     {
                         if (User.IsInRole(RoleHelper.HOD) ||
-                    User.IsInRole(RoleHelper.Admin) ||
-                    User.IsInRole(RoleHelper.SuperAdmin))
+                            User.IsInRole(RoleHelper.Admin) ||
+                            User.IsInRole(RoleHelper.SuperAdmin))
                         {
                             <div class="btn-group-xs">
-                                <a asp-action="Approve" asp-route-id="@item.PaperId" class="btn btn-info">Approve</a>
+                                <a asp-action="Approve" asp-route-id="@item.PaperId" class="mdl-button mdl-button--primary">Approve</a>
                             </div>
                         }
                         else
                         {
-                            @Html.Raw("&#10008;")
-
+                            <i class="material-icons mdl-button--accent">cancel</i>
                         }
-
                     }
                 </td>
-                <td style="vertical-align:middle;">
-                    @Html.DisplayFor(modelItem => item.Copies)
-                </td>
-                <td style="vertical-align:middle;">
-                    @Html.DisplayFor(modelItem => item.Title)
-                </td>
-                <td style="vertical-align:middle;">
-                    @Html.DisplayFor(modelItem => item.Uploader.FullName)
-                </td>
-                <td style="vertical-align:middle;">
-                    @Html.DisplayFor(modelItem => item.Uploader.Department.Name)
-                </td>
-                <td>
+                <td class="mdl-data-table__cell--non-numeric">
 
                     <div class="btn-group-xs">
-                        <a asp-action="Details" asp-route-id="@item.PaperId" class="btn btn-info">Details</a>
+                        <a asp-action="Details" asp-route-id="@item.PaperId" class="mdl-button mdl-button--primary">Details</a>
 
-                        @if (User.IsInRole(RoleHelper.IC))
+
+                        @if (ViewBag.Options == "true")
                         {
-                            if (item.Done == true)
+                            // Comment Model Box
+                            @if (item.Comment != null)
                             {
-                                <a asp-action="JobUnDone" asp-route-id="@item.PaperId" class="btn btn-danger">Undo Done</a>
-                            }
-                            if (ViewBag.Options == "true")
-                            {
-                                <a asp-action="Download" asp-route-id="@item.PaperId" class="btn btn-primary">Download</a>
-                                <a asp-action="JobDone" asp-route-id="@item.PaperId" class="btn btn-success">Done</a>
+                                var id = "comments" + item.PaperId;
+                                var btnId = "#" + id;
+                                <button type="button" class="mdl-button mdl-button--primary" data-toggle="modal" data-target=@btnId>
+                                    Comment
+                                </button>
 
-                                // Comment Model Box
-                                @if (item.Comment != null)
-                                {
-                                    var id = "comments" + item.PaperId;
-                                    var btnId = "#" + id;
-                                    <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target=@btnId>
-                                        Comment
-                                    </button>
-
-                                    <div class="modal fade" id=@id tabindex="-1" role="dialog">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                                    <h4 class="modal-title">Comment</h4>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <p>@item.Comment</p>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                </div>
+                                <div class="modal fade" id=@id tabindex="-1" role="dialog">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                <h4 class="modal-title">Comment</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>@item.Comment</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="mdl-button mdl-button--primary" data-dismiss="modal">Close</button>
                                             </div>
                                         </div>
                                     </div>
-                                }
+                                </div>
                             }
-
-
-                        }
-                        @if (User.IsInRole(RoleHelper.Teacher) && ViewBag.Options == "true")
-                        {
-                            <a asp-action="Edit" asp-route-id="@item.PaperId" class="btn btn-primary">Edit</a>
-                            <a asp-action="Delete" asp-route-id="@item.PaperId" class="btn btn-danger">Delete</a>
                         }
                         @if (User.IsInRole(RoleHelper.Examiner))
                         {
-                            <a asp-action="Unlock" asp-route-id="@item.PaperId" class="btn btn-primary">Unlock</a>
+                            if (ViewData["Locked"] == "false")
+                            {
+                                @*<a asp-action="Download" asp-route-id="@item.PaperId" class="mdl-button mdl-button--accent">Download</a>*@
+                                @*<a asp-action="Print" asp-route-id="@item.PaperId" class="mdl-button mdl-button--accent">Print</a>*@
+
+                        if (item.Done == true)
+                        {
+                            <a asp-action="JobUnDone" asp-route-id="@item.PaperId" class="mdl-button mdl-button--primary">Undo Done</a>
+                        }
+                        else
+                        {
+                            var id = "print" + item.PaperId;
+                            var btnId = "#" + id;
+
+                            <button type="button" class="mdl-button mdl-button--accent"
+                                    data-toggle="modal" data-target=@btnId
+                                    onclick="loadPDF()">
+                                Print
+                            </button>
+                                <script>
+                            function loadPDF() {
+                                document.getElementById("iframePDF").src = "@Url.Action("DownloadPdf", "Papers", new { id = item.PaperId })"
+                            }
+                                </script>
+                                <div class="modal fade" id=@id tabindex="-1" role="dialog">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                                <h4 class="modal-title">Copies : @item.Copies</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <h3 class="mdl-typography--text-center">Printing</h3>
+                                                <div class="mdl-progress mdl-js-progress mdl-progress__indeterminate"></div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <a asp-action="JobDone" asp-route-id="@item.PaperId" class="mdl-button mdl-button--primary">Done</a>
+                                                <button type="button" class="mdl-button" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                }
+
+                            }
 
                         }
+                        @*@if (User.IsInRole(RoleHelper.Teacher) && ViewBag.Options == "true")
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.PaperId" class="btn btn-primary">Edit</a>
+                                <a asp-action="Delete" asp-route-id="@item.PaperId" class="btn btn-danger">Delete</a>
+                            }*@
                     </div>
                 </td>
 
@@ -142,3 +157,5 @@
         }
     </tbody>
 </table>
+
+<iframe id="iframePDF" name="iframePDF" type="application/pdf" style="display:none;"></iframe>

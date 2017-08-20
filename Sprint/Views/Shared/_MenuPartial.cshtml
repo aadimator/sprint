@@ -3,21 +3,23 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    <a class="mdl-navigation__link text-primary-color" asp-controller="Papers" asp-action="Index">Papers</a>
-    <a class="mdl-navigation__link text-primary-color" asp-controller="Papers" asp-action="Status">Status</a>
-    @if (User.IsInRole(RoleHelper.Teacher))
-    {
-        <a class="mdl-navigation__link text-primary-color" asp-controller="Papers" asp-action="Create">Upload</a>
-    }
-    else if (User.IsInRole(RoleHelper.IC))
-    {
 
-    }
+    
     if (User.IsInRole(RoleHelper.Admin) || User.IsInRole(RoleHelper.SuperAdmin))
     {
         <a class="mdl-navigation__link text-primary-color" asp-controller="Manage" asp-action="VerifyUsers">Verify</a>
+        <a class="mdl-navigation__link text-primary-color" asp-controller="Manage" asp-action="Users"><span>Manage&nbsp;Users</span></a>
     }
-}
+    else
+    {
+        <a class="mdl-navigation__link text-primary-color" asp-controller="Papers" asp-action="Index" asp-route-id="">Papers</a>
+        <a class="mdl-navigation__link text-primary-color" asp-controller="Papers" asp-action="Status">Status</a>
+        if (User.IsInRole(RoleHelper.Teacher))
+        {
+            <a class="mdl-navigation__link text-primary-color" asp-controller="Papers" asp-action="Create">Upload</a>
+        }
+    }
 
+}
 
 

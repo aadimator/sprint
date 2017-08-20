@@ -154,9 +154,11 @@ D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\System.Xml.ReaderWriter.dll
 D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\System.Xml.XmlDocument.dll
 D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\System.Xml.XPath.dll
 D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\System.Xml.XPath.XDocument.dll
-D:\workspace\Sprint\Sprint\obj\Debug\net461\win7-x86\Sprint.csprojResolveAssemblyReference.cache
 D:\workspace\Sprint\Sprint\obj\Debug\net461\win7-x86\Sprint.csproj.Sprint.exe.config
-D:\workspace\Sprint\Sprint\obj\Debug\net461\win7-x86\UserSecretsAssemblyInfo.cs
 D:\workspace\Sprint\Sprint\obj\Debug\net461\win7-x86\Sprint.AssemblyInfo.cs
 D:\workspace\Sprint\Sprint\obj\Debug\net461\win7-x86\Sprint.exe
 D:\workspace\Sprint\Sprint\obj\Debug\net461\win7-x86\Sprint.pdb
+D:\workspace\Sprint\Sprint\bin\Debug\net461\win7-x86\Microsoft.AspNetCore.Session.dll
+D:\workspace\Sprint\Sprint\obj\Debug\net461\win7-x86\UserSecretsAssemblyInfo.cs
+D:\workspace\Sprint\Sprint\obj\Debug\net461\win7-x86\Sprint.csprojResolveAssemblyReference.cache
+D:\workspace\Sprint\Sprint\obj\Debug\net461\win7-x86\Sprint.csproj.CoreCompileInputs.cache

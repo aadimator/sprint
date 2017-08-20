@@ -6,29 +6,38 @@
     String base64EncodedPdf = System.Convert.ToBase64String(Model.PdfBytes);
 }
 
-<h2 class="text-primary-color">@ViewData["Title"]</h2>
+<h2 class="mdl-color-text--primary-contrast">@ViewData["Title"]</h2>
 <div class="well col-lg-10 col-lg-offset-1">
-    <form asp-action="Details" class="form-horizontal">
-        <h4 class="col-md-6">
-            Paper Title : <span class="mdl-color-text--blue-grey">@Model.Paper.Title</span>
-            
-        </h4>
-        <h4 class="col-md-6">
-            Author : <span class="mdl-color-text--blue-grey">@Model.Paper.Uploader.FullName</span>
-        </h4>
+    <form asp-action="Details">
+        <div class="row">
+            <h4 class="col-md-6">
+                Paper Title : <span class="mdl-color-text--blue-grey">@Model.Paper.Title</span>
+            </h4>
+            <h4 class="col-md-6">
+                Author : <span class="mdl-color-text--blue-grey">@Model.Paper.Uploader.FullName</span>
+            </h4>
+        </div>
         <hr />
-        <div asp-validation-summary="ModelOnly" class="text-danger">
+        <div class="row">
+            <div class="mdl-typography--text-center">
+                <div class="form-group">
+                    <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary" asp-action="Approved" asp-route-id="@Model.Paper.PaperId">Approve</a>
+                    <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--accent" asp-action="Rejected" asp-route-id="@Model.Paper.PaperId">Reject</a>
+                </div>
+            </div>
         </div>
-        <div class="col-md-12 col-md-offset-0">
-            <object data="data:application/pdf;base64,@base64EncodedPdf"
-                    width="100%" height="600" type="application/pdf">
-            </object>
+        <hr />
+        <div class="row">
+            <div asp-validation-summary="ModelOnly" class="text-danger">
+            </div>
+            <div class="col-md-12 col-md-offset-0">
+                <object data="data:application/pdf;base64,@base64EncodedPdf"
+                        width="100%" height="600" type="application/pdf"></object>
+            </div>
         </div>
-        <div class="col-md-6 col-md-offset-3">
-            <div class="form-group">
-                <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised" asp-action="Index">Back to List</a>
-                <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--primary mdl-button--raised" asp-action="Approved" asp-route-id="@Model.Paper.PaperId">Approve</a>
-                <a class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--accent mdl-button--raised" asp-action="Rejected" asp-route-id="@Model.Paper.PaperId">Reject</a>
+        <div class="row">
+            <div class="mdl-typography--text-center">
+                <a class="mdl-button mdl-js-button mdl-js-ripple-effect" href="javascript:history.back()">Back to List</a>
             </div>
         </div>
     </form>

@@ -25,7 +25,7 @@ namespace Sprint.Models
         [Required]
         public string FileName { get; set; }
 
-        [Display(Name = "No. of Copies")]
+        [Display(Name = "Copies")]
         [Range(0, 500)]
         [Required]
         public int Copies { get; set; }

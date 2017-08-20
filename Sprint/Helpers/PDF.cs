@@ -31,13 +31,18 @@ namespace Sprint.Helpers
             return true; // everything went great
         }
 
-        public byte[] Download(string filePath, string DownloaderID, string encKey = "")
+        public byte[] Print (string filePath, string DownloaderID, string encKey = "")
+        {
+            return Download(filePath, DownloaderID, encKey, true);
+        }
+
+        public byte[] Download(string filePath, string DownloaderID, string encKey = "", bool print = false)
         {
             EncKey = (encKey != "") ? encKey : null;
             var decryptedStream = Decrypt(filePath, EncKey);
 
             // Add QrCode and TimeStamp
-            var fileContents = AddInfo(DownloaderID, decryptedStream);
+            var fileContents = AddInfo(DownloaderID, decryptedStream, print);
             return fileContents;
         }
 
@@ -76,7 +81,7 @@ namespace Sprint.Helpers
             return encrypt.DecryptFile(input);
         }
 
-        private byte[] AddInfo(string msg, Stream input)
+        private byte[] AddInfo(string msg, Stream input, bool print = false)
         {
             using (MemoryStream ms = new MemoryStream())
             {
@@ -97,6 +102,15 @@ namespace Sprint.Helpers
                         float Lefty = 0;
 
                         PdfContentByte ContentByte = stamper.GetOverContent(i);
+
+                        if (print)
+                        {
+                            // Insert JavaScript to print the document after a fraction of a second (allow time to become visible).
+                            string jsText = "var res = app.setTimeOut('var pp = this.getPrintParams();pp.interactive = pp.constants.interactionLevel.full;this.print(pp);', 200);";
+                            //string jsTextNoWait = "var pp = this.getPrintParams();pp.interactive = pp.constants.interactionLevel.full;this.print(pp);";
+                            PdfAction js = PdfAction.JavaScript(jsText, stamper.Writer);
+                            stamper.Writer.AddJavaScript(js);
+                        }
 
                         //var downloads = "# " + downloads.ToString();
                         AddQRCode(ContentByte, msg, Rightx, Righty, 3);

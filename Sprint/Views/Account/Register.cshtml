@@ -4,7 +4,7 @@
     ViewData["Title"] = "Register";
 }
 
-<h2 class="text-primary-color">@ViewData["Title"]</h2>
+<h2 class="mdl-color-text--primary-contrast">@ViewData["Title"]</h2>
 <div class="well col-md-11 col-md-offset-1">
     <form asp-controller="Account" asp-action="Register" method="post" class="form-horizontal" role="form">
         <h4 class="mdl-color-text--primary">Create a new account</h4>
@@ -12,49 +12,47 @@
         <div asp-validation-summary="All" class="text-danger"></div>
         <div class="row">
             <div class="col-md-6">
-                <div class="form-group label-floating">
-                    <label asp-for="Name" class="control-label"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label asp-for="Name" class="mdl-textfield__label"></label>
+                    <input asp-for="Name" class="mdl-textfield__input" />
+                    <span asp-validation-for="Name" class="mdl-textfield__error"></span>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="form-group label-floating">
-                    <label asp-for="Email" class="control-label"></label>
-                    <input asp-for="Email" class="form-control" />
-                    <span asp-validation-for="Email" class="text-danger"></span>
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label asp-for="Email" class="mdl-textfield__label"></label>
+                    <input asp-for="Email" class="mdl-textfield__input" />
+                    <span asp-validation-for="Email" class="mdl-textfield__error"></span>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-md-6">
-                <div class="form-group label-floating">
-                    <label asp-for="Password" class="control-label"></label>
-                    <input asp-for="Password" class="form-control" />
-                    <span asp-validation-for="Password" class="text-danger"></span>
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label asp-for="Password" class="mdl-textfield__label"></label>
+                    <input asp-for="Password" class="mdl-textfield__input" />
+                    <span asp-validation-for="Password" class="mdl-textfield__error"></span>
                 </div>
             </div>
             <div class="col-md-6">
-                <div class="form-group label-floating">
-                    <label asp-for="ConfirmPassword" class="control-label"></label>
-                    <input asp-for="ConfirmPassword" class="form-control" />
-                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label asp-for="ConfirmPassword" class="mdl-textfield__label"></label>
+                    <input asp-for="ConfirmPassword" class="mdl-textfield__input" />
+                    <span asp-validation-for="ConfirmPassword" class="mdl-textfield__error"></span>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-md-6">
-                <div id="dept" class="form-group label-floating">
-                    <label asp-for="DepartmentId" class="control-label"></label>
-                    <select asp-for="DepartmentId" asp-items="@ViewBag.Departments" class="form-control"></select>
-                    <span asp-validation-for="DepartmentId" class="text-danger"></span>
+                <div id="dept" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <label asp-for="DepartmentId" class="mdl-textfield__label"></label>
+                    <select asp-for="DepartmentId" asp-items="@ViewBag.Departments" class="mdl-textfield__input"></select>
+                    @*<span asp-validation-for="DepartmentId" class="text-danger"></span>*@
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <button type="submit" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--accent mdl-button--raised">Register</button>
-            </div>
+        <div class="mdl-typography--text-center">
+            <button type="submit" class="mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--accent mdl-button--raised">Register</button>
         </div>
     </form>
 </div>

@@ -4,33 +4,23 @@
     ViewData["Title"] = "Verify Users";
 }
 
-<h2 class="text-primary-color">@ViewData["Title"]</h2>
+<h2 class="mdl-color-text--primary-contrast">@ViewData["Title"]</h2>
 
     <div class="well col-md-10 col-md-offset-1">
         <form asp-controller="Manage" asp-action="Verify" method="post" class="form-horizontal" role="form">
-            <div class="form-group">
-                <div class="checkbox checkbox-inline">
-                    <label>
-                        <input type="checkbox" class="checkbox-inline" id="toggleAll" /> Check All
-                    </label>
-                </div>
-                <button class="btn btn-primary btn-raised pull-right" type="submit">Verify</button>
-            </div>
-            <table class="table">
+            
+            <table style="width:100%" class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
                 <tr>
-                    <th>
-                        @Html.Raw("Verify")
-                    </th>
-                    <th>
-                        @Html.DisplayNameFor(model => model.Email)
-                    </th>
-                    <th>
+                    <th class="mdl-data-table__cell--non-numeric  mdl-data-table__header--sorted-ascending">
                         @Html.DisplayNameFor(model => model.FullName)
                     </th>
-                    <th>
+                    <th class="mdl-data-table__cell--non-numeric">
+                        @Html.DisplayNameFor(model => model.Email)
+                    </th>
+                    <th class="mdl-data-table__cell--non-numeric">
                         @Html.DisplayNameFor(model => model.Department)
                     </th>
-                    <th>
+                    <th class="mdl-data-table__cell--non-numeric">
                         @Html.DisplayNameFor(model => model.EmailConfirmed)
                     </th>
                     <th></th>
@@ -39,31 +29,27 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td style="vertical-align:middle;">
-                            <div class="checkbox checkbox-inline">
-                                <label>
-                                    <input type="checkbox" name="selected" value="@item.Id" />
-                                </label>
-                            </div>
-                        </td>
-                        <td style="vertical-align:middle;">
-                            @Html.DisplayFor(modelItem => item.Email)
-                        </td>
-                        <td style="vertical-align:middle;">
+                        <td class="mdl-data-table__cell--non-numeric">
                             @Html.DisplayFor(modelItem => item.FullName)
                         </td>
-                        <td style="vertical-align:middle;">
+                        <td class="mdl-data-table__cell--non-numeric">
+                            @Html.DisplayFor(modelItem => item.Email)
+                        </td>
+                        <td class="mdl-data-table__cell--non-numeric">
                             @Html.DisplayFor(modelItem => item.Department)
                         </td>
-                        <td style="vertical-align:middle;">
-                            <div class="checkbox checkbox-inline">
-                                <label>
-                                    <input asp-for="@item.EmailConfirmed" class="checkbox checkbox-inline" disabled />
-                                </label>
-                            </div>
+                        <td class="mdl-data-table__cell--non-numeric">
+                            @if (@item.EmailConfirmed)
+                            {
+                                <i class="material-icons mdl-button--primary">check_circle</i>
+                            }
+                            else
+                            {
+                                <i class="material-icons mdl-button--accent">cancel</i>
+                            }
                         </td>
-                        <td style="vertical-align:middle;">
-                            <a asp-action="VerifyUser" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Verify</a>
+                        <td class="mdl-data-table__cell--non-numeric">
+                            <a asp-action="VerifyUser" asp-route-id="@item.Id" asp-route-returnUrl="Users" class="btn btn-sm mdl-color-text--primary">Verify</a>
                         </td>
                     </tr>
                 }

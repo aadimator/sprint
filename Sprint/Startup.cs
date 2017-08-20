@@ -49,6 +49,14 @@ namespace Sprint
 
             services.AddMvc();
 
+            // Adds a default in-memory implementation of IDistributedCache.
+            services.AddDistributedMemoryCache();
+            services.AddSession(options =>
+            {
+                options.CookieName = ".Sprint.Session";
+                //options.IdleTimeout = System.TimeSpan.FromSeconds(10);
+            });
+
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
             services.AddTransient<ISmsSender, AuthMessageSender>();
@@ -98,18 +106,15 @@ namespace Sprint
             }
 
             app.UseStaticFiles();
-
             app.UseIdentity();
-
-            // To configure external authentication please see http://go.microsoft.com/fwlink/?LinkID=532715
-
+            app.UseSession();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-
+            
             await RoleHelper.EnsureRolesCreated(roleManager);
             await DepartmentHelper.EnsureDepartmentsCreated(app.ApplicationServices.GetService<ApplicationDbContext>());
         }

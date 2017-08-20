@@ -9,8 +9,6 @@ namespace Sprint.Models.ManageViewModels
 {
     public class IndexViewModel
     {
-        [Display(Name =("User Name"))]
-        public string UserName { get; set; }
         [Display(Name =("Full Name"))]
         public string FullName { get; set; }
 

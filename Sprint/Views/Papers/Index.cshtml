@@ -4,7 +4,7 @@
     ViewData["Title"] = "Papers";
 }
 
-<h2 class="text-primary-color">@ViewData["Title"]</h2>
+<h2 class="mdl-color-text--primary-contrast">@ViewData["Title"]</h2>
 
 <div class="well">
     @*<div class="panel-heading mdl-color--primary-dark">
@@ -12,9 +12,25 @@
         </div>
         <div class="panel-body">*@
     <form asp-controller="Papers" asp-action="Done" method="post" class="form-horizontal" role="form">
-        @Html.Partial("_CheckAllPartial")
+        @if (User.IsInRole(RoleHelper.Examiner))
+        {
+            if (ViewData["Locked"] == "false")
+            {
+                <h4 class="mdl-typography--text-center mdl-color-text--primary">
+                    <i class="material-icons mdl-button--primary">check_circle</i>
+                    Unlocked
+                </h4>
+            }
+            else
+            {
+                <a asp-action="Unlock" asp-route-id="@ViewContext.RouteData.Values["id"]"
+                   class="mdl-button mdl-button--accent mdl-button--raised">
+                    Unlock
+                </a>
+            }
+            <hr />
+        }
         @{
-            ViewData["Checks"] = "true";
             ViewData["Options"] = "true";
         }
         @Html.Partial("_PapersList", Model)
@@ -25,6 +41,20 @@
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ModalScriptPartial");
-        await Html.RenderPartialAsync("_CheckAllScriptPartial");
     }
+
+    <script>
+
+        function printPDF() {
+            if ($("#iframePDF").contents().get(0).URL != "about:blank") {
+                var pdfFrame = document.getElementById("iframePDF").contentWindow;
+                pdfFrame.focus();
+                pdfFrame.print();
+            }
+        }
+
+        $("#iframePDF").load(function () {
+            setTimeout(printPDF, 500);
+        })
+    </script>
 }

@@ -64,8 +64,7 @@ namespace Sprint.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+                
                 // Require the user to have a confirmed email before they can log on.
                 var user = await _userManager.FindByEmailAsync(model.Email);
                 if (user != null)
@@ -82,6 +81,9 @@ namespace Sprint.Controllers
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                     return View(model);
                 }
+
+                // This doesn't count login failures towards account lockout
+                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
@@ -203,6 +205,7 @@ namespace Sprint.Controllers
         // GET: /Account/LogOff
         public async Task<IActionResult> LogOff()
         {
+            HttpContext.Session.Clear();
             await _signInManager.SignOutAsync();
             _logger.LogInformation(4, "User logged out.");
             return RedirectToAction(nameof(HomeController.Index), "Home");
