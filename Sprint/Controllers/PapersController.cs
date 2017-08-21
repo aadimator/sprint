@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Sprint.Models.AccountViewModels;
 using iTextSharp.text.pdf;
+using Sprint.Data;
 
 namespace Portal.Controllers
 {

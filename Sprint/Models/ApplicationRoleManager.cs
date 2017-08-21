@@ -18,7 +18,7 @@ namespace Sprint.Models
             IdentityErrorDescriber errors,
             ILogger<RoleManager<IdentityRole>> logger,
             IHttpContextAccessor contextAccessor)
-            : base(store, roleValidators, keyNormalizer, errors, logger, contextAccessor)
+            : base(store, roleValidators, keyNormalizer, errors, logger)
         {
         }
     }

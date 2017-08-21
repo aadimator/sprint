@@ -13,6 +13,7 @@ using Sprint.Services;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Sprint.Models.AccountViewModels;
 using Sprint.Models.EmailViewModels;
+using Sprint.Data;
 
 namespace Sprint.Controllers
 {

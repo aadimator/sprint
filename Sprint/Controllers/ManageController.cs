@@ -12,6 +12,7 @@ using Sprint.Models.ManageViewModels;
 using Sprint.Models;
 using Sprint.Services;
 using Sprint.Helpers;
+using Sprint.Data;
 
 namespace Sprint.Controllers
 {

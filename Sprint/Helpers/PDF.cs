@@ -96,7 +96,7 @@ namespace Sprint.Helpers
                         float Righty = 0;
 
                         float Centerx = pageSize.Width / 2;
-                        float Centery = 0;
+                        //float Centery = 0;
 
                         float Leftx = 0;
                         float Lefty = 0;

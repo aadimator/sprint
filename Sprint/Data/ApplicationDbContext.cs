@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore;
+using Sprint.Models;
 
-namespace Sprint.Models
+namespace Sprint.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
