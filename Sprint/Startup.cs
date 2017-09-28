@@ -59,7 +59,7 @@ namespace Sprint
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public async void Configure(IApplicationBuilder app, IHostingEnvironment env, RoleManager<IdentityRole> roleManager)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, RoleManager<IdentityRole> roleManager)
         {
 
             if (env.IsDevelopment())
@@ -86,10 +86,13 @@ namespace Sprint
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            //await RoleHelper.EnsureRolesCreated(roleManager);
-            //await DepartmentHelper.EnsureDepartmentsCreated(
-            //    app.ApplicationServices.GetService<ApplicationDbContext>()
-            //    );
+            var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+            using (var scope = scopeFactory.CreateScope())
+            {
+                RoleHelper.EnsureRolesCreated(roleManager).Wait();
+                DepartmentHelper.EnsureDepartmentsCreated(scope.ServiceProvider.GetService<ApplicationDbContext>()).Wait();
+            }
+            
         }
     }
 }
